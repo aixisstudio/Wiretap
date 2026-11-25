@@ -356,6 +356,14 @@ jobs:
         with:
           path: artifacts
           pattern: wiretap-*
+      # EN: wiretap-unsigned-exe is the SignPath *input* — an unsigned copy
+      #     of the same installer. Publishing it alongside wiretap-app-*
+      #     collides on identical asset names (HTTP 422 name already
+      #     exists). / FR: wiretap-unsigned-exe est l'ENTRÉE SignPath — le
+      #     même installeur non signé. Le publier en plus de
+      #     wiretap-app-* crée des doublons de nom (HTTP 422).
+      - name: Drop intermediate unsigned artifact
+        run: rm -rf artifacts/wiretap-unsigned-exe
       # EN: Rename installer assets to versionless names before upload so
       #     links like releases/latest/download/Wiretap-Setup-windows.exe
       #     stay valid forever — the website's download button depends on it.
