@@ -47,10 +47,14 @@ def open_files_for_pid(pid: int) -> dict:
     if pid <= 0:
         return {"files": [], "source": "none", "confidence": "none"}
     if platform.system() == "Linux":
-        fd_dir = Path(f"/proc/{pid}/fd")
+        fd_dir = Path(f"/proc/{int(pid)}/fd")
         try:
+            # EN: fd names in /proc/pid/fd are always numeric — enforce it so no
+            #     crafted entry can turn the readlink into a path traversal.
+            # FR: les noms de fd sont toujours numeriques — on l'impose.
             files = sorted({os.readlink(fd_dir / fd) for fd in os.listdir(fd_dir)
-                            if not os.readlink(fd_dir / fd).startswith(("socket", "pipe", "anon"))})
+                            if fd.isdigit()
+                            and not os.readlink(fd_dir / fd).startswith(("socket", "pipe", "anon"))})
             return {"files": files[:100], "source": "procfs", "confidence": "high"}
         except (OSError, FileNotFoundError):
             return {"files": [], "source": "procfs", "confidence": "process-gone-or-denied"}

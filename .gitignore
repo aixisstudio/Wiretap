@@ -35,3 +35,4 @@ logs/
 .env
 staging/
 .playwright-mcp/
+site/
