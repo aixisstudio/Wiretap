@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Бесплатная open-source альтернатива Little Snitch для Windows (да, она есть) - Wiretap</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0411\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u0430\u044f open-source \u0430\u043b\u044c\u0442\u0435\u0440\u043d\u0430\u0442\u0438\u0432\u0430 Little Snitch \u0434\u043b\u044f Windows (\u0434\u0430, \u043e\u043d\u0430 \u0435\u0441\u0442\u044c)";
+        var mkdocs_page_input_path = "articles/little-snitch-alternative-windows.ru.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Бесплатная open-source альтернатива Little Snitch для Windows (да, она есть)</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/articles/little-snitch-alternative-windows.ru.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Твой компьютер общается с сотнями серверов каждый день. Большая часть — нормально: обновления, синхронизация, телеметрия, на которую ты подписался. Часть — нет. Вопрос «с кем на самом деле говорит моя машина?» — причина, по которой Little Snitch 15 лет — базовая программа на macOS.</p>
+<p>Проблема: <strong>Little Snitch не существует на Windows и Linux.</strong> А большинство «альтернатив» на Windows либо платные, либо требуют аккаунт, либо firewall-first — когда нужна была только видимость.</p>
+<p>Я автор <a href="https://github.com/aixisstudio/Wiretap">Wiretap</a> — open-source визуализатора сети реального времени (AGPL) с Windows-портом — так что сразу честно. Вот реальное состояние опций.</p>
+<h2 id="_1">Сначала: визуализатор или блокировщик<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Стоит уточнить, потому что их путают:</p>
+<ul>
+<li><strong>Видимость</strong> = «покажи, с кем говорит машина» (карта, привязка к приложениям, история)</li>
+<li><strong>Блокировка</strong> = «дай мне решать, что разрешено» (правила фаервола, промпты)</li>
+</ul>
+<p>Little Snitch делает и то и другое. Некоторые альтернативы — одно из двух. Wiretap теперь тоже делает оба — видимость его сильная сторона, а блокировка оркестрирует фаервол ОС.</p>
+<h2 id="_2">Честное сравнение<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Инструмент</th>
+<th>ОС</th>
+<th>Блокирует?</th>
+<th>Бесплатно?</th>
+<th>Аккаунт?</th>
+<th>Заметки</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Little Snitch</strong></td>
+<td>macOS</td>
+<td>✅</td>
+<td>платно (~$59)</td>
+<td>нет</td>
+<td>Эталон. Ничего подобного вне macOS.</td>
+</tr>
+<tr>
+<td><strong>Wiretap</strong></td>
+<td>macOS, Windows, Linux</td>
+<td>✅ правила OS-фаервола + lockdown (best-effort)</td>
+<td>✅ AGPL</td>
+<td>нет</td>
+<td>Живая карта мира, детект аномалий, privacy score, opt-in threat intel, форензик-экспорт. 100% локально.</td>
+</tr>
+<tr>
+<td><strong>Portmaster</strong></td>
+<td>Win, Linux, macOS</td>
+<td>✅</td>
+<td>✅ ядро бесплатно</td>
+<td>нет</td>
+<td>Блокировка на уровне DNS + правила приложений. Тяжелее — работает системным сервисом.</td>
+</tr>
+<tr>
+<td><strong>OpenSnitch</strong></td>
+<td>Linux</td>
+<td>✅</td>
+<td>✅ GPL</td>
+<td>нет</td>
+<td>Ближайший Linux-эквивалент — фаервол приложений с промптами.</td>
+</tr>
+<tr>
+<td><strong>GlassWire</strong></td>
+<td>Windows, Android</td>
+<td>✅</td>
+<td>freemium</td>
+<td>навязывает аккаунт/cloud</td>
+<td>Отполированный UI, но ключевые фичи и история за пейволом, и он выпрашивает облачный тариф.</td>
+</tr>
+<tr>
+<td><strong>Wireshark</strong></td>
+<td>все</td>
+<td>❌</td>
+<td>✅</td>
+<td>нет</td>
+<td>Золотой стандарт <em>глубокого</em> анализа — но для диссекции пакетов, а не «кто стучит домой прямо сейчас».</td>
+</tr>
+<tr>
+<td><strong>LuLu</strong></td>
+<td>macOS</td>
+<td>✅</td>
+<td>✅</td>
+<td>нет</td>
+<td>Отличный бесплатный фаервол macOS — но только macOS, block-first с минимальной визуализацией.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="wiretap">Что Wiretap реально делает<a class="headerlink" href="#wiretap" title="Permanent link">&para;</a></h2>
+<p>Одним предложением: <strong>живая карта каждого соединения твоего компьютера — какое приложение, какой сервер, какая страна.</strong></p>
+<ul>
+<li>Force-граф + карта мира в реальном времени, офлайн-геолокация (MaxMind/DB-IP — IP не покидают машину)</li>
+<li>Атрибуция процессов: какое <em>приложение</em> открыло соединение, а не просто IP</li>
+<li>Детект аномалий: port-сканы, паттерны beaconing, объёмы эксфильтрации, DNS-туннелирование</li>
+<li>Privacy score + детект трекеров по редактируемым спискам</li>
+<li>Трафик по приложениям, таймлайн (15/30/60 мин), история SQLite 24 ч</li>
+<li>Пассивный LAN-сканер (читает ARP-таблицу — показывает все устройства сети)</li>
+<li><strong>Исходящие правила + lockdown</strong>: блок IP/CIDR/домена/процесса/порта в фаерволе ОС (<code>netsh advfirewall</code> на Windows), kill/suspend процессов, форензик-экспорт JSON/CSV/STIX</li>
+<li><strong>Opt-in threat intel</strong>: AbuseIPDB / OTX / VirusTotal с твоим ключом API</li>
+</ul>
+<p>То, что важно любителям приватности: <strong>всё локально.</strong> Без аккаунта, без телеметрии, и каждый исходящий вызов — GeoIP, обновления, threat intel, вебхуки — opt-in. API аутентифицирован токеном и по умолчанию привязан к loopback.</p>
+<h2 id="wiretap_1">Чего Wiretap НЕ делает<a class="headerlink" href="#wiretap_1" title="Permanent link">&para;</a></h2>
+<p>Секция честности, потому что HN/Reddit всё равно спросит:</p>
+<ul>
+<li><strong>Его блокировка — оркестрация, а не драйвер.</strong> С v1.2 Wiretap пушит правила <code>ip</code>/<code>cidr</code>/<code>domain</code>/<code>process</code>/<code>port</code> в нативный фаервол ОС (<code>netsh advfirewall</code> на Windows, <code>iptables</code> на Linux, <code>pf</code> на macOS) плюс lockdown — best-effort: правила требуют тех же привилегий, что и захват, чтобы реально применяться, и <code>pf</code> не умеет матчить процессы. UI честно сообщает, если правило не применилось. Для зрелого интерактивного фаервола приложений Portmaster (или Little Snitch на macOS) остаётся эталоном.</li>
+<li><strong>Нужен admin/root</strong> для захвата (неизбежно — как Wireshark).</li>
+<li><strong>Глубокая диссекция пакетов</strong> — тут Wireshark всё ещё побеждает. Wiretap — вид с высоты 10 000 футов.</li>
+</ul>
+<h2 id="windows">Установка на Windows<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Установи <a href="https://npcap.com">Npcap</a> (Windows-драйвер захвата — обязателен, та же зависимость, что у Wireshark)</li>
+<li>Скачай <code>Wiretap Setup &lt;версия&gt;.exe</code> с <a href="https://github.com/aixisstudio/Wiretap/releases">последнего релиза</a> — нативное Electron-приложение с треем — или Lite-установщик (только бэкенд)</li>
+<li>Запусти от имени администратора (установщик сам обработает UAC-промпт при запуске бэкенда)</li>
+<li>UI откроется сам — в окне Electron или в браузере с Lite</li>
+</ol>
+<p>Linux: <code>docker run --network host ghcr.io/aixisstudio/wiretap</code> — или релизный tarball. macOS: упакованное приложение или <code>brew</code>.</p>
+<h2 id="windows-">Как появился Windows-порт<a class="headerlink" href="#windows-" title="Permanent link">&para;</a></h2>
+<p>Я веду проект один. Windows-порт сделал не я — пользователи прислали баг-репорты с анализом первопричины, а незнакомец прислал три PR, починившие захват + правильный интерфейс + падение при старте. Open source работает как обещано. v1.0.5 вышла на прошлой неделе.</p>
+<p>Если попробуешь и поймаешь что-то интересное — в репо есть <a href="https://github.com/aixisstudio/Wiretap/discussions/39">обсуждение «Что вы поймали?»</a>. А если пригодится — ⭐ на <a href="https://github.com/aixisstudio/Wiretap">GitHub</a> реально помогает проекту находиться.</p>
+<p><strong>Репо:</strong> https://github.com/aixisstudio/Wiretap — AGPL, UI и доки на 8 языках (EN/FR/ES/DE/RU/JA/PT-BR/中文).</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

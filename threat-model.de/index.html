@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Threat Model - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Threat Model";
+        var mkdocs_page_input_path = "threat-model.de.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Threat Model</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/threat-model.de.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="threat-model">Threat Model<a class="headerlink" href="#threat-model" title="Permanent link">&para;</a></h1>
+<p><a href="../threat-model/">English</a> | <a href="../threat-model/">Français</a> | <a href="../threat-model.es/">Español</a> | <strong>Deutsch</strong> | <a href="../threat-model.ru/">Русский</a> | <a href="../threat-model.ja/">日本語</a> | <a href="../threat-model.pt-BR/">Português</a> | <a href="../threat-model.zh-CN/">中文</a></p>
+<h2 id="was-wiretap-ist">Was Wiretap ist<a class="headerlink" href="#was-wiretap-ist" title="Permanent link">&para;</a></h2>
+<p>Ein Local-first-Visualizer für Netzwerkverkehr. Er erfasst Pakete auf dem
+Host, ordnet sie Prozessen zu, reichert sie <strong>offline</strong> an (lokale
+<code>.mmdb</code>-Geolokalisierung, lokale DNS/SNI-Karten) und rendert sie in einer
+Web-UI, die vom selben Prozess ausgeliefert wird. <strong>Keine
+Cloud-Komponente, keine Telemetrie.</strong></p>
+<h2 id="assets">Assets<a class="headerlink" href="#assets" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Deine Verkehrs-Metadaten (Ziel-IPs, Ports, Volumen, Prozessnamen).</li>
+<li>Das API-Token (pro Start in Electron, pro Installation in CLI/Docker).</li>
+<li>Die lokale SQLite-DB (<code>traffic</code>, <code>alerts_log</code>, Historien, Einstellungen).</li>
+<li>Die Integrität der Maschine selbst (ein kompromittiertes Wiretap könnte
+  dich belügen).</li>
+</ul>
+<h2 id="vertrauensgrenzen">Vertrauensgrenzen<a class="headerlink" href="#vertrauensgrenzen" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Grenze</th>
+<th>Bedrohung</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Browser/Remote-Client → REST</td>
+<td>Ein LAN-Angreifer oder eine bösartige Webseite liest/steuert deine Verkehrsansicht</td>
+<td>Token auf <strong>jedem</strong> Endpoint (<code>Authorization: Bearer</code>). Bind <code>127.0.0.1</code> standardmäßig. In Docker erfordert <code>0.0.0.0</code> ein explizites <code>WIRETAP_TOKEN</code>.</td>
+</tr>
+<tr>
+<td>Webseite → <code>/ws</code></td>
+<td>Cross-Site-WebSocket-Hijacking (CSWSH)</td>
+<td>Token <strong>und</strong> <code>Origin</code>-Allowlist (Loopback + Electron <code>null</code>-Origin).</td>
+</tr>
+<tr>
+<td>Host → Dritte</td>
+<td>Privacy-Leak</td>
+<td>Null ausgehende Aufrufe standardmäßig. GeoIP-Download, Threat Intel, Webhooks und Updates sind <strong>Opt-in</strong> und in PRIVACY.md dokumentiert.</td>
+</tr>
+<tr>
+<td>Capture-Treiber → Parser</td>
+<td>Malformed Frames crashen den Prozess</td>
+<td>Der Parser prüft jeden Offset; malformed Pakete liefern <code>None</code> und werfen nie in die Capture-Schleife.</td>
+</tr>
+<tr>
+<td>Renderer ↔ Main (Electron)</td>
+<td>Token-Exfiltration aus der Seite</td>
+<td><code>contextIsolation</code> + <code>sandbox</code>; das Token kreuzt nur via <code>ipcRenderer.invoke</code>, landet nie im DOM oder einer URL.</td>
+</tr>
+<tr>
+<td>Lokaler Angreifer mit FS-Zugriff</td>
+<td>Token-/Historien-Diebstahl</td>
+<td>Token-Datei <code>0600</code>; Datenverzeichnis im User-Verzeichnis; DB unverschlüsselt — Festplattenverschlüsselung ist OS-Aufgabe.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="bekannte-grenzen">Bekannte Grenzen<a class="headerlink" href="#bekannte-grenzen" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Capture erfordert Admin-/Root-Rechte</strong>, aber begrenzt aufs Backend:
+  die Electron-UI läuft unprivilegiert, während das Backend über den
+  Plattform-Prompt erhöht startet (<code>Start-Process -Verb RunAs</code> auf Windows,
+  <code>osascript</code> auf macOS, <code>pkexec</code> auf Linux) und via authentifiziertem
+  <code>/shutdown</code>-Endpoint gestoppt wird.</li>
+<li>Das Token schützt HTTP/WS, aber <strong>nicht</strong> gegen einen anderen lokalen
+  Prozess unter deinem Account, der <code>data/api_token.txt</code> oder die
+  Electron-IPC lesen kann.</li>
+<li>SQLite-Daten im Ruhezustand sind unverschlüsselt.</li>
+<li>Alarm-Unterdrückung ist lokal und still — ein Angreifer mit Schreibzugriff
+  auf die DB kann Alarme stumm schalten (Abwehr: FS-Rechte).</li>
+</ul>
+<h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
+<p>Bösartige Paket-Payloads (nur Header werden geparst), Kernel-/Treiber-
+Kompromittierung, bösartiger Administrator.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

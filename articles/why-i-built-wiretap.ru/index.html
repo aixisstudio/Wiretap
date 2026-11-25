@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Why i built wiretap.ru - Wiretap</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Why i built wiretap.ru";
+        var mkdocs_page_input_path = "articles/why-i-built-wiretap.ru.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Why i built wiretap.ru</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/articles/why-i-built-wiretap.ru.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Три недели назад я захотел ответить на до глупости простой вопрос: <strong>с кем разговаривает мой компьютер?</strong></p>
+<p>Не «могу ли я захватывать пакеты» (Wireshark может — но это микроскоп, когда нужно было лобовое стекло). Не «блокировать соединения» (Little Snitch умеет на macOS за $59, а на Windows ничего подобного не было). Просто: живой визуальный ответ. Какое приложение, какой сервер, какая страна — прямо сейчас.</p>
+<p>Так появился <a href="https://github.com/aixisstudio/Wiretap">Wiretap</a>. Open source, AGPL, UI на 8 языках, ~400 звёзд за три недели. Что я понял — и как незнакомцы написали за меня Windows-порт.</p>
+<h2 id="_1">Сборка<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Ограничение, которое я себе поставил: <strong>никаких тяжёлых зависимостей, никакой телеметрии, никогда.</strong></p>
+<ul>
+<li>Захват: <code>ctypes → libpcap</code> на macOS/Linux, Npcap на Windows. Без Scapy — прямые биндинги легче и дают точный контроль полей.</li>
+<li>Парсинг: самописные декодеры IPv4/IPv6/TCP/UDP/DNS/TLS-SNI. ~2K строк на весь конвейер.</li>
+<li>Бэкенд: FastAPI + WebSockets + кольцевой буфер SQLite (хранение 24 ч, затем самоудаление — приватность это ещё и <em>не</em> копить данные).</li>
+<li>Фронтенд: React + force-граф D3 + карта мира TopoJSON.</li>
+<li>Геолокация: локальный файл MaxMind/DB-IP. IP никогда не покидают машину.</li>
+</ul>
+<p>Безопасность как фича: API только на loopback, с токеном, и каждый исходящий вызов — opt-in: загрузка GeoIP, проверки обновлений, threat intel и вебхуки выключены по умолчанию. Для инструмента приватности код <em>и есть</em> обещание — AGPL делает его проверяемым.</p>
+<h2 id="_2">Чего я не планировал<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Сначала я выпустил macOS-версию и повесил на репозиторий тег «help wanted» для Windows. Через несколько дней:</p>
+<ul>
+<li>Пользователи присылали баг-репорты <strong>с готовым анализом первопричины</strong> — не «не работает», а настоящие стектрейсы и найденный сбойный путь захвата</li>
+<li>Незнакомец, с которым я никогда не говорил, прислал три PR: захват Npcap, выбор сетевого интерфейса, падение при запуске</li>
+<li>Кто-то ещё открыл <a href="https://github.com/microsoft/winget-pkgs/pull/455520">PR пакета winget</a></li>
+</ul>
+<p>v1.0.5 вышла на прошлой неделе с полностью рабочим Windows-портом. Самый мощный канал распространения оказался не маркетинговым трюком — это «выложи настоящую проблему в паблик, и люди с той же проблемой придут».</p>
+<h2 id="_3">Что сказали данные о трафике<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Забавный мета-момент: реферальный трафик самого Wiretap рассказал историю. Китайская tech-рассылка (ruanyifeng.com) рассказала о проекте — и вдруг ~20% трафика стали китайскими читателями, смотрящими на английский README. Теперь есть полный <a href="https://github.com/aixisstudio/Wiretap/blob/main/README.zh-CN.md">README 中文</a> — и переводы на 8 языков суммарно. Данные решают; я просто слушаю.</p>
+<h2 id="dev-tools">Что я сказал бы любому, кто делает dev tools<a class="headerlink" href="#dev-tools" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Решай осязаемую проблему.</strong> «С кем говорит моя машина» — это visceral: все задаются вопросом, никто не может увидеть ответ.</li>
+<li><strong>Local-first теперь дифференциатор.</strong> «Без аккаунта, без телеметрии» — не ограничение, а питч.</li>
+<li><strong>Мультиязычные доки — не благотворительность</strong> — это дистрибуция к аудиториям с нулевой конкуренцией.</li>
+<li><strong>Issues и Discussions конвертируют.</strong> Быстрые ответы превратили баг-репортёров в контрибьюторов. Так появился мой Windows-порт.</li>
+</ol>
+<h2 id="_4">Попробуй<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash">docker run --network host ghcr.io/aixisstudio/wiretap   # Linux
+# macOS/Windows: страница релизов — WIRETAP_DEMO=1 работает без admin
+</code></pre>
+<p>Репо: https://github.com/aixisstudio/Wiretap — AGPL, UI и доки на EN/FR/ES/DE/RU/JA/PT-BR/中文, а v1.2 добавила самое запрашиваемое: блокировку исходящих через фаервол ОС, opt-in threat intel и форензик-экспорт в один клик. <a href="https://github.com/aixisstudio/Wiretap/discussions/39">Тред «что вы поймали?»</a> открыт, и ⭐ реально помогает, если заслужена.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

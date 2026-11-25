@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>glasswire alternative.zh CN - Wiretap</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "glasswire alternative.zh CN";
+        var mkdocs_page_input_path = "articles/glasswire-alternative.zh-CN.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">glasswire alternative.zh CN</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/articles/glasswire-alternative.zh-CN.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>如果你在 Windows 上找过网络监控工具，一定遇见过 GlassWire。它精致漂亮——然后付费墙接踵而至：历史记录要订阅、防火墙功能分档、不断推荐的账号、云端「精英」同步。</p>
+<p>为软件付费没有错。但「让我看看电脑在和谁通信」属于基础卫生——本就不该上锁。我是 <a href="https://github.com/aixisstudio/Wiretap">Wiretap</a> 的作者——一款免费的开源（AGPL）替代品——所以这里给出诚实的对比而非销售话术。</p>
+<h2 id="wiretap-glasswire">Wiretap 对比 GlassWire，逐项功能<a class="headerlink" href="#wiretap-glasswire" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Wiretap</strong></th>
+<th><strong>GlassWire</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>价格</td>
+<td>永久免费</td>
+<td>Freemium——关键功能付费</td>
+</tr>
+<tr>
+<td>许可证</td>
+<td>AGPL 开源</td>
+<td>专有</td>
+</tr>
+<tr>
+<td>账号</td>
+<td><strong>永远不需要</strong></td>
+<td>推荐账号/云档</td>
+</tr>
+<tr>
+<td>遥测</td>
+<td><strong>无 opt-in 即无任何外发调用</strong>（GeoIP、更新、威胁情报、webhook 默认全关）</td>
+<td>为同步/功能 phone-home</td>
+</tr>
+<tr>
+<td>数据位置</td>
+<td>本地 SQLite，归你</td>
+<td>存在云关联功能</td>
+</tr>
+<tr>
+<td>连接实时世界地图</td>
+<td>✅ 离线定位</td>
+<td>✅（付费档）</td>
+</tr>
+<tr>
+<td>按应用流量与带宽</td>
+<td>✅</td>
+<td>✅（部分免费）</td>
+</tr>
+<tr>
+<td>历史</td>
+<td>免费 24 小时（SQLite 环形缓冲）</td>
+<td>免费档受限</td>
+</tr>
+<tr>
+<td>异常告警（端口扫描、信标回连、外泄、DNS 隧道）</td>
+<td>✅</td>
+<td>✅（多为付费）</td>
+</tr>
+<tr>
+<td>LAN 设备扫描</td>
+<td>✅ 被动，经 ARP</td>
+<td>✅（付费）</td>
+</tr>
+<tr>
+<td>防火墙/阻断</td>
+<td>✅ OS 防火墙编排 + lockdown（best-effort，需权限）</td>
+<td>✅（GlassWire 防火墙更成熟）</td>
+</tr>
+<tr>
+<td>威胁情报信誉</td>
+<td>✅ opt-in（AbuseIPDB / OTX / VirusTotal，自备密钥）</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>结束/挂起进程</td>
+<td>✅ 内置</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>取证导出</td>
+<td>✅ JSON / CSV / STIX</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>平台</td>
+<td>macOS、Windows、Linux</td>
+<td>Windows、Android</td>
+</tr>
+<tr>
+<td>隐私评分/跟踪器检测</td>
+<td>✅ 可编辑列表</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<h2 id="glasswire">GlassWire 仍然胜出的地方<a class="headerlink" href="#glasswire" title="Permanent link">&para;</a></h2>
+<p>公平地说：</p>
+<ul>
+<li><strong>阻断成熟度。</strong> GlassWire 的应用防火墙打磨了十年——Wiretap 的出站阻断（v1.2 新增）以 best-effort 方式编排 OS 原生防火墙，真正应用规则需要抓包级权限。如果交互式「拒绝此应用」是你的核心需求，GlassWire（或免费的 Portmaster）仍是更成熟的选择。</li>
+<li><strong>完成度。</strong> GlassWire 有十年的 UI 积累。Wiretap 年轻得多——图很棒，设置够用，边角粗糙请见谅。</li>
+<li><strong>长历史保留</strong> —— Wiretap 设计上只保留 24 小时（隐私优先也意味着<em>不</em>囤积你的流量）。</li>
+</ul>
+<h2 id="_1">真正重要的架构差异<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>GlassWire 的模式是行业惯例：免费档 → 烦扰 → 订阅 → 云功能。Wiretap 相反：你运行的二进制就是产品全部。没有要解锁的，因为没有上锁的。你的历史存在本地 SQLite 文件里——代码是 AGPL，想偷偷 phone-home，diff 立刻公之于众。</p>
+<p>具体来说：API 绑定 loopback 且 token 认证，零遥测端点，代码里没有任何分析 SDK（你可以 grep——它是开源的）。</p>
+<h2 id="_2">试一试<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash"># Windows：安装 Npcap，然后以管理员运行 release 的 exe
+# Linux/Docker:
+docker run --network host ghcr.io/aixisstudio/wiretap
+# macOS：打包应用或 brew
+# 无管理员的演示模式：WIRETAP_DEMO=1
+</code></pre>
+<p>仓库：https://github.com/aixisstudio/Wiretap —— 欢迎 issue 和功能请求，Windows 移植本身就是社区贡献。如果它替换了你不想要的订阅，那就是意义所在。若如此请给个 ⭐。</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Firewall & blocking - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Firewall \u0026 blocking";
+        var mkdocs_page_input_path = "FIREWALL.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Firewall & blocking</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#english">English</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#outbound-firewall-orchestration">Outbound firewall orchestration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#incident-response">Incident response</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#threat-intelligence-opt-in-off-by-default">Threat intelligence — opt-in, off by default</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#webhooks-opt-in-off-by-default">Webhooks — opt-in, off by default</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#detection-additions">Detection additions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#process-integrity-watch">Process integrity watch</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#alert-explanations">Alert explanations</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#optional-probes-v13">Optional probes (v1.3)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#policy-response-additions-v14">Policy &amp; response additions (v1.4)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#passive-inspection-kernel-verdicts-fleet-sync-v15">Passive inspection, kernel verdicts &amp; fleet sync (v1.5)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#francais">Français</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#orchestration-du-pare-feu-sortant">Orchestration du pare-feu sortant</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#reponse-a-incident">Réponse à incident</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#threat-intelligence-opt-in-desactive-par-defaut">Threat intelligence — opt-in, désactivé par défaut</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#webhooks-opt-in-desactives-par-defaut">Webhooks — opt-in, désactivés par défaut</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ajouts-de-detection">Ajouts de détection</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#veille-dintegrite-des-processus">Veille d'intégrité des processus</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#explications-dalertes">Explications d'alertes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sondes-optionnelles-v13">Sondes optionnelles (v1.3)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ajouts-politique-reponse-v14">Ajouts politique &amp; réponse (v1.4)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#inspection-passive-verdicts-noyau-sync-de-flotte-v15">Inspection passive, verdicts noyau &amp; sync de flotte (v1.5)</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Firewall & blocking</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/FIREWALL.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="security-features-fonctionnalites-de-securite">Security features / Fonctionnalités de sécurité<a class="headerlink" href="#security-features-fonctionnalites-de-securite" title="Permanent link">&para;</a></h1>
+<p><a href="./">English</a> | <a href="./">Français</a> | <a href="../FIREWALL.es/">Español</a> | <a href="../FIREWALL.de/">Deutsch</a> | <a href="../FIREWALL.ru/">Русский</a> | <a href="../FIREWALL.ja/">日本語</a> | <a href="../FIREWALL.pt-BR/">Português</a> | <a href="../FIREWALL.zh-CN/">中文</a></p>
+<h2 id="english">English<a class="headerlink" href="#english" title="Permanent link">&para;</a></h2>
+<p>Wiretap ships a threat-hunting layer on top of passive observation. <strong>What it
+does and — just as important — what it does not do:</strong></p>
+<h3 id="outbound-firewall-orchestration">Outbound firewall orchestration<a class="headerlink" href="#outbound-firewall-orchestration" title="Permanent link">&para;</a></h3>
+<p>Wiretap does <strong>not</strong> filter packets in user-space. Rules you create are
+applied to the OS-native firewall, best-effort:</p>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows</td>
+<td><strong>WFP user-mode filters</strong> via <code>fwpuclnt.dll</code> (ctypes, elevated) — <code>netsh advfirewall</code> remains the fallback</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>nftables</code> when available (dedicated <code>inet wiretap</code> table, rules removed by handle/comment), <code>iptables -A OUTPUT -j DROP</code> otherwise (<code>WIRETAP_LOCK</code> chain for lockdown); <code>tc</code> clsact/flower for throttling</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>generated <code>pf</code> anchor loaded with <code>pfctl</code></td>
+</tr>
+</tbody>
+</table>
+<p>On Windows, <code>detection/wfp.py</code> talks to the <strong>Windows Filtering Platform</strong>
+directly — no <code>netsh</code> subprocess, no kernel driver: outbound ALE filters
+matched on app path, remote IP/CIDR and remote port, created with
+deterministic keys so a removed rule deletes exactly its own filters, and
+an enumeration sweep purges filters Wiretap created but forgot. It is
+<em>filter management</em> — Wiretap does not run a WFP callout, does not inspect
+payloads in-kernel, and reports <code>applied=False</code> when not elevated.</p>
+<p>Rule kinds: <code>ip</code>, <code>cidr</code>, <code>domain</code>, <code>process</code>, <code>port</code>. Rules persist in
+<code>wiretap.db</code> and are re-applied at startup. <code>domain</code> rules are re-resolved
+every ~10 minutes — the resolved IP delta is applied so CDN rotation can't
+silently unblock a name.</p>
+<p>Rule actions: <code>block</code> (default) drops the traffic; <code>sinkhole</code> redirects it
+to loopback instead — domains via a marked <code># wiretap-sinkhole</code> block in the
+hosts file (all OSes), IPs/CIDRs via iptables <code>DNAT</code> in the nat OUTPUT chain
+(Linux only). A sinkholed destination keeps "answering" from 127.0.0.1 so an
+analyst can watch what the process expects instead of severing the call.
+<code>throttle</code> (Linux only, <code>rate</code> kbit/s) polices the destination with a <code>tc</code>
+clsact egress flower filter instead of blocking — useful for choking a
+suspect process without tipping it off.</p>
+<p><strong>Honest limits:</strong></p>
+<ul>
+<li>Applying rules needs the same privileges as packet capture. If the
+  backend is not elevated, <code>applied=False</code> is recorded on the rule — the
+  UI shows <em>"visibility only"</em>. Matching still works: packets violating a
+  rule raise <code>BLOCKED_ATTEMPT</code> alerts with per-rule counters.</li>
+<li>macOS <code>pf</code> can't match a <em>process</em> — process rules on macOS are
+  visibility-only by design.</li>
+<li>IP/CIDR <code>sinkhole</code> is Linux-only (needs the nat table); other platforms
+  record <code>applied=False</code> with the reason. <code>sinkhole</code> on <code>process</code>/<code>port</code>
+  is rejected — redirecting by process/port is not meaningful.</li>
+<li><strong>Lockdown</strong> drops outbound traffic to <em>public</em> IPs only — loopback and
+  LAN stay up so the UI remains reachable.</li>
+</ul>
+<h3 id="incident-response">Incident response<a class="headerlink" href="#incident-response" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>POST /processes/kill</code> / <code>POST /processes/suspend</code> — by PID, refuses
+  PIDs ≤ 3 and Wiretap itself. Normal OS privileges apply (you can't kill a
+  root process as a normal user).</li>
+<li><code>POST /firewall/rules</code>, <code>DELETE /firewall/rules/{id}</code>,
+  <code>POST /firewall/rules/{id}/toggle</code>, <code>POST /firewall/lockdown</code> —
+  authenticated like every endpoint.</li>
+<li><code>GET /forensics/export?process=&lt;name&gt;&amp;ip=&lt;ip&gt;</code> — investigation bundle:
+  process tree (up to 8 ancestors), SHA-256 of the executable, cmdline,
+  matching alerts, per-minute traffic history. <code>format=json|csv|stix</code> picks the
+  output (STIX = minimal 2.1 bundle for SIEM import). Local data only;
+  export is a download, never an upload.</li>
+</ul>
+<h3 id="threat-intelligence-opt-in-off-by-default">Threat intelligence — opt-in, off by default<a class="headerlink" href="#threat-intelligence-opt-in-off-by-default" title="Permanent link">&para;</a></h3>
+<p><code>Settings → Threat intelligence</code> accepts a provider (<code>abuseipdb</code>, <code>otx</code>, <code>virustotal</code>)
+plus <strong>your own API key</strong>. When enabled, newly-seen public IPs are checked
+once per 24 h TTL; verdicts are cached and a <code>THREAT_HIT</code> alert fires on
+<code>suspicious</code>/<code>malicious</code> verdicts. With provider <code>none</code> or an empty key,
+<strong>zero outbound calls</strong> are made. <code>GET /security/ti</code> reports the masked
+configuration; <code>POST /security/threat_check</code> runs a manual check (also
+cache-aware).</p>
+<h3 id="webhooks-opt-in-off-by-default">Webhooks — opt-in, off by default<a class="headerlink" href="#webhooks-opt-in-off-by-default" title="Permanent link">&para;</a></h3>
+<p><code>Settings → External webhook</code> accepts a URL and a switch. Warning and
+critical alerts are POSTed live: Discord/Slack <code>{content}</code>, Telegram
+<code>{chat_id, text}</code> (chat ID field shown when a telegram URL is used), any
+other endpoint gets <code>{alert, source, text}</code>. Failures are logged, never
+fatal.</p>
+<h3 id="detection-additions">Detection additions<a class="headerlink" href="#detection-additions" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>DNS_TUNNEL</code> — oversized DNS names/labels (&gt;60 chars / label &gt;40),
+  classic exfiltration pattern; once per host per 10 min.</li>
+<li><code>CLEARTEXT</code> — outbound TCP to ports that are unencrypted by design
+  (80, 21, 23, 25, 110, 143…), INFO level, feeds the audit.</li>
+<li><code>BASELINE_DEVIATION</code> — each process learns its usual destination
+  countries over its first packets, then warns once when it reaches a new
+  one. Baselines persist across restarts (<code>app_baselines</code> setting).</li>
+<li><code>BEACON</code> — already shipped: regular-interval detection (CV of
+  inter-arrival times) works even for tiny keep-alive traffic.</li>
+<li><code>BLOCKED_ATTEMPT</code>, <code>LOCKDOWN</code>, <code>THREAT_HIT</code> — alert types added by the
+  modules above.</li>
+<li><code>BINARY_CHANGED</code>, <code>NAME_MISMATCH</code>, <code>MEM_RWX</code> — emitted by the integrity
+  watch below.</li>
+</ul>
+<h3 id="process-integrity-watch">Process integrity watch<a class="headerlink" href="#process-integrity-watch" title="Permanent link">&para;</a></h3>
+<p><code>Settings → Integrity watch</code> (on by default — read-only local inspection)
+checks each PID that shows network activity, once per process lifetime:</p>
+<ul>
+<li><strong>Exe hash watch</strong> — SHA-256 of the executable on disk; the first hash
+  per path becomes a persisted baseline (<code>integrity_baselines</code>). A changed
+  file under a live PID raises <code>BINARY_CHANGED</code> (critical).</li>
+<li><strong>Name/exe mismatch</strong> — process name vs executable basename (tolerates
+  <code>.exe</code> and version suffixes) → <code>NAME_MISMATCH</code> (warning), the classic
+  masquerading tell.</li>
+<li><strong>RWX maps scan</strong> — Linux only: <code>rwxp</code> regions in <code>/proc/&lt;pid&gt;/maps</code> ≥
+  64 KiB → <code>MEM_RWX</code>. Known JIT apps (browsers, node, java, electron) are
+  reported at <em>info</em> — their RWX pages are by design.</li>
+</ul>
+<p>Honest limits: the hash compares on-disk file states — detecting true
+in-memory tampering (hollowing, reflective injection that never touches
+the file) needs kernel/memory tooling and stays on the research roadmap.
+<code>GET /security/integrity</code> reports capabilities + findings;
+<code>POST /security/integrity/check</code> forces a re-check on one PID.</p>
+<h3 id="alert-explanations">Alert explanations<a class="headerlink" href="#alert-explanations" title="Permanent link">&para;</a></h3>
+<p><code>GET /security/explain?type=&lt;ALERT_TYPE&gt;</code> returns a hand-written bilingual
+(EN/FR) explanation — what the alert means, why it matters, concrete next
+steps. Deterministic templates, fully offline — <strong>not</strong> a language model;
+the UI shows it behind the "Why?" button on every alert.</p>
+<p><code>GET /security/audit</code> computes a 0–100 score from the last 500 alerts plus
+the live graph: alert-type counts, contacts to high-risk countries,
+unresolved hosts, firewall posture — and returns plain-language
+recommendations. It is a <em>finding report</em>, not a certification.</p>
+<h3 id="optional-probes-v13">Optional probes (v1.3)<a class="headerlink" href="#optional-probes-v13" title="Permanent link">&para;</a></h3>
+<p>All of these are <strong>off by default or self-gating</strong>, degrade honestly, and
+never ship data off the machine:</p>
+<ul>
+<li><strong>eBPF connect probe</strong> (Linux, <code>ebpf_probe</code> setting) — a BCC
+  <code>tcpconnect</code>-style kprobe attributes <code>connect()</code> calls of processes too
+  short-lived for the socket table. Needs <code>python3-bcc</code> + root; ambiguous
+  destinations (two pids → same <code>ip:port</code>) are <em>never</em> guessed.
+  <code>GET /security/ebpf</code> reports availability with the honest reason.</li>
+<li><strong>Frida deep inspection</strong> — <code>POST /security/deep_inspect {pid,seconds}</code>
+  attaches to ONE pid for ≤60 s (needs the optional <code>frida</code> package +
+  debugger rights) and reports <em>which loaded module</em> issued each
+  <code>connect()</code>. Module paths under temp/staging dirs → <code>INJECT_SUSPECT</code>.</li>
+<li><strong>Sinkhole responder</strong> — while a <code>sinkhole</code> rule is enabled, loopback
+  listeners on :80 (HTTP) and :443 (TLS/SNI) turn every redirected
+  attempt into a <code>SINKHOLE_HIT</code> alert carrying Host/URI or SNI plus the
+  initiating process. <code>GET /security/sinkhole</code> shows listeners + hits.</li>
+<li><strong>Module integrity</strong> — a Merkle root over each process's file-backed
+  executable mappings → <code>MODULE_CHANGED</code> on tamper; mapped paths under
+  <code>/tmp</code>, memfd or other staging dirs → <code>MODULE_SUSPECT</code>.</li>
+<li><strong>Mining detection</strong> — stratum JSON (<code>mining.subscribe</code>) in a bounded
+  cleartext payload head → <code>MINING_STRATUM</code>; known pool ports + sustained
+  CPU → <code>MINING_SUSPECT</code>. A pool port alone never alerts.</li>
+<li><strong>Hardware counters</strong> — <code>POST /security/perf {pid,seconds}</code> samples
+  cycles/instructions/cache-misses via <code>perf_event_open</code> (Linux, gated by
+  <code>kernel.perf_event_paranoid</code>) to corroborate mining suspicion.</li>
+<li><strong>Local LLM enrichment</strong> — opt-in (<code>slm_enabled</code>): <code>/security/explain</code>
+  can call an Ollama-compatible endpoint, <strong>loopback only</strong> — remote
+  endpoints are rejected so alert metadata can't leave the machine.</li>
+<li><strong>IOC packs</strong> — <code>GET /security/iocpack</code> exports indicators as a Bloom
+  filter + randomized response (ε≈4.6 — deniable, never raw);
+  <code>POST /security/iocpack/import</code> checks observed destinations against a
+  received pack, probabilistically, and never auto-blocks. A second
+  <code>format=proof</code> pack carries salted SHA-256 leaves + a Merkle
+  commitment: membership is cryptographically exact and tampering is
+  detected. Not an interactive ZK protocol — a commitment scheme.</li>
+</ul>
+<h3 id="policy-response-additions-v14">Policy &amp; response additions (v1.4)<a class="headerlink" href="#policy-response-additions-v14" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Named profiles</strong> — <code>POST /firewall/profile</code> applies <code>permissive</code>
+  (clean slate), <code>balanced</code> (conservative egress baseline: outbound
+  SMTP + common stratum pool ports) or <code>strict</code> (baseline + lockdown).
+  Profiles expand into ordinary rules via the same machinery the UI
+  uses — no hidden code path — and dedup against identical rules.</li>
+<li><strong>Custom alert rules</strong> — <code>GET/POST/DELETE /alerts/rules</code> plus a
+  per-rule toggle. One field (<code>remote_ip</code>, <code>host</code>, <code>process_name</code>,
+  <code>remote_port</code>, <code>protocol</code>, <code>direction</code>, <code>size</code>, <code>asn</code>, <code>country</code>),
+  one operator (<code>eq</code>, <code>ne</code>, <code>contains</code>, <code>regex</code>, <code>gt</code>, <code>lt</code>, <code>cidr</code>),
+  one value → <code>CUSTOM_RULE</code> alerts with hit counters. Validated at
+  creation, bounded regex cache. Default <code>action</code> is <code>alert</code>; setting
+  <code>action=block</code> also installs a real firewall rule on the matched
+  remote IP (deduped per rule+target) — the opt-in kill-switch.</li>
+<li><strong>Blocklist import</strong> — <code>POST /firewall/blocklist</code> turns a local
+  hosts/domain file (a pure local read) or an opt-in URL (bounded
+  4 MiB HTTPS fetch — one of the few outbound requests Wiretap can ever
+  emit, flagged <code>remote_fetch</code> in the response) into <code>domain</code> rules.
+  Deduplicated, capped 500–5000 entries.</li>
+<li><strong>PCAP export</strong> — <code>GET /forensics/pcap</code> (optional <code>ip=</code>/<code>process=</code>
+  filters) serves the bounded ~4 MiB raw-frame ring as a
+  Wireshark-ready <code>.pcap</code> with real capture timestamps.</li>
+<li><strong>Remote pairing</strong> — <code>POST /remote/pairing</code> persists <code>lan_bind</code>
+  (<code>0.0.0.0</code> or a local LAN address) applied at the <em>next</em> backend
+  start — uvicorn cannot rebind a live socket, and the API says so.
+  Token auth remains mandatory; pairing only widens the listen
+  address. <code>GET /remote/pairing</code> reports effective bind + LAN IPs.</li>
+<li><strong>Network-denial sandbox</strong> — <code>POST /security/sandbox {path,seconds}</code>
+  runs a chosen executable with <strong>zero egress</strong>: unprivileged
+  <code>unshare --user --net</code> on Linux, <code>sandbox-exec</code> deny-network on
+  macOS. Bounded runtime + output; honest unsupported-error elsewhere.
+  <code>contrib/wiretap-contain</code> is the manual equivalent.</li>
+<li><strong>Embedded model</strong> — <code>slm_mode=embedded</code> loads a user-provided
+  <code>.gguf</code> via optional <code>llama-cpp-python</code> — explanations fully
+  in-process, zero network. Wiretap never downloads weights.</li>
+<li><strong>Native filter skeletons</strong> — <code>contrib/wfp-callout/</code> (C WFP kernel
+  callout + signing notes) and <code>contrib/macos-filter/</code> (Swift
+  <code>NEFilterDataProvider</code> + entitlements notes). Research scaffolding
+  for anyone who wants to build the signed/platform components;
+  not shipped, not loaded by Wiretap.</li>
+<li><strong>ASN attribution</strong> — when <code>GeoLite2-ASN.mmdb</code>/<code>dbip-asn-lite.mmdb</code>
+  is present, nodes carry <code>asn</code> (AS number) alongside <code>org</code>.</li>
+</ul>
+<h3 id="passive-inspection-kernel-verdicts-fleet-sync-v15">Passive inspection, kernel verdicts &amp; fleet sync (v1.5)<a class="headerlink" href="#passive-inspection-kernel-verdicts-fleet-sync-v15" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Passive TLS certificate inspection</strong> — the parser reassembles
+  bounded TCP streams (≤16 KiB/flow, 30 s TTL) and reads the
+  <code>Certificate</code> handshake message: issuer/subject CN+O, self-signed
+  flag, DNS SANs, validity window, and <code>san_mismatch</code> against the
+  observed SNI → <code>TLS_CERT</code> alerts. <strong>TLS 1.3 stays opaque</strong> — its
+  certificates are encrypted, Wiretap reports nothing rather than
+  guessing. No MITM, no decryption, no injected CA.</li>
+<li><strong>High-entropy cleartext watch</strong> — payloads ≥48 B on non-TLS
+  channels scoring ≥4.7 bits/byte raise <code>HIGH_ENTROPY</code> (covert
+  encryption/stego hint). Per-host 10-min cooldown.</li>
+<li><strong>ICMP tunnel heuristic</strong> — echo types carrying ≥24 B payloads,
+  repeated ≥3× in 5 min → <code>ICMP_TUNNEL</code> (ptunnel/icmpsh signature).</li>
+<li><strong>ML flow anomaly</strong> — pure-Python isolation forest (64 trees, zero
+  dependencies) over your own flow summaries — port, size, interval,
+  fan-out, hour. Inert below 384 learned flows, refits every 256,
+  score ≥0.62 → <code>ML_ANOMALY</code>. Baseline deviation, <strong>not</strong> a malware
+  classifier.</li>
+<li><strong>Ask-on-connect (Linux, opt-in)</strong> — <code>ask_enabled=1</code> + root +
+  iptables: new outbound flows are held on NFQUEUE 7 until you answer
+  <code>POST /security/ask/verdict</code> in the UI — the Little Snitch-style
+  prompt, for real. The NFQUEUE client is <strong>pure Python</strong>
+  (<code>detection/nfqueue.py</code>, AF_NETLINK) — no <code>python-netfilterqueue</code>
+  or libnetfilter_queue to install. Default timeout 15 s, fail-closed
+  (<code>ask_failopen=1</code> to reverse). Windows/macOS need the
+  signed callout/NetworkExtension skeletons in <code>contrib/</code> — user-mode
+  cannot hold a connection.</li>
+<li><strong>eBPF cgroup enforcement (Linux, opt-in)</strong> — <code>ebpf_enforce.py</code>
+  moves a contained process into a dedicated cgroup and attaches a
+  <code>cgroup_skb/egress</code> program dropping its packets kernel-side.
+  Honest <code>available()</code> probe; firewall rules remain the fallback.</li>
+<li><strong>Process-hollowing check (Linux)</strong> — <code>GET /security/hollow/{pid}</code>
+  reads executable file-backed pages from <code>/proc/&lt;pid&gt;/mem</code> and diffs
+  them against the on-disk binary → bounded mismatch evidence.</li>
+<li><strong>IOC peer sync (opt-in)</strong> — <code>gossip_peers</code> lists up to 32 explicit
+  <code>host:port</code> Wiretap instances; salted-Merkle proof packs are pushed
+  over authenticated HTTP(S), 8 s timeout. No discovery, no central
+  server — and it is <strong>not</strong> a zero-knowledge protocol: commitments
+  prove exact membership only.</li>
+<li><strong>Syslog output (opt-in)</strong> — <code>syslog_addr</code> (<code>host:port</code> UDP or
+  <code>tcp://host:port</code>) forwards warning/critical alerts as RFC 3164
+  <code>local4</code> — Wazuh/SIEM-ready. Independent of webhooks.</li>
+<li><strong>Firejail containment</strong> — <code>security/sandbox</code> prefers
+  <code>firejail --net=none</code> when present, falls back to <code>unshare</code>.</li>
+<li><strong>nftables backend</strong> — where <code>nft</code> exists, rules land in a dedicated
+  <code>inet wiretap</code> table instead of iptables; <code>iptables-nft</code> hosts are
+  detected and keep the iptables path.</li>
+<li><strong>Actionable alerts</strong> — every alert carries structured <code>actions</code>
+  (block IP, kill/suspend process, ask verdict, inspect memory); the
+  UI renders them as one-click buttons.</li>
+<li><strong><code>asn</code>/<code>country</code> in custom rules</strong> — matched against the local
+  geo DB, usable with <code>action=block</code> for a geo-fence kill-switch.</li>
+<li><strong>DGA heuristic</strong> — resolved DNS names and TLS SNIs are scored on
+  lexical features (entropy, vowel ratio, consonant runs, digits) →
+  <code>DGA_SUSPECT</code>. Pure local heuristic; no WHOIS or domain-age data.</li>
+<li><strong>Protocol/port mismatch</strong> — the ≤64-byte payload head must match
+  what the port advertises (HTTP/80, DNS/53, SSH/22, TLS/443+853,
+  mail ASCII commands) → <code>PROTO_MISMATCH</code>, cooled down per flow.</li>
+<li><strong>Volume kill-switch (opt-in)</strong> — <code>kill_switch_enabled</code> turns an
+  <code>UPLOAD_SPIKE</code> alert into a real firewall block on the remote IP
+  (deduped, best-effort). Off by default.</li>
+<li><strong>Pure-Python NFQUEUE</strong> — ask-on-connect no longer needs
+  <code>python-netfilterqueue</code>: <code>detection/nfqueue.py</code> speaks
+  nfnetlink_queue over AF_NETLINK directly. Linux + root + iptables
+  only.</li>
+<li><strong>Permanent ask verdicts</strong> — the four classic choices exist:
+  allow once / deny once (session-scoped) and allow always /
+  deny always (<code>permanent=true</code> → the IP lands in <code>whitelisted_ips</code>
+  or a persisted firewall block rule, and whitelisted IPs get an
+  iptables RETURN exemption so they are never re-asked).</li>
+</ul>
+<hr />
+<h2 id="francais">Français<a class="headerlink" href="#francais" title="Permanent link">&para;</a></h2>
+<p>Wiretap embarque une couche de chasse aux menaces au-dessus de
+l'observation passive. <strong>Ce qu'elle fait — et, aussi important, ce qu'elle
+ne fait pas :</strong></p>
+<h3 id="orchestration-du-pare-feu-sortant">Orchestration du pare-feu sortant<a class="headerlink" href="#orchestration-du-pare-feu-sortant" title="Permanent link">&para;</a></h3>
+<p>Wiretap ne filtre <strong>pas</strong> les paquets en user-space. Les règles créées sont
+appliquées au pare-feu natif de l'OS, au mieux :</p>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>Mécanisme</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows</td>
+<td><strong>filtres WFP user-mode</strong> via <code>fwpuclnt.dll</code> (ctypes, élevé) — <code>netsh advfirewall</code> reste le repli</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>iptables -A OUTPUT -j DROP</code> (chaîne dédiée <code>WIRETAP_LOCK</code> pour le lockdown) ; <code>tc</code> clsact/flower pour le bridage</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>ancre <code>pf</code> générée chargée avec <code>pfctl</code></td>
+</tr>
+</tbody>
+</table>
+<p>Sous Windows, <code>detection/wfp.py</code> dialogue avec la <strong>Windows Filtering
+Platform</strong> directement — sans subprocess <code>netsh</code>, sans driver noyau :
+filtres ALE sortants par chemin d'appli, IP/CIDR et port, créés avec des
+clés déterministes pour qu'une règle supprimée efface exactement ses
+filtres, plus une purge par énumération des filtres orphelins. C'est de la
+<em>gestion de filtres</em> — Wiretap ne fait pas de callout WFP, n'inspecte pas
+les payloads en noyau et rapporte <code>applied=False</code> sans élévation.</p>
+<p>Types de règles : <code>ip</code>, <code>cidr</code>, <code>domain</code>, <code>process</code>, <code>port</code>. Les règles
+persistent dans <code>wiretap.db</code> et sont réappliquées au démarrage. Les règles
+<code>domain</code> sont re-résolues toutes les ~10 min — le delta d'IP est appliqué
+pour que la rotation CDN ne débloque pas un nom en silence.</p>
+<p>Actions : <code>block</code> (défaut) droppe le trafic ; <code>sinkhole</code> le redirige vers
+loopback — domaines via un bloc marqué <code># wiretap-sinkhole</code> dans le fichier
+hosts (tous OS), IP/CIDR via <code>DNAT</code> iptables dans la table nat OUTPUT
+(Linux seulement). Une destination sinkholée continue de « répondre »
+depuis 127.0.0.1 : l'analyste observe ce que le processus attend au lieu
+de couper l'appel. <code>throttle</code> (Linux seul, <code>rate</code> kbit/s) bride la
+destination avec un filtre flower egress <code>tc</code> clsact au lieu de bloquer —
+utile pour étouffer un processus suspect sans l'alerter.</p>
+<p><strong>Limites honnêtes :</strong></p>
+<ul>
+<li>Appliquer les règles exige les mêmes privilèges que la capture. Sans
+  élévation, <code>applied=False</code> est enregistré sur la règle — l'UI affiche
+  <em>« visibilité seule »</em>. Le matching reste actif : les paquets violant une
+  règle lèvent des alertes <code>BLOCKED_ATTEMPT</code> avec compteurs par règle.</li>
+<li><code>pf</code> sur macOS ne peut pas matcher un <em>processus</em> — les règles processus
+  y sont par conception de la visibilité seule.</li>
+<li>Le <code>sinkhole</code> IP/CIDR est Linux-only (besoin de la table nat) ; les autres
+  plateformes enregistrent <code>applied=False</code> avec la raison. <code>sinkhole</code> sur
+  <code>process</code>/<code>port</code> est rejeté — rediriger par processus/port n'a pas de sens.</li>
+<li><strong>Lockdown</strong> ne coupe le trafic sortant que vers les IP <em>publiques</em> —
+  loopback et LAN restent actifs pour garder l'UI joignable.</li>
+</ul>
+<h3 id="reponse-a-incident">Réponse à incident<a class="headerlink" href="#reponse-a-incident" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>POST /processes/kill</code> / <code>POST /processes/suspend</code> — par PID, refuse les
+  PID ≤ 3 et Wiretap lui-même. Privilèges OS usuels (on ne tue pas un
+  processus root en simple utilisateur).</li>
+<li><code>POST /firewall/rules</code>, <code>DELETE /firewall/rules/{id}</code>,
+  <code>POST /firewall/rules/{id}/toggle</code>, <code>POST /firewall/lockdown</code> —
+  authentifiés comme tous les endpoints.</li>
+<li><code>GET /forensics/export?process=&lt;nom&gt;&amp;ip=&lt;ip&gt;</code> — paquet d'investigation :
+  arbre de processus (jusqu'à 8 ancêtres), SHA-256 de l'exécutable, ligne
+  de commande, alertes associées, historique par minute. <code>format=json|csv|stix</code>
+  choisit la sortie (STIX = bundle 2.1 minimal pour SIEM). Données locales
+  uniquement ; l'export est un téléchargement, jamais un envoi.</li>
+</ul>
+<h3 id="threat-intelligence-opt-in-desactive-par-defaut">Threat intelligence — opt-in, désactivé par défaut<a class="headerlink" href="#threat-intelligence-opt-in-desactive-par-defaut" title="Permanent link">&para;</a></h3>
+<p><em>Réglages → Threat intelligence</em> accepte un fournisseur (<code>abuseipdb</code>,
+<code>otx</code>, <code>virustotal</code>) plus <strong>votre propre clé API</strong>. Activé, chaque nouvelle IP publique
+est vérifiée une fois par TTL de 24 h ; les verdicts sont cachés et une
+alerte <code>THREAT_HIT</code> est émise sur verdict <code>suspicious</code>/<code>malicious</code>.
+Sans fournisseur ni clé, <strong>zéro appel sortant</strong>. <code>GET /security/ti</code>
+rapporte la configuration masquée ; <code>POST /security/threat_check</code> lance
+une vérification manuelle (aussi consciente du cache).</p>
+<h3 id="webhooks-opt-in-desactives-par-defaut">Webhooks — opt-in, désactivés par défaut<a class="headerlink" href="#webhooks-opt-in-desactives-par-defaut" title="Permanent link">&para;</a></h3>
+<p><em>Réglages → Webhook externe</em> accepte une URL et un interrupteur. Les
+alertes warning et critiques sont POSTées en direct : Discord/Slack
+<code>{content}</code>, Telegram <code>{chat_id, text}</code> (champ chat ID affiché si URL
+telegram), tout autre endpoint reçoit <code>{alert, source, text}</code>. Les échecs
+sont journalisés, jamais fatals.</p>
+<h3 id="ajouts-de-detection">Ajouts de détection<a class="headerlink" href="#ajouts-de-detection" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>DNS_TUNNEL</code> — noms/labels DNS surdimensionnés (&gt;60 car. / label &gt;40),
+  motif classique d'exfiltration ; une fois par hôte par 10 min.</li>
+<li><code>CLEARTEXT</code> — TCP sortant vers des ports non chiffrés par nature
+  (80, 21, 23, 25, 110, 143…), niveau INFO, alimente l'audit.</li>
+<li><code>BASELINE_DEVIATION</code> — chaque processus apprend ses pays de destination
+  usuels sur ses premiers paquets, puis avertit une fois à l'atteinte d'un
+  nouveau pays. Les baselines persistent (<code>app_baselines</code>).</li>
+<li><code>BEACON</code> — déjà livré : détection d'intervalles réguliers (CV des
+  inter-arrivées) même pour un trafic minime.</li>
+<li><code>BLOCKED_ATTEMPT</code>, <code>LOCKDOWN</code>, <code>THREAT_HIT</code> — types d'alertes ajoutés
+  par les modules ci-dessus.</li>
+<li><code>BINARY_CHANGED</code>, <code>NAME_MISMATCH</code>, <code>MEM_RWX</code> — émis par la veille
+  d'intégrité ci-dessous.</li>
+</ul>
+<h3 id="veille-dintegrite-des-processus">Veille d'intégrité des processus<a class="headerlink" href="#veille-dintegrite-des-processus" title="Permanent link">&para;</a></h3>
+<p><em>Réglages → Veille d'intégrité</em> (activée par défaut — inspection locale
+en lecture seule) contrôle chaque PID avec activité réseau, une fois par
+durée de vie du processus :</p>
+<ul>
+<li><strong>Surveillance du hash exe</strong> — SHA-256 de l'exécutable sur disque ; le
+  premier hash par chemin devient une baseline persistée
+  (<code>integrity_baselines</code>). Un fichier modifié sous un PID actif lève
+  <code>BINARY_CHANGED</code> (critique).</li>
+<li><strong>Mismatch nom/exe</strong> — nom du processus vs basename de l'exécutable
+  (tolère <code>.exe</code> et les suffixes de version) → <code>NAME_MISMATCH</code> (warning),
+  le signe classique de masquage.</li>
+<li><strong>Scan maps RWX</strong> — Linux seulement : régions <code>rwxp</code> de
+  <code>/proc/&lt;pid&gt;/maps</code> ≥ 64 Kio → <code>MEM_RWX</code>. Les apps à JIT connues
+  (navigateurs, node, java, electron) sont signalées en <em>info</em> — leurs
+  pages RWX sont prévues.</li>
+</ul>
+<p>Limites honnêtes : le hash compare les états sur disque — détecter une
+altération en mémoire vive (hollowing, injection réflexive sans toucher
+au fichier) exige un outillage noyau/mémoire, à la roadmap.
+<code>GET /security/integrity</code> rapporte capacités + constats ;
+<code>POST /security/integrity/check</code> force une re-vérification sur un PID.</p>
+<h3 id="explications-dalertes">Explications d'alertes<a class="headerlink" href="#explications-dalertes" title="Permanent link">&para;</a></h3>
+<p><code>GET /security/explain?type=&lt;TYPE&gt;</code> renvoie une explication bilingue
+(EN/FR) écrite à la main — ce que signifie l'alerte, pourquoi elle compte,
+les étapes concrètes. Gabarits déterministes, 100 % hors-ligne — <strong>pas</strong>
+un modèle de langage ; l'UI l'affiche derrière le bouton « Pourquoi ? »
+de chaque alerte.</p>
+<p><code>GET /security/audit</code> calcule un score 0–100 depuis les 500 dernières
+alertes et le graphe : comptes par type, contacts vers pays à risque,
+hôtes non résolus, posture pare-feu — et renvoie des recommandations en
+langage clair. C'est un <em>rapport de constats</em>, pas une certification.</p>
+<h3 id="sondes-optionnelles-v13">Sondes optionnelles (v1.3)<a class="headerlink" href="#sondes-optionnelles-v13" title="Permanent link">&para;</a></h3>
+<p>Toutes sont <strong>désactivées par défaut ou auto-limitées</strong>, dégradent
+honnêtement et n'envoient jamais de données hors de la machine :</p>
+<ul>
+<li><strong>Sonde eBPF connect</strong> (Linux, réglage <code>ebpf_probe</code>) — un kprobe BCC de
+  type <code>tcpconnect</code> attribue les <code>connect()</code> des processus trop courts
+  pour la table des sockets. Exige <code>python3-bcc</code> + root ; les
+  destinations ambiguës (deux pids → même <code>ip:port</code>) ne sont <em>jamais</em>
+  devinées. <code>GET /security/ebpf</code> rapporte la disponibilité honnêtement.</li>
+<li><strong>Inspection Frida</strong> — <code>POST /security/deep_inspect {pid,seconds}</code>
+  attache à UN pid ≤60 s (exige le paquet optionnel <code>frida</code> + droits de
+  débogage) et rapporte <em>quel module chargé</em> a émis chaque <code>connect()</code>.
+  Chemins de modules sous temp/staging → <code>INJECT_SUSPECT</code>.</li>
+<li><strong>Répondeur sinkhole</strong> — tant qu'une règle <code>sinkhole</code> est active, des
+  écouteurs loopback sur :80 (HTTP) et :443 (TLS/SNI) transforment chaque
+  tentative redirigée en alerte <code>SINKHOLE_HIT</code> avec Host/URI ou SNI +
+  processus. <code>GET /security/sinkhole</code> montre écouteurs + hits.</li>
+<li><strong>Intégrité des modules</strong> — racine Merkle sur les mappings exécutables
+  fichier-basés d'un processus → <code>MODULE_CHANGED</code> en cas d'altération ;
+  chemins sous <code>/tmp</code>, memfd ou staging → <code>MODULE_SUSPECT</code>.</li>
+<li><strong>Détection de minage</strong> — JSON stratum (<code>mining.subscribe</code>) dans une
+  tête de payload bornée → <code>MINING_STRATUM</code> ; ports de pools + CPU
+  soutenue → <code>MINING_SUSPECT</code>. Un port de pool seul n'alerte jamais.</li>
+<li><strong>Compteurs matériels</strong> — <code>POST /security/perf {pid,seconds}</code>
+  échantillonne cycles/instructions/cache-misses via <code>perf_event_open</code>
+  (Linux, sous réserve de <code>kernel.perf_event_paranoid</code>) pour corroborer
+  la suspicion de minage.</li>
+<li><strong>Enrichissement LLM local</strong> — opt-in (<code>slm_enabled</code>) :
+  <code>/security/explain</code> peut appeler un endpoint compatible Ollama,
+  <strong>loopback uniquement</strong> — les endpoints distants sont rejetés pour que
+  les métadonnées d'alerte ne quittent jamais la machine.</li>
+<li><strong>Paquets IOC</strong> — <code>GET /security/iocpack</code> exporte les indicateurs en
+  filtre de Bloom + randomized response (ε≈4,6 — déni plausible, jamais
+  en clair) ; <code>POST /security/iocpack/import</code> confronte les destinations
+  observées à un paquet reçu, en probabiliste, sans blocage automatique.
+  Un second format <code>format=proof</code> porte des feuilles SHA-256 salées +
+  un engagement Merkle : appartenance cryptographiquement exacte et
+  falsification détectée. Pas un protocole ZK — un schéma d'engagement.</li>
+</ul>
+<h3 id="ajouts-politique-reponse-v14">Ajouts politique &amp; réponse (v1.4)<a class="headerlink" href="#ajouts-politique-reponse-v14" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Profils nommés</strong> — <code>POST /firewall/profile</code> applique <code>permissive</code>
+  (table rase), <code>balanced</code> (base sortante prudente : SMTP sortant +
+  ports de pools stratum courants) ou <code>strict</code> (base + lockdown). Les
+  profils se déplient en règles ordinaires par la même machinerie que
+  l'UI — aucun chemin caché — avec dédup des règles identiques.</li>
+<li><strong>Règles d'alerte personnalisées</strong> — <code>GET/POST/DELETE /alerts/rules</code></li>
+<li>bascule par règle. Un champ (<code>remote_ip</code>, <code>host</code>, <code>process_name</code>,
+  <code>remote_port</code>, <code>protocol</code>, <code>direction</code>, <code>size</code>, <code>asn</code>, <code>country</code>),
+  un opérateur (<code>eq</code>, <code>ne</code>, <code>contains</code>, <code>regex</code>, <code>gt</code>, <code>lt</code>, <code>cidr</code>),
+  une valeur → alertes <code>CUSTOM_RULE</code> avec compteurs. Validées à la
+  création, cache regex borné. L'<code>action</code> par défaut est <code>alert</code> ;
+  <code>action=block</code> installe de plus une vraie règle pare-feu sur l'IP
+  distante matchée (dédup par règle+cible) — le kill-switch opt-in.</li>
+<li><strong>Import de blocklist</strong> — <code>POST /firewall/blocklist</code> convertit un
+  fichier hosts/domaines local (lecture purement locale) ou une URL
+  opt-in (fetch HTTPS borné à 4 Mio — l'une des rares requêtes sortantes
+  que Wiretap puisse émettre, signalée <code>remote_fetch</code>) en règles
+  <code>domain</code>. Dédupliquées, plafonnées à 500–5000 entrées.</li>
+<li><strong>Export PCAP</strong> — <code>GET /forensics/pcap</code> (filtres <code>ip=</code>/<code>process=</code>
+  optionnels) sert l'anneau de trames brutes ~4 Mio en <code>.pcap</code> prêt
+  pour Wireshark avec les timestamps réels de capture.</li>
+<li><strong>Pairing distant</strong> — <code>POST /remote/pairing</code> persiste <code>lan_bind</code>
+  (<code>0.0.0.0</code> ou une adresse LAN locale) appliqué au <em>prochain</em>
+  démarrage du backend — uvicorn ne peut re-binder un socket actif, et
+  l'API le dit. Le jeton reste obligatoire ; le pairing n'élargit que
+  l'adresse d'écoute. <code>GET /remote/pairing</code> rapporte bind + IP LAN.</li>
+<li><strong>Sandbox sans réseau</strong> — <code>POST /security/sandbox {path,seconds}</code>
+  exécute un binaire choisi avec <strong>zéro égress</strong> : <code>unshare
+  --user --net</code> non privilégié sous Linux, <code>sandbox-exec</code> deny-network
+  sous macOS. Durée + sortie bornées ; erreur honnête ailleurs.
+  <code>contrib/wiretap-contain</code> est l'équivalent manuel.</li>
+<li><strong>Modèle embarqué</strong> — <code>slm_mode=embedded</code> charge un <code>.gguf</code> fourni
+  par l'utilisateur via <code>llama-cpp-python</code> optionnel — explications
+  entièrement en processus, zéro réseau. Wiretap ne télécharge jamais
+  de poids.</li>
+<li><strong>Squelettes de filtres natifs</strong> — <code>contrib/wfp-callout/</code> (callout
+  WFP noyau en C + notes de signature) et <code>contrib/macos-filter/</code>
+  (<code>NEFilterDataProvider</code> Swift + notes entitlements). Échafaudage de
+  recherche pour qui veut construire les composants signés ;
+  non livrés, non chargés par Wiretap.</li>
+<li><strong>Attribution ASN</strong> — quand <code>GeoLite2-ASN.mmdb</code>/<code>dbip-asn-lite.mmdb</code>
+  est présente, les nœuds portent <code>asn</code> (numéro d'AS) en plus de <code>org</code>.</li>
+</ul>
+<h3 id="inspection-passive-verdicts-noyau-sync-de-flotte-v15">Inspection passive, verdicts noyau &amp; sync de flotte (v1.5)<a class="headerlink" href="#inspection-passive-verdicts-noyau-sync-de-flotte-v15" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Inspection TLS passive</strong> — le parseur réassemble des flux TCP
+  bornés (≤16 Kio/flux, TTL 30 s) et lit le message <code>Certificate</code> :
+  CN+O émetteur/sujet, drapeau auto-signé, SANs DNS, fenêtre de
+  validité, <code>san_mismatch</code> vs le SNI observé → alertes <code>TLS_CERT</code>.
+  <strong>TLS 1.3 reste opaque</strong> — ses certificats sont chiffrés, Wiretap ne
+  rapporte rien plutôt que deviner. Pas de MITM, pas de déchiffrement.</li>
+<li><strong>Veille d'entropie en clair</strong> — payloads ≥48 o hors TLS à ≥4,7
+  bits/octet → <code>HIGH_ENTROPY</code> (indice de chiffrement couvert/stégo).
+  Cooldown 10 min par hôte.</li>
+<li><strong>Heuristique tunnel ICMP</strong> — types echo portant ≥24 o, répétés
+  ≥3× en 5 min → <code>ICMP_TUNNEL</code> (signature ptunnel/icmpsh).</li>
+<li><strong>Anomalie ML de flux</strong> — forêt d'isolation pur Python (64 arbres,
+  zéro dépendance) sur vos propres résumés de flux — port, taille,
+  intervalle, fan-out, heure. Inerte sous 384 flux appris, réajustée
+  tous les 256, score ≥0,62 → <code>ML_ANOMALY</code>. Déviation de baseline,
+  <strong>pas</strong> un classifieur de malware.</li>
+<li><strong>Ask-on-connect (Linux, opt-in)</strong> — <code>ask_enabled=1</code> + root +
+  iptables : les nouveaux flux sortants sont retenus sur NFQUEUE 7
+  jusqu'à votre <code>POST /security/ask/verdict</code> dans l'UI — la pop-up
+  façon Little Snitch, pour de vrai. Le client NFQUEUE est en <strong>pur
+  Python</strong> (<code>detection/nfqueue.py</code>, AF_NETLINK) — plus besoin de
+  <code>python-netfilterqueue</code> ni de libnetfilter_queue. Timeout 15 s,
+  fail-closed (<code>ask_failopen=1</code> inverse). Windows/macOS exigent
+  les callout/NetworkExtension signés de <code>contrib/</code> — le user-mode ne
+  peut pas suspendre une connexion.</li>
+<li><strong>Enforcement eBPF cgroup (Linux, opt-in)</strong> — <code>ebpf_enforce.py</code>
+  déplace un processus contenu dans un cgroup dédié et attache un
+  programme <code>cgroup_skb/egress</code> qui droppe ses paquets côté noyau.
+  Sonde <code>available()</code> honnête ; les règles pare-feu restent le repli.</li>
+<li><strong>Vérif process-hollowing (Linux)</strong> — <code>GET /security/hollow/{pid}</code>
+  lit les pages exécutables fichier-mappées de <code>/proc/&lt;pid&gt;/mem</code> et
+  les compare au binaire disque → preuve de mismatch bornée.</li>
+<li><strong>Sync IOC entre pairs (opt-in)</strong> — <code>gossip_peers</code> liste jusqu'à
+  32 instances Wiretap <code>host:port</code> explicites ; les packs de preuves
+  Merkle salés sont poussés en HTTP(S) authentifié, timeout 8 s. Ni
+  découverte ni serveur central — et ce n'est <strong>pas</strong> du zero-knowledge :
+  les engagements prouvent seulement l'appartenance exacte.</li>
+<li><strong>Sortie syslog (opt-in)</strong> — <code>syslog_addr</code> (<code>host:port</code> UDP ou
+  <code>tcp://host:port</code>) relaie les alertes warning/critiques en RFC 3164
+  <code>local4</code> — prêt pour Wazuh/SIEM. Indépendant des webhooks.</li>
+<li><strong>Containment Firejail</strong> — <code>security/sandbox</code> préfère
+  <code>firejail --net=none</code> s'il est présent, repli <code>unshare</code>.</li>
+<li><strong>Backend nftables</strong> — là où <code>nft</code> existe, les règles vont dans une
+  table <code>inet wiretap</code> dédiée plutôt que iptables ; les hôtes
+  <code>iptables-nft</code> sont détectés et gardent le chemin iptables.</li>
+<li><strong>Alertes actionnables</strong> — chaque alerte porte des <code>actions</code>
+  structurées (bloquer IP, tuer/suspendre, verdict ask, inspecter la
+  mémoire) rendues en boutons un clic dans l'UI.</li>
+<li><strong><code>asn</code>/<code>country</code> dans les règles custom</strong> — matchés sur la base
+  geo locale, combinables avec <code>action=block</code> pour un geo-fence.</li>
+<li><strong>Heuristique DGA</strong> — les noms DNS résolus et SNI TLS sont notés sur
+  des traits lexicaux (entropie, voyelles, consonnes empilées,
+  chiffres) → <code>DGA_SUSPECT</code>. Heuristique locale pure ; ni WHOIS ni
+  âge de domaine.</li>
+<li><strong>Protocole déguisé</strong> — la tête ≤64 o du payload doit correspondre
+  au protocole annoncé par le port (HTTP/80, DNS/53, SSH/22,
+  TLS/443+853, commandes ASCII mail) → <code>PROTO_MISMATCH</code>, cooldown
+  par flux.</li>
+<li><strong>Kill-switch de volume (opt-in)</strong> — <code>kill_switch_enabled</code>
+  transforme une alerte <code>UPLOAD_SPIKE</code> en vrai blocage pare-feu sur
+  l'IP distante (dédupliqué, au mieux). Désactivé par défaut.</li>
+<li><strong>NFQUEUE pur Python</strong> — ask-on-connect n'exige plus
+  <code>python-netfilterqueue</code> : <code>detection/nfqueue.py</code> parle
+  nfnetlink_queue en AF_NETLINK directement. Linux + root + iptables
+  seulement.</li>
+<li><strong>Verdicts ask permanents</strong> — les quatre choix classiques existent :
+  autoriser / refuser une fois (portée session) et toujours autoriser /
+  toujours refuser (<code>permanent=true</code> → l'IP rejoint <code>whitelisted_ips</code>
+  ou une règle de blocage persistée, et les IP whitelistées reçoivent
+  une exemption iptables RETURN pour ne plus jamais être demandées).</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../architecture/" class="btn btn-neutral float-left" title="Architecture"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../INTEGRATIONS/" class="btn btn-neutral float-right" title="Integrations (SIEM/deploy)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../architecture/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../INTEGRATIONS/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

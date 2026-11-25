@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Little snitch alternative linux.ru - Wiretap</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Little snitch alternative linux.ru";
+        var mkdocs_page_input_path = "articles/little-snitch-alternative-linux.ru.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Little snitch alternative linux.ru</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/articles/little-snitch-alternative-linux.ru.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Твой компьютер общается с сотнями серверов в день. На Linux классические ответы — <code>tcpdump</code>, <code>ss</code>, <code>netstat</code> или Wireshark — мощные, но они отвечают на «покажи пакеты», а не на «с кем говорит моя машина, и стоит ли волноваться?».</p>
+<p>Я написал <a href="https://github.com/aixisstudio/Wiretap">Wiretap</a> именно для второго вопроса — open-source визуализатор сети в реальном времени (AGPL), полностью работающий на Linux через Docker или релизный бинарь. Честно: я автор, так что вот трезвый обзор существующего и места Wiretap.</p>
+<h2 id="linux">Ландшафт Linux<a class="headerlink" href="#linux" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Инструмент</th>
+<th>Что делает</th>
+<th>Чего не делает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>tcpdump / ss / netstat</strong></td>
+<td>Сырые данные о соединениях</td>
+<td>Без UI, истории, геолокации, привязки к приложениям</td>
+</tr>
+<tr>
+<td><strong>Wireshark</strong></td>
+<td>Глубокая диссекция пакетов</td>
+<td>Перебор для «кто стучит домой» — микроскоп, не дашборд</td>
+</tr>
+<tr>
+<td><strong>OpenSnitch</strong></td>
+<td>Фаервол приложений (промпты block/allow)</td>
+<td>Минимальная визуализация — block-first, только Linux</td>
+</tr>
+<tr>
+<td><strong>iftop / nethogs / nload</strong></td>
+<td>Bandwidth по интерфейсу или процессу</td>
+<td>Без карты мира, детекта аномалий, персистентности</td>
+</tr>
+<tr>
+<td><strong>Wiretap</strong></td>
+<td>Живая карта каждого соединения: приложение → сервер → страна, детект аномалий, история 24 ч, opt-in блокировка через фаервол ОС</td>
+<td>Применение правил ОС — best-effort (нужны привилегии); не полный интерактивный фаервол</td>
+</tr>
+</tbody>
+</table>
+<p>OpenSnitch и Wiretap — комплементарны, не конкуренты: OpenSnitch — зрелый интерактивный фаервол приложений, Wiretap показывает, <em>что</em> делает твоя машина — и с v1.2 ещё может пушить правила (<code>ip</code>/<code>cidr</code>/<code>domain</code>/<code>process</code>/<code>port</code>) в <code>iptables</code> плюс переключатель lockdown, best-effort.</p>
+<h2 id="wiretap-linux">Что Wiretap даёт на Linux<a class="headerlink" href="#wiretap-linux" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Живая карта мира</strong> каждого исходящего соединения с атрибуцией процесса — какое приложение его открыло, а не просто IP</li>
+<li><strong>Офлайн-геолокация</strong> через локальную базу MaxMind/DB-IP — твои IP не покидают машину</li>
+<li><strong>Детект аномалий</strong>: port-сканы в LAN, beaconing (регулярные колбэки — классический паттерн C2), необычный исходящий объём, DNS-туннелирование, отклонения от baseline по процессам</li>
+<li><strong>Privacy score</strong> + детект трекеров по редактируемым спискам суффиксов</li>
+<li><strong>Bandwidth по приложениям</strong>, таймлайн, хранение SQLite 24 ч, правила подавления тревог</li>
+<li><strong>Пассивный LAN-скан</strong> через системную ARP-таблицу — все устройства сети, без единого инъецированного пакета</li>
+<li><strong>Исходящие правила фаервола + lockdown</strong> — блок IP, CIDR, домена, процесса или порта через нативный фаервол (<code>iptables</code> на Linux), kill/suspend процессов, форензик-бандл (JSON/CSV/STIX)</li>
+<li><strong>Opt-in threat intel</strong> — репутация через AbuseIPDB / AlienVault OTX / VirusTotal с твоим ключом API</li>
+<li>UI и доки на 8 языках (EN/FR/ES/DE/RU/JA/PT-BR/中文)</li>
+</ul>
+<h2 id="_1">Часть про приватность<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Это первое, что проверяют линуксоиды, поэтому: API биндится на <strong>127.0.0.1</strong> и требует токен. <strong>Ни телеметрии, ни аккаунта</strong>, а каждый исходящий вызов — загрузка GeoIP, проверки обновлений, threat intel, вебхуки — независимо opt-in. Данные о трафике живут в локальном файле SQLite, принадлежащем тебе.</p>
+<h2 id="_2">Установка<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash"># Docker (для захвата нужен host networking)
+docker run --network host ghcr.io/aixisstudio/wiretap
+
+# или релизный tarball — нужен root/cap_net_raw как у tcpdump
+sudo ./wiretap-backend
+</code></pre>
+<p>Затем открой напечатанный URL. Есть и демо-режим (<code>WIRETAP_DEMO=1</code>), гоняющий синтетический трафик через настоящий конвейер — посмотреть до выдачи прав захвата.</p>
+<h2 id="_3">Что под капотом (для любопытных)<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Чистый Python + ctypes → libpcap для захвата — без Scapy. Парсинг IPv4/IPv6/TCP/UDP/DNS/TLS-SNI написан вручную, ~2K строк на весь конвейер. Бэкенд FastAPI + WebSocket, фронтенд React + D3, оболочка Electron на десктопе.</p>
+<p>Если хочешь ответ на «не болтает ли моя машина со странными местами в 3 часа ночи» на Linux — без платного фаервола и круглосуточного сниффинга — это ровно оно. ⭐ на <a href="https://github.com/aixisstudio/Wiretap">GitHub</a>, если заслужил, и в Discussions есть тред «что вы поймали?» — буду рад скриншотам.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

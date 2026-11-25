@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Wiretap — Enterprise-Integrationen - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Wiretap \u2014 Enterprise-Integrationen";
+        var mkdocs_page_input_path = "INTEGRATIONS.de.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Wiretap — Enterprise-Integrationen</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/INTEGRATIONS.de.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="wiretap-enterprise-integrationen">Wiretap — Enterprise-Integrationen<a class="headerlink" href="#wiretap-enterprise-integrationen" title="Permanent link">&para;</a></h1>
+<p><em>Community translated — PRs welcome for refinement / Von der Community übersetzt — PRs zur Verbesserung willkommen.</em></p>
+<p><strong>DE:</strong> Schritt-für-Schritt-Anleitungen, um Wiretap in einen SOC-Stack
+einzubinden — Wazuh, Splunk, Graylog/Loki, Ansible, Docker/Kubernetes —
+alles kostenlos und selbst gehostet, passend zu Wiretaps Local-first-Ansatz.
+Wiretap sendet keine eigene Telemetrie; die einzigen ausgehenden
+Verbindungen sind die hier konfigurierten.</p>
+<hr />
+<h2 id="1-siem-ausgabe">1. SIEM-Ausgabe<a class="headerlink" href="#1-siem-ausgabe" title="Permanent link">&para;</a></h2>
+<p>Wiretap bietet drei native Formate für die Alarm-Weiterleitung:</p>
+<table>
+<thead>
+<tr>
+<th>Einstellung</th>
+<th>Werte</th>
+<th>Wirkung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>syslog_addr</code></td>
+<td><code>host:514</code> oder <code>tcp://host:514</code></td>
+<td>Aktiviert Syslog-Weiterleitung (UDP Standard, TCP mit <code>tcp://</code>-Präfix)</td>
+</tr>
+<tr>
+<td><code>syslog_format</code></td>
+<td><code>rfc3164</code> <em>(Standard)</em></td>
+<td>Klassisches BSD-Syslog — von jedem Kollektor lesbar</td>
+</tr>
+<tr>
+<td></td>
+<td><code>cef</code></td>
+<td><code>CEF:0|Wiretap|…</code> — ArcSight/Wazuh/Splunk parsen <code>src</code>, <code>dst</code>, <code>dpt</code>, <code>cs1</code> (Prozess) automatisch</td>
+</tr>
+<tr>
+<td><code>webhook_url</code> + <code>webhook_enabled</code></td>
+<td>URL</td>
+<td>Generischer JSON-<code>POST</code> (oder automatisch erkannte Discord/Slack/Telegram-Payloads)</td>
+</tr>
+<tr>
+<td><code>GET /forensics/export?format=…</code></td>
+<td><code>json</code>, <code>csv</code>, <code>stix</code>, <code>ecs</code></td>
+<td>Einmalige Forensik-Bundles — <code>ecs</code> erzeugt zeilenweise Elastic Common Schema</td>
+</tr>
+</tbody>
+</table>
+<p>In der UI setzen (Einstellungen → Sicherheit) oder in <code>wiretap.toml</code>:</p>
+<pre><code class="language-toml">syslog_addr = &quot;siem.example.com:514&quot;
+syslog_format = &quot;cef&quot;
+</code></pre>
+<h2 id="2-wazuh">2. Wazuh<a class="headerlink" href="#2-wazuh" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Syslog-Listener auf dem Wazuh-Manager aktivieren (<code>/var/ossec/etc/ossec.conf</code>):</li>
+</ol>
+<p><code>xml
+   &lt;remote&gt;
+     &lt;connection&gt;syslog&lt;/connection&gt;
+     &lt;port&gt;514&lt;/port&gt;
+     &lt;protocol&gt;udp&lt;/protocol&gt;
+     &lt;allowed-ips&gt;your-agent-subnet&lt;/allowed-ips&gt;
+   &lt;/remote&gt;</code></p>
+<ol>
+<li>Jeden Wiretap-Agenten darauf zeigen lassen — Ansible:</li>
+</ol>
+<p><code>yaml
+   wiretap_syslog_addr: "wazuh.example.com:514"
+   wiretap_syslog_format: "cef"</code></p>
+<ol>
+<li>Der CEF-Decoder von Wazuh übernimmt die <code>CEF:0|Wiretap|…</code>-Meldungen;
+   <code>severity</code> wird auf syslog-PRI abgebildet (critical→2, warning→4, info→6).</li>
+</ol>
+<h2 id="3-splunk">3. Splunk<a class="headerlink" href="#3-splunk" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Einstellungen → Daten-Inputs → UDP → neuer Input auf 514, Sourcetype
+   <code>syslog</code> (oder TCP-Input für <code>tcp://…</code>-Sender).</li>
+<li><code>syslog_format = "cef"</code> liefert <code>src</code>, <code>dst</code>, <code>dpt</code>, <code>cs1Label</code> gratis;
+   für Dashboards <code>GET /forensics/export?format=ecs</code> per Scripted Input
+   abfragen — JSON wird automatisch extrahiert.</li>
+</ol>
+<h2 id="4-graylog-loki">4. Graylog / Loki<a class="headerlink" href="#4-graylog-loki" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Graylog</strong>: System → Inputs → Syslog UDP, Port 514. CEF-Erweiterungsfelder
+  landen als Nachrichtenfelder.</li>
+<li><strong>Loki/Grafana</strong>: <code>syslog_addr</code> auf ein <code>promtail</code>-Syslog-Target richten
+  oder <code>/forensics/export?format=ecs</code> per Cronjob → Loki-Push-Job scrapen.</li>
+</ul>
+<h2 id="5-deklarative-konfiguration-security-as-code">5. Deklarative Konfiguration (Security-as-Code)<a class="headerlink" href="#5-deklarative-konfiguration-security-as-code" title="Permanent link">&para;</a></h2>
+<p>Das Backend wendet <strong>eine Datei</strong> beim Start an — <code>$WIRETAP_CONFIG</code>, sonst
+<code>wiretap.toml</code>/<code>wiretap.json</code> im Datenverzeichnis. Jede deklarierte
+Einstellung überschreibt den UI/DB-Wert — die Datei ist die
+Wahrheitsquelle der Flotte:</p>
+<pre><code class="language-toml">syslog_addr = &quot;siem.example.com:514&quot;
+syslog_format = &quot;cef&quot;
+kill_switch_enabled = true
+ask_enabled = false          # headless Server
+gossip_peers = [&quot;sec-01:8000&quot;]
+ports = [80, 443]
+</code></pre>
+<p>Vollständiges Vokabular: <code>packaging/wiretap.toml.example</code>.</p>
+<h2 id="6-ansible-puppet-salt-gpo">6. Ansible / Puppet / Salt / GPO<a class="headerlink" href="#6-ansible-puppet-salt-gpo" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Ansible</strong> — fertige Rolle in <code>deploy/ansible/</code>:</li>
+</ul>
+<p><code>bash
+  ansible-playbook -i inventory deploy/ansible/site.yml</code></p>
+<p>Installiert <code>/opt/wiretap</code>, das venv, <code>/etc/wiretap/wiretap.toml</code> und die
+  gehärtete systemd-Unit, aktiviert dann <code>wiretap.service</code>.</p>
+<ul>
+<li>
+<p><strong>Puppet / SaltStack</strong> — Community-Skelette in <code>deploy/puppet/</code> und
+  <code>deploy/salt/</code> (Label <code>help wanted</code>): dieselben drei Primitive —
+  Backend-Baum kopieren, <code>wiretap.toml</code> rendern, <code>wiretap.service</code> verwalten.</p>
+</li>
+<li>
+<p><strong>Windows GPO</strong> — <code>deploy/gpo/Install-Wiretap.ps1</code> führt die
+  Silent-Installation aus (ProgramData-Config, venv, SYSTEM-Aufgabe auf
+  127.0.0.1). Ask-on-connect unter Windows braucht zusätzlich den
+  signierten WFP-Callout — siehe <code>docs/SIGNING.md</code>.</p>
+</li>
+</ul>
+<h2 id="7-docker-kubernetes">7. Docker &amp; Kubernetes<a class="headerlink" href="#7-docker-kubernetes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Einzelhost</strong>: <code>docker compose up</code> — <code>network_mode: host</code> +
+  <code>cap_add: NET_RAW/NET_ADMIN</code> bereits in <code>docker-compose.yml</code>.</li>
+<li><strong>Flotten-Konsole</strong>: <code>deploy/helm/wiretap</code> — <code>mode: collector</code> startet
+  ein ClusterIP-Deployment, das die Audits aller konfigurierten Agenten
+  in <code>GET /remote/fleet</code> zusammenführt; <code>mode: agent</code> rendert ein
+  Host-Network-DaemonSet mit <code>NET_RAW</code>/<code>NET_ADMIN</code>.</li>
+</ul>
+<p><code>bash
+  helm install wiretap ./deploy/helm/wiretap \
+      --set token=$(openssl rand -hex 32) \
+      --set config.gossip_peers='["agent-1:8000","agent-2:8000"]'</code></p>
+<h2 id="8-sigma-regeln">8. Sigma-Regeln<a class="headerlink" href="#8-sigma-regeln" title="Permanent link">&para;</a></h2>
+<p><code>POST /alerts/rules/sigma</code> akzeptiert ein Sigma-YAML und kompiliert die
+unterstützte Teilmenge (Feld→Wert-Selektionen, <code>|contains</code>/<code>|startswith</code>/
+<code>|endswith</code>/<code>|re</code>/<code>|cidr</code>/<code>|gt</code>/<code>|lt</code>/<code>|all</code>, <code>1 of</code>/<code>all of</code>-Bedingungen)
+in Wiretap-Custom-Rules — nur Alarme, <code>skipped</code>-Gründe für alles
+außerhalb der Teilmenge. Felder werden auf das gemappt, was ein
+<em>Paket</em>-Sensor sieht (<code>DestinationIp→remote_ip</code>, <code>Image→process_name</code>,
+<code>Domain→host</code>, …).</p>
+<p>YARA-L für Google SecOps/Chronicle: <code>GET /alerts/rules/yaral</code> exportiert
+alle Regeln (inkl. importierter Sigma-Regeln) als <code>.yar</code>-Datei — der
+Weg Sigma→YARA-L ist damit abgedeckt.</p>
+<h2 id="9-remote-agenten-wiretap-agent1">9. Remote-Agenten (wiretap-agent/1)<a class="headerlink" href="#9-remote-agenten-wiretap-agent1" title="Permanent link">&para;</a></h2>
+<p><code>agent/</code> enthält einen leichten Rust-Daemon (null Abhängigkeiten, ein
+~1-MB-Binary), der die Socket-Tabelle des Hosts (<code>/proc/net/*</code>)
+beobachtet und neue ausgehende Flows an <code>POST /ingest/events</code> pusht.
+Er beobachtet Sockets — keine Payloads/SNI (das bleibt beim lokalen
+Capture); Prozess-Attribution ist als TODO markiert. Transport: HTTP +
+Bearer-Token (Trust-Domain wie <code>gossip_peers</code>).</p>
+<h2 id="10-kostenlose-threat-intel-feeds">10. Kostenlose Threat-Intel-Feeds<a class="headerlink" href="#10-kostenlose-threat-intel-feeds" title="Permanent link">&para;</a></h2>
+<p><code>POST /firewall/blocklist</code> importiert beide Formen:</p>
+<ul>
+<li><code>kind: "domain"</code> — Hosts-/Domain-Listen (StevenBlack, EasyList…) →
+  <code>domain</code>-Firewall-Regeln;</li>
+<li><code>kind: "ip"</code> — IP-Feeds (Blocklist.de, URLhaus/Feodo-Exports) →
+  <code>ip</code>-Regeln; private/reservierte/Loopback-Adressen werden nie importiert.</li>
+</ul>
+<p><code>path:</code> liest eine lokale Datei (vollständig offline); <code>url:</code> ist ein
+expliziter, auditierter Opt-in-Fetch (<code>remote_fetch: true</code> in der
+Antwort). Limit <code>max_entries ≤ 5000</code> — riesige Feeds gehören in einen
+Resolver.</p>
+<p>Opt-in-API-Anbieter (AbuseIPDB / OTX / VirusTotal) bleiben über
+<code>ti_provider</code> + <code>ti_api_key</code> verfügbar — ohne Schlüssel geht nichts raus.</p>
+<h2 id="11-headless-daemon-modus">11. Headless- / Daemon-Modus<a class="headerlink" href="#11-headless-daemon-modus" title="Permanent link">&para;</a></h2>
+<p>Die GUI ist optional: das Backend ist das gesamte Produkt. Direkt
+(<code>uvicorn api.main:app</code>), unter der mitgelieferten systemd-Unit oder im
+Container — alle Funktionen oben laufen ohne Frontend.
+<code>WIRETAP_DEMO=1</code> liefert weiterhin einen root-freien synthetischen Feed
+für Schulungen und CTFs.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
