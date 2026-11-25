@@ -6,6 +6,18 @@ All notable changes to Wiretap. / Toutes les modifications notables de Wiretap.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
+### Added — time-travel (round 4)
+- **Time-travel state diff** (`timetravel.py`): "what changed on this machine
+  since Tuesday" — the question every investigation starts with — answered in
+  milliseconds. Hourly snapshots of the security-relevant state (persistence
+  entries, listening ports with owners, process shapes), disk-persisted,
+  pruned to 48h. Diff any point: appeared / vanished / mutated, risk-noted.
+  Verified live: 19 persist + 9 listeners + 631 process shapes in one snapshot.
+- Endpoints: `GET /timetravel/status`, `POST /timetravel/snapshot`,
+  `GET /timetravel/diff?since=<ts>`.
+- Fixed latent `_minutes_ago` helper missing in db (ruff F821 caught what no
+  test did — the procdest query path now verified end-to-end on real SQLite).
+
 ### Added — the intrusion cycle, closed (round 3)
 - **Persistence surface watch** (`perswatch.py`): the layer every network-first
   tool misses. Enumerates every auto-start mechanism without privileges —

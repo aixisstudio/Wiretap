@@ -63,6 +63,12 @@ _alerts_dropped = 0
 _chain_head = "0" * 64                        # EN: forensic genesis / FR: genèse forensique
 
 
+def _minutes_ago(n: int) -> str:
+    """EN: minute key n minutes in the past. FR: clé minute il y a n minutes."""
+    from datetime import datetime, timedelta, timezone
+    return (datetime.now(timezone.utc) - timedelta(minutes=n)).strftime("%Y-%m-%dT%H:%M")
+
+
 def _utcnow_minute() -> str:
     """EN: Current UTC minute as 'YYYY-MM-DDTHH:MM' (timezone-aware; utcnow()
     is deprecated since Python 3.12). / FR: Minute UTC courante au format

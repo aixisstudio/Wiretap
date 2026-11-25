@@ -124,6 +124,7 @@ from detection.integrity import IntegrityWatcher
 from detection.killchain import KillChain
 from detection.flowdna import FlowDNA
 from detection.perswatch import PersistenceWatch
+from detection.timetravel import TimeTravel
 from detection.blastradius import BlastRadius
 from detection.mcpwatch import McpWatch
 from detection.lineage import LineageWatch
@@ -201,7 +202,8 @@ killchain = KillChain()                 # EN: cross-signal correlator / FR: corr
 flowdna = FlowDNA()                 # EN: per-process traffic metabolism / FR: métabolisme réseau par processus
 mcpwatch = McpWatch()
 perswatch = PersistenceWatch()       # EN: auto-start surface diff / FR: diff de la surface auto-start
-blastradius = BlastRadius()          # EN: impact assessment engine / FR: moteur d'évaluation d'impact               # EN: MCP config governance / FR: gouvernance des configs MCP
+blastradius = BlastRadius()
+timetravel = TimeTravel(store_dir=None)   # EN: state-diff engine / FR: moteur de diff temporel          # EN: impact assessment engine / FR: moteur d'évaluation d'impact               # EN: MCP config governance / FR: gouvernance des configs MCP
 systemdns = SystemDns(_platform.system())  # EN: system DNS integration / FR: intégration DNS système
 presencew = PresenceWatch(_platform.system())  # EN: was a human there? / FR: un humain était-il là ?
 lineagew = LineageWatch()            # EN: ancestry verdicts / FR: verdicts d'ascendance
@@ -2566,7 +2568,20 @@ async def lifespan(app: FastAPI):
         hst = await honeyports.start()
         if hst["errors"]:
             logger.warning("honeyports partial: %s", hst["errors"])
-    asyncio.ensure_future(_perswatch_loop())     # EN: 5-min persistence diff / FR: diff persistance 5 min
+    asyncio.ensure_future(_perswatch_loop())
+    try:
+        timetravel.store_dir = data_dir() / "timetravel"
+        timetravel.store_dir.mkdir(parents=True, exist_ok=True)
+        tt_snap = timetravel.snapshot()             # EN: boot baseline / FR: baseline de démarrage
+        logger.info("timetravel baseline: %s", tt_snap)
+    except Exception as e:                          # noqa: BLE001
+        logger.warning("timetravel baseline failed: %s", e)
+
+    async def _tt_loop() -> None:
+        while True:
+            await asyncio.sleep(3600)
+            await asyncio.get_running_loop().run_in_executor(None, timetravel.snapshot)
+    asyncio.ensure_future(_tt_loop())     # EN: 5-min persistence diff / FR: diff persistance 5 min
     if db.get_setting("dnsfw_enabled", False):
         asyncio.ensure_future(asyncio.get_running_loop().run_in_executor(None, dnsfw.refresh_lists))
         st = await dnsfw.start()
@@ -3616,6 +3631,26 @@ async def impact_for_alert(alert_id: str) -> dict:
     if not a:
         return {"error": "no assessment for this alert", "alert_id": alert_id}
     return a
+
+
+@app.get("/timetravel/status", dependencies=_AUTH)
+async def timetravel_status() -> dict:
+    """EN: Snapshot store status. FR: état du magasin de snapshots."""
+    return timetravel.status()
+
+
+@app.post("/timetravel/snapshot", dependencies=_AUTH)
+async def timetravel_snap() -> dict:
+    """EN: Take a state snapshot now. FR: prendre un snapshot maintenant."""
+    return timetravel.snapshot()
+
+
+@app.get("/timetravel/diff", dependencies=_AUTH)
+async def timetravel_diff(since: float | None = None) -> dict:
+    """EN: "What changed since then" — appeared/vanished/mutated across
+        persistence, listeners, processes, risk-noted. Evidence grade.
+    FR: « qu'est-ce qui a changé depuis » — apparu/disparu/muté."""
+    return timetravel.diff_since(since)
 
 
 @app.get("/flowdna", dependencies=_AUTH)
