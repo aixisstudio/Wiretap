@@ -120,6 +120,7 @@ from detection import digest as digestmod
 from detection.aiwatch import AiWatch
 from detection.secretwatch import SecretWatch
 from detection.supplychain import SupplyChainWatch
+from detection import nlquery
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -3380,6 +3381,23 @@ async def secretwatch_rescan() -> dict:
 async def supplychain_status() -> dict:
     """EN: Supply-chain watch state. / FR: état de la veille supply-chain."""
     return scwatch.status()
+
+
+
+@app.post("/ask", dependencies=_AUTH)
+async def ask_nl(body: dict) -> dict:
+    """EN: Natural-language query over your traffic — deterministic answers
+        from SQLite (never hallucinated), SLM narration optional.
+    FR: requête langage naturel sur votre trafic — réponses déterministes
+        depuis SQLite (jamais hallucinées), narration SLM optionnelle."""
+    question = str(body.get("question", "")).strip()[:500]
+    if not question:
+        raise HTTPException(400, "question required")
+    loop = asyncio.get_running_loop()
+    facts = await loop.run_in_executor(
+        None, nlquery.answer, db.get_conn(), question,
+        detector.history[-200:], aiwatch.activity())
+    return facts
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)
