@@ -114,6 +114,7 @@ from detection import perfprobe
 from detection import protomatch
 from detection.sinkresponder import SinkholeResponder
 from detection.threatintel import ThreatIntel
+from detection.dnsfw import DnsFirewall
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -156,6 +157,7 @@ sink = SinkholeResponder()        # EN: loopback :80/:443 sinkhole listener / FR
 miner = MinerDetector()           # EN: stratum/pool/CPU mining signals / FR: signaux de minage
 slm = LocalSlm()                  # EN: optional localhost LLM enrichment / FR: enrichissement LLM local
 custom_rules = CustomRules()      # EN: user-defined alert rules / FR: règles d'alerte utilisateur
+dnsfw = DnsFirewall(data_dir())   # EN: filtering DNS proxy (opt-in) / FR: proxy DNS filtrant (opt-in)
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -2106,6 +2108,14 @@ def _load_settings() -> None:
     #     for operator-listed addresses (detection/gossip.py).
     # FR: Sync IOC entre pairs opt-in — liste explicite seulement.
     peer_sync.configure(db.get_setting("gossip_peers", []) or [])
+    # EN: DNS filtering proxy — opt-in; categories/upstream/port restored,
+    #     started in lifespan when enabled. / FR: Proxy DNS filtrant — opt-in.
+    dnsfw.configure(categories=db.get_setting("dnsfw_categories", []) or [],
+                    upstream_mode=db.get_setting("dnsfw_upstream_mode", "system") or "system",
+                    upstream_custom=db.get_setting("dnsfw_upstream_custom", "") or "",
+                    bind_port=int(db.get_setting("dnsfw_bind_port", 5353) or 5353))
+    for _d in (db.get_setting("dnsfw_whitelist", []) or []):
+        dnsfw.filter.whitelist_add(_d)
     # EN: Ask-on-first-connect (Linux NFQUEUE) — started only when the
     #     persisted opt-in is set AND the platform allows it.
     # FR: Ask-on-first-connect (NFQUEUE Linux) — démarré seulement si
@@ -2227,6 +2237,11 @@ async def lifespan(app: FastAPI):
     """EN: FastAPI lifespan — startup, yield, then clean shutdown.
     FR: Lifespan FastAPI — démarrage, yield, puis arrêt propre."""
     await _startup()
+    if db.get_setting("dnsfw_enabled", False):
+        asyncio.ensure_future(asyncio.get_running_loop().run_in_executor(None, dnsfw.refresh_lists))
+        st = await dnsfw.start()
+        if not st["running"]:
+            logger.warning("DNS firewall not started: %s", st["last_error"])
     try:
         yield
     finally:
@@ -3091,6 +3106,82 @@ async def firewall_presets() -> dict:
     """EN: Built-in threat intelligence feed presets (ThreatFox C2, etc.).
     FR: Préréglages de flux de renseignement sur les menaces intégrés."""
     return {"ok": True, "presets": blocklist.PRESETS}
+
+
+
+class DnsfwConfigBody(BaseModel):
+    enabled: bool | None = None
+    categories: list[str] | None = None
+    upstream_mode: str | None = None
+    upstream_custom: str | None = None
+    bind_port: int | None = None
+
+
+@app.get("/dnsfw/status", dependencies=_AUTH)
+async def dnsfw_status() -> dict:
+    """EN: DNS firewall state, counters and available list categories.
+    FR: État du pare-feu DNS, compteurs et catégories disponibles."""
+    return dnsfw.status()
+
+
+@app.get("/dnsfw/blocked", dependencies=_AUTH)
+async def dnsfw_blocked() -> dict:
+    """EN: Recent blocked queries (bounded ring, newest last).
+    FR: Requêtes bloquées récentes (anneau borné)."""
+    return {"blocked": dnsfw.recent_blocked[-100:], "total": dnsfw.stats["blocked"]}
+
+
+@app.post("/dnsfw/config", dependencies=_AUTH)
+async def dnsfw_config(body: DnsfwConfigBody) -> dict:
+    """EN: Configure + start/stop the filtering DNS proxy. Every change
+        persists; enabling categories triggers a background list refresh
+        (bounded, opt-in fetch, see detection/dnsfw.py).
+    FR: Configure + démarre/arrête le proxy DNS filtrant. Tout persiste ;
+        activer des catégories lance un refresh en tâche de fond."""
+    dnsfw.configure(categories=body.categories, upstream_mode=body.upstream_mode,
+                    upstream_custom=body.upstream_custom, bind_port=body.bind_port)
+    db.set_setting("dnsfw_categories", sorted(dnsfw.enabled_categories))
+    db.set_setting("dnsfw_upstream_mode", dnsfw.upstream_mode)
+    db.set_setting("dnsfw_upstream_custom", dnsfw.upstream_custom)
+    db.set_setting("dnsfw_bind_port", dnsfw.bind_port)
+    if body.enabled is not None:
+        db.set_setting("dnsfw_enabled", bool(body.enabled))
+    if body.categories:
+        asyncio.ensure_future(asyncio.get_running_loop().run_in_executor(None, dnsfw.refresh_lists))
+    if body.enabled is True and not dnsfw.running:
+        st = await dnsfw.start()
+        if not st["running"]:
+            return {**st, "warning": "bind failed — check port/privileges"}
+        return st
+    if body.enabled is False and dnsfw.running:
+        return await dnsfw.stop()
+    return dnsfw.status()
+
+
+@app.post("/dnsfw/refresh", dependencies=_AUTH)
+async def dnsfw_refresh() -> dict:
+    """EN: Force-refresh the enabled filter lists (still bounded + honest).
+    FR: Force le rafraîchissement des listes activées (borné + honnête)."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, dnsfw.refresh_lists, True)
+
+
+class DnsfwWhitelistBody(BaseModel):
+    domain: str
+    remove: bool = False
+
+
+@app.post("/dnsfw/whitelist", dependencies=_AUTH)
+async def dnsfw_whitelist(body: DnsfwWhitelistBody) -> dict:
+    """EN: Whitelist beats every list — the user's escape hatch, persisted.
+    FR: La whitelist prime sur toute liste — issue de secours, persistée."""
+    if body.remove:
+        dnsfw.filter.whitelist_remove(body.domain)
+    else:
+        dnsfw.filter.whitelist_add(body.domain)
+    wl = sorted(dnsfw.filter._whitelist)
+    db.set_setting("dnsfw_whitelist", wl)
+    return {"whitelist": wl}
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)

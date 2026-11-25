@@ -38,6 +38,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
   const [uploadMb, setUploadMb] = useState(50)
   const [geoStatus, setGeoStatus] = useState(null)
   const [geoMsg, setGeoMsg] = useState('')
+  const [dnsfw, setDnsfw] = useState(null)
   const [saved, setSaved] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(false)
   const [ifaces, setIfaces] = useState(null)
@@ -101,6 +102,24 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
     if (!item || watchlist.includes(item)) { setWatchInput(''); return }
     onWatchlist?.([...watchlist, item])
     setWatchInput('')
+  }
+
+
+  async function dnsfwCall(path, body) {
+    const base = await apiBase()
+    const h = await authHeaders({ 'Content-Type': 'application/json' })
+    const r = await fetch(base + path, body
+      ? { method: 'POST', headers: h, body: JSON.stringify(body) }
+      : { headers: h })
+    const j = await r.json()
+    setDnsfw(prev => ({ ...prev, ...j }))
+    return j
+  }
+  async function dnsfwLoad() {
+    const base = await apiBase()
+    const h = await authHeaders()
+    const r = await fetch(base + '/dnsfw/status', { headers: h })
+    if (r.ok) setDnsfw(await r.json())
   }
 
   async function save(key, value) {
@@ -394,6 +413,83 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
             </form>
           </div>
           <div style={{ ...hint, marginTop: 4 }}>{t('ti_privacy')}</div>
+        </div>
+
+
+        {/* DNS firewall / Pare-feu DNS */}
+        <div style={{ ...row, display: 'block' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={label}>{t('dnsfw_title')}</div>
+            {dnsfw && (
+              <span style={{ fontSize: 10, color: dnsfw.running ? '#22c55e' : 'var(--text-dim)' }}>
+                {dnsfw.running ? t('dnsfw_running') : t('dnsfw_stopped')}
+              </span>
+            )}
+          </div>
+          <div style={hint}>{t('dnsfw_hint')}</div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={async () => {
+                const enabling = !(dnsfw?.running)
+                await dnsfwCall('/dnsfw/config', { enabled: enabling })
+              }}
+              role="switch" aria-checked={!!dnsfw?.running}
+              style={{
+                width: 36, height: 20, borderRadius: 10, border: '1px solid var(--border)',
+                background: dnsfw?.running ? '#3b82f6' : 'var(--bg)', cursor: 'pointer', position: 'relative',
+              }}>
+              <span style={{
+                position: 'absolute', top: 3, left: dnsfw?.running ? 19 : 3,
+                width: 12, height: 12, borderRadius: 6, background: 'var(--text)',
+              }} />
+            </button>
+            <span style={{ fontSize: 11, color: 'var(--text)' }}>{t('dnsfw_enable')}</span>
+            <select
+              value={dnsfw?.upstream_mode ?? 'system'}
+              onChange={e => dnsfwCall('/dnsfw/config', { upstream_mode: e.target.value })}
+              aria-label={t('dnsfw_upstream')}
+              style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', padding: '4px 8px', fontSize: 11 }}
+            >
+              <option value="system">system</option>
+              <option value="cloudflare">cloudflare (DoH)</option>
+              <option value="quad9">quad9 (DoH)</option>
+              <option value="google">google (DoH)</option>
+            </select>
+            <button onClick={() => dnsfwCall('/dnsfw/refresh', {})} style={{
+              background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+              color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
+            }}>{t('dnsfw_refresh')}</button>
+          </div>
+          {dnsfw?.available_categories && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+              {Object.entries(dnsfw.available_categories).map(([key, label]) => {
+                const on = (dnsfw.categories || []).includes(key)
+                return (
+                  <button key={key}
+                    onClick={() => {
+                      const cur = new Set(dnsfw.categories || [])
+                      if (on) cur.delete(key); else cur.add(key)
+                      dnsfwCall('/dnsfw/config', { categories: [...cur] })
+                    }}
+                    style={{
+                      background: on ? 'rgba(59,130,246,.18)' : 'var(--bg)',
+                      border: `1px solid ${on ? '#3b82f6' : 'var(--border)'}`,
+                      borderRadius: 8, color: 'var(--text)', padding: '3px 9px',
+                      fontSize: 10, cursor: 'pointer',
+                    }}>
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {dnsfw?.stats && (
+            <div style={{ ...hint, marginTop: 6 }}>
+              {dnsfw.stats.queries} {t('dnsfw_queries')} · {dnsfw.stats.blocked} {t('dnsfw_blocked')} · {dnsfw.domains_loaded} domains
+              {dnsfw.last_error ? ` · ${dnsfw.last_error}` : ''}
+            </div>
+          )}
+          <div style={{ ...hint, marginTop: 4 }}>{t('dnsfw_setup')}</div>
         </div>
 
         {/* External webhook / Webhook externe */}
