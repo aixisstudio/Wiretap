@@ -1,6 +1,6 @@
 {
   "name": "wiretap",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Wiretap \u2014 application firewall and real-time network monitor / pare-feu applicatif et moniteur r\u00e9seau en temps r\u00e9el",
   "main": "main.js",
   "license": "AGPL-3.0-or-later",

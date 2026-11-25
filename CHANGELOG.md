@@ -6,7 +6,7 @@ All notable changes to Wiretap. / Toutes les modifications notables de Wiretap.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
-## [Unreleased] — "full-spectrum" security update
+## [1.8.0] — "full-spectrum" security update
 
 ### Added — the post-AI security stack nobody else has
 
