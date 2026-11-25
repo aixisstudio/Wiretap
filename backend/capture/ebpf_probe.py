@@ -1,6 +1,6 @@
 """
 EN: Optional eBPF connect probe (Linux only, opt-in). When the `bcc`
-    package and root privileges are present, Snitch attaches kprobes to
+    package and root privileges are present, Wiretap attaches kprobes to
     tcp_v4_connect / tcp_v6_connect — the kernel functions performing
     connect() — and streams (pid, comm, dst) events into a small ring.
     The sniffer consults that ring when its psutil socket-table lookup
@@ -13,10 +13,10 @@ EN: Optional eBPF connect probe (Linux only, opt-in). When the `bcc`
     graceful, honest degradation. Nothing is simulated.
 
     Layout follows iovisor/bcc's tcpconnect.py (Apache-2.0): same kprobes,
-    same perf-buffer mechanism, reduced to the fields Snitch needs.
+    same perf-buffer mechanism, reduced to the fields Wiretap needs.
 
 FR: Sonde eBPF optionnelle pour connect() (Linux seulement, opt-in). Quand
-    le paquet `bcc` et les droits root sont présents, Snitch attache des
+    le paquet `bcc` et les droits root sont présents, Wiretap attache des
     kprobes à tcp_v4_connect / tcp_v6_connect — les fonctions noyau qui
     réalisent connect() — et streame les événements (pid, comm, dst) vers
     un petit anneau. Le sniffer le consulte quand la table psutil rate :
@@ -48,7 +48,7 @@ _BPF_SRC = r"""
 #include <net/sock.h>
 #include <bcc/proto.h>
 
-struct snitch_evt {
+struct wiretap_evt {
     u32 pid;
     char comm[16];
     u16 dport;
@@ -59,7 +59,7 @@ struct snitch_evt {
 BPF_PERF_OUTPUT(events);
 
 static int trace_connect(struct pt_regs *ctx, struct sock *sk, int v6) {
-    struct snitch_evt ev = {};
+    struct wiretap_evt ev = {};
     ev.pid = bpf_get_current_pid_tgid() >> 32;
     bpf_get_current_comm(&ev.comm, sizeof(ev.comm));
     ev.dport = ntohs(sk->__sk_common.skc_dport);
@@ -85,8 +85,8 @@ int kprobe__tcp_v6_connect(struct pt_regs *ctx, struct sock *sk) {
 
 
 class _Event(ctypes.Structure):
-    """EN: ctypes mirror of struct snitch_evt for perf-buffer decoding.
-    FR: Miroir ctypes de struct snitch_evt pour décoder le perf buffer."""
+    """EN: ctypes mirror of struct wiretap_evt for perf-buffer decoding.
+    FR: Miroir ctypes de struct wiretap_evt pour décoder le perf buffer."""
     _fields_ = [("pid", ctypes.c_uint32), ("comm", ctypes.c_char * 16),
                 ("dport", ctypes.c_uint16), ("ipver", ctypes.c_uint8),
                 ("daddr", ctypes.c_uint8 * 16)]
@@ -162,7 +162,7 @@ class EbpfProbe:
             return False
         self._stop.clear()
         self._thread = threading.Thread(target=self._poll, daemon=True,
-                                        name="snitch-ebpf")
+                                        name="wiretap-ebpf")
         self._thread.start()
         return True
 

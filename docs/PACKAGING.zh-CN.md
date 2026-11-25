@@ -6,9 +6,9 @@
 
 | 格式 | 文件 | 说明 |
 |---|---|---|
-| AppImage | `Snitch-x86_64.AppImage` | 便携，需要 `libfuse2`；更新信息经 `latest-linux.yml` |
-| deb | `snitch-linux-amd64.deb` | 标准 Debian/Ubuntu 安装 |
-| snap | `Snitch-amd64.snap` | 严格限制（strict confinement）——见下文 |
+| AppImage | `Wiretap-x86_64.AppImage` | 便携，需要 `libfuse2`；更新信息经 `latest-linux.yml` |
+| deb | `wiretap-linux-amd64.deb` | 标准 Debian/Ubuntu 安装 |
+| snap | `Wiretap-amd64.snap` | 严格限制（strict confinement）——见下文 |
 
 ## Snap —— 沙箱限制下的抓包
 
@@ -17,8 +17,8 @@ Snap 由 electron-builder（`linux.target` 含 `"snap"`）以 strict 模式
 （与 `tcpdump` snap 相同的模式）。安装本地 `.snap` 后：
 
 ```bash
-sudo snap install --dangerous Snitch-amd64.snap
-sudo snap connect snitch:network-observe   # 授予 AF_PACKET 读取
+sudo snap install --dangerous Wiretap-amd64.snap
+sudo snap connect wiretap:network-observe   # 授予 AF_PACKET 读取
 ```
 
 不连接该接口时 UI 正常但抓包为空。发布到 Store 后，人工审核通过会
@@ -34,4 +34,4 @@ Flatpak 沙箱无法授予 `AF_PACKET`：没有任何 portal 或 `finish-args`
 
 ## rpm + Homebrew 配方 + 发布流水线
 
-`release.yml` 工作流（每个 `v*` tag 或 `workflow_dispatch`）运行四个发布任务：**nfpm** 构建 `snitch-linux-amd64.rpm`（nfpm v2.48，`packaging/nfpm.yaml`）；**homebrew** 将 `Formula/snitch.rb` 推送到 `aixisstudio/homebrew-tap` 并安装无头 `snitchd` 守护进程（`brew install aixisstudio/tap/snitch`，需要 `HOMEBREW_TAP_TOKEN`）；**winget** 在存在 `Snitch-Setup-*.exe` 资产时通过 winget-releaser 提交（`WINGET_TOKEN`）；**chocolatey** 在配置 `CHOCO_API_KEY` 后打包/发布 `installer/Snitch.nuspec`。
+`release.yml` 工作流（每个 `v*` tag 或 `workflow_dispatch`）运行四个发布任务：**nfpm** 构建 `wiretap-linux-amd64.rpm`（nfpm v2.48，`packaging/nfpm.yaml`）；**homebrew** 将 `Formula/wiretap.rb` 推送到 `aixisstudio/homebrew-tap` 并安装无头 `wiretapd` 守护进程（`brew install aixisstudio/tap/wiretap`，需要 `HOMEBREW_TAP_TOKEN`）；**winget** 在存在 `Wiretap-Setup-*.exe` 资产时通过 winget-releaser 提交（`WINGET_TOKEN`）；**chocolatey** 在配置 `CHOCO_API_KEY` 后打包/发布 `installer/Wiretap.nuspec`。

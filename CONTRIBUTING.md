@@ -4,7 +4,7 @@
 
 ## English
 
-Thanks for your interest! Snitch is a bilingual (EN/FR) project — code
+Thanks for your interest! Wiretap is a bilingual (EN/FR) project — code
 comments and user-facing text should exist in both languages where
 practical. The UI ships 8 locales under `frontend/src/locales/` — a new
 language is a single file copied from `en.js` (keep key parity) plus an
@@ -35,7 +35,7 @@ Frontend: `npm run dev` → http://localhost:5173/?token=<token from backend out
 
 ## Français
 
-Merci de votre intérêt ! Snitch est un projet bilingue (EN/FR) — les
+Merci de votre intérêt ! Wiretap est un projet bilingue (EN/FR) — les
 commentaires de code et les textes utilisateur doivent exister dans les deux
 langues autant que possible. L'UI compte 8 locales dans
 `frontend/src/locales/` — une nouvelle langue = un nouveau fichier copiant

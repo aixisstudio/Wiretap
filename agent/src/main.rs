@@ -1,10 +1,10 @@
-//! Snitch agent — lightweight remote sensor for a Snitch collector.
-//! Agent Snitch — capteur léger pour un collecteur Snitch.
+//! Wiretap agent — lightweight remote sensor for a Wiretap collector.
+//! Agent Wiretap — capteur léger pour un collecteur Wiretap.
 //!
 //! EN: Watches the host's live socket table (Linux: /proc/net/{tcp,tcp6,
 //!     udp,udp6}; falls back to a periodic scan) and pushes the DIFF —
 //!     new outbound/established endpoints only — to the collector's
-//!     `POST /ingest/events` endpoint, contract `snitch-agent/1`.
+//!     `POST /ingest/events` endpoint, contract `wiretap-agent/1`.
 //!
 //!     Deliberately minimal-dependency and honest about scope:
 //!       * it observes SOCKETS, it does not sniff packets — no payloads,
@@ -12,17 +12,17 @@
 //!         those duties on the host it runs on);
 //!       * pid↔process attribution walks /proc/*/fd (Linux; other OSes
 //!         report pid 0 honestly);
-//!       * transport is plain HTTP by default — set SNITCH_TLS=1 for
+//!       * transport is plain HTTP by default — set WIRETAP_TLS=1 for
 //!         rustls TLS (system-free pure-Rust stack). On hostile links
 //!         either enable it or run behind WireGuard/Tailscale.
 //!
-//!     Config: SNITCH_SERVER="collector:8000"  SNITCH_TOKEN="<bearer>"
-//!             SNITCH_HOST="agent-name"        SNITCH_INTERVAL_SECS=5
-//!             SNITCH_TLS=1                    SNITCH_CA="/path/ca.pem"
+//!     Config: WIRETAP_SERVER="collector:8000"  WIRETAP_TOKEN="<bearer>"
+//!             WIRETAP_HOST="agent-name"        WIRETAP_INTERVAL_SECS=5
+//!             WIRETAP_TLS=1                    WIRETAP_CA="/path/ca.pem"
 //!
 //! FR: Surveille la table de sockets de l'hôte (/proc/net/*) et pousse
 //!     le DIFF — nouvelles extrémités sortantes/établies — vers le
-//!     collecteur `POST /ingest/events`, contrat `snitch-agent/1`.
+//!     collecteur `POST /ingest/events`, contrat `wiretap-agent/1`.
 //!     Zéro dépendance volontaire, périmètre honnête : SOCKETS seulement
 //!     (pas de payloads/SNI/DNS), attribution pid↔process en TODO, HTTP
 //!     uniquement (domaine de confiance LAN).
@@ -36,7 +36,7 @@ use std::process;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-const AGENT_ID: &str = "snitch-agent/1";
+const AGENT_ID: &str = "wiretap-agent/1";
 const MAX_EVENTS_PER_POST: usize = 1000; // EN: matches backend cap / FR: cap backend
 
 /// EN: Transport abstraction — plain TCP or a rustls TLS session over it.
@@ -73,10 +73,10 @@ impl Write for Transport {
 }
 
 /// EN: Build the root store — the system-free webpki bundle by default,
-///     plus an optional extra CA PEM (SNITCH_CA) for internal collectors
+///     plus an optional extra CA PEM (WIRETAP_CA) for internal collectors
 ///     terminating TLS with a private/self-signed certificate.
 /// FR: Construire le magasin de racines — le bundle webpki autonome par
-///     défaut, plus une CA PEM optionnelle (SNITCH_CA) pour les collecteurs
+///     défaut, plus une CA PEM optionnelle (WIRETAP_CA) pour les collecteurs
 ///     internes terminant TLS avec un certificat privé/auto-signé.
 fn root_store(ca_path: Option<&str>) -> Result<rustls::RootCertStore, String> {
     let mut roots = rustls::RootCertStore::empty();
@@ -217,15 +217,15 @@ fn post_batch(server: &str, token: &str, host: &str,
               events: &[String], use_tls: bool, ca_path: Option<&str>)
               -> Result<(), String> {
     // EN: Minimal HTTP/1.1 POST over plain TCP or rustls TLS. `sagt_…`
-    //     tokens are per-agent enrolled credentials → `X-Snitch-Agent`;
-    //     anything else is the master API token → `X-Snitch-Token`.
+    //     tokens are per-agent enrolled credentials → `X-Wiretap-Agent`;
+    //     anything else is the master API token → `X-Wiretap-Token`.
     // FR: POST HTTP/1.1 minimal sur TCP brut ou TLS rustls. Les jetons
-    //     « sagt_… » sont des crédences d'agent enrôlé → « X-Snitch-Agent » ;
-    //     le reste = jeton maître → « X-Snitch-Token ».
+    //     « sagt_… » sont des crédences d'agent enrôlé → « X-Wiretap-Agent » ;
+    //     le reste = jeton maître → « X-Wiretap-Token ».
     let auth = if token.starts_with("sagt_") {
-        format!("X-Snitch-Agent: {token}")
+        format!("X-Wiretap-Agent: {token}")
     } else {
-        format!("X-Snitch-Token: {token}")
+        format!("X-Wiretap-Token: {token}")
     };
     let body = format!(
         "{{\"agent\":\"{}\",\"host\":\"{}\",\"events\":[{}]}}",
@@ -293,10 +293,10 @@ fn sock_to_event(s: &Sock,
                  -> Option<String> {
     // EN: only flow-like rows — a REMOTE endpoint with a real port.
     //     Direction is "out": the agent reports what the box reaches,
-    //     which is the threat surface Snitch models.
+    //     which is the threat surface Wiretap models.
     // FR: seulement les lignes flux — une extrémité distante avec un vrai
     //     port. Direction « out » : l'agent rapporte ce que la machine
-    //     joint, surface de menace modélisée par Snitch.
+    //     joint, surface de menace modélisée par Wiretap.
     let (rip, rport) = s.remote.rsplit_once(':')?;
     let (lip, lport) = s.local.rsplit_once(':')?;
     if rip.is_empty() || rip == "0.0.0.0" || rip == "::" || rport == "0" {
@@ -316,27 +316,27 @@ fn sock_to_event(s: &Sock,
 }
 
 fn main() {
-    let server = env::var("SNITCH_SERVER").unwrap_or_else(|_| "127.0.0.1:8000".into());
-    let token = env::var("SNITCH_TOKEN").unwrap_or_default();
+    let server = env::var("WIRETAP_SERVER").unwrap_or_else(|_| "127.0.0.1:8000".into());
+    let token = env::var("WIRETAP_TOKEN").unwrap_or_default();
     if token.is_empty() {
-        eprintln!("snitch-agent: SNITCH_TOKEN is required (collector bearer)");
+        eprintln!("wiretap-agent: WIRETAP_TOKEN is required (collector bearer)");
         process::exit(2);
     }
-    let host = env::var("SNITCH_HOST")
+    let host = env::var("WIRETAP_HOST")
         .unwrap_or_else(|_| env::var("HOSTNAME").unwrap_or_else(|_| "agent".into()));
-    let interval: u64 = env::var("SNITCH_INTERVAL_SECS")
+    let interval: u64 = env::var("WIRETAP_INTERVAL_SECS")
         .ok().and_then(|v| v.parse().ok()).unwrap_or(5).max(1);
-    // EN: TLS opt-in — anything but empty/"0" enables it. SNITCH_CA points
+    // EN: TLS opt-in — anything but empty/"0" enables it. WIRETAP_CA points
     //     at an extra PEM bundle for collectors on a private CA.
-    // FR: TLS opt-in — tout sauf vide/« 0 » l'active. SNITCH_CA pointe vers
+    // FR: TLS opt-in — tout sauf vide/« 0 » l'active. WIRETAP_CA pointe vers
     //     un bundle PEM additionnel pour les collecteurs en CA privée.
-    let use_tls = !matches!(env::var("SNITCH_TLS").as_deref(),
+    let use_tls = !matches!(env::var("WIRETAP_TLS").as_deref(),
                             Err(_) | Ok("") | Ok("0"));
-    let ca_path = env::var("SNITCH_CA").ok().filter(|s| !s.is_empty());
+    let ca_path = env::var("WIRETAP_CA").ok().filter(|s| !s.is_empty());
 
     let mut seen: HashSet<Sock> = HashSet::new();
     let mut pending: Vec<String> = Vec::new();
-    eprintln!("snitch-agent {AGENT_ID} → {server} as '{host}' every {interval}s{}",
+    eprintln!("wiretap-agent {AGENT_ID} → {server} as '{host}' every {interval}s{}",
               if use_tls { " (TLS)" } else { "" });
 
     loop {
@@ -366,7 +366,7 @@ fn main() {
                              use_tls, ca_path.as_deref()) {
                 Ok(()) => {}
                 Err(e) => {
-                    eprintln!("snitch-agent: {e}");
+                    eprintln!("wiretap-agent: {e}");
                     // EN: bounded retry — requeue but never grow past the cap.
                     // FR: retry borné — remise en file sans jamais dépasser le cap.
                     pending.splice(0..0, chunk.into_iter());

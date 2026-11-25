@@ -13,7 +13,7 @@ EN: Local SLM enrichment — a REAL small language model, not a simulated
         breaks when the model is down.
       * TWO LOCAL BACKENDS — `ollama` talks to a loopback endpoint;
         `embedded` loads a user-provided GGUF file through the optional
-        `llama-cpp-python` package — zero network at all. Snitch never
+        `llama-cpp-python` package — zero network at all. Wiretap never
         downloads weights itself: the user points it at a model they
         fetched on their own.
 
@@ -29,7 +29,7 @@ FR: Enrichissement SLM local — un VRAI petit modèle de langage, pas un
         déterministes (explain.py) restent le repli permanent.
       * DEUX BACKENDS LOCAUX — `ollama` parle à un endpoint loopback ;
         `embedded` charge un fichier GGUF fourni par l'utilisateur via le
-        paquet optionnel `llama-cpp-python` — zéro réseau. Snitch ne
+        paquet optionnel `llama-cpp-python` — zéro réseau. Wiretap ne
         télécharge jamais de poids.
 """
 

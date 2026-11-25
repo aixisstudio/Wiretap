@@ -1,5 +1,5 @@
 """
-Snitch — SQLite persistence layer.
+Wiretap — SQLite persistence layer.
 
 EN: Two tables:
       - traffic    : per-minute aggregates (packets + bytes by category)
@@ -9,8 +9,8 @@ EN: Two tables:
     24-hour sliding window.
 
     DB location resolution order:
-      1. SNITCH_DATA_DIR env var (tests, custom deployments)
-      2. LOCALAPPDATA\\Snitch      (frozen/Electron builds on Windows)
+      1. WIRETAP_DATA_DIR env var (tests, custom deployments)
+      2. LOCALAPPDATA\\Wiretap      (frozen/Electron builds on Windows)
       3. <repo>/data               (dev / Docker)
 
 FR: Deux tables :
@@ -21,8 +21,8 @@ FR: Deux tables :
     Un nettoyage horaire limite la base à une fenêtre glissante de 24 h.
 
     Ordre de résolution de l'emplacement de la base :
-      1. variable SNITCH_DATA_DIR (tests, déploiements personnalisés)
-      2. LOCALAPPDATA\\Snitch       (builds figés/Electron sous Windows)
+      1. variable WIRETAP_DATA_DIR (tests, déploiements personnalisés)
+      2. LOCALAPPDATA\\Wiretap       (builds figés/Electron sous Windows)
       3. <dépôt>/data               (dev / Docker)
 """
 
@@ -36,9 +36,9 @@ from typing import Optional
 
 from paths import data_dir
 
-logger = logging.getLogger("snitch.storage")
+logger = logging.getLogger("wiretap.storage")
 
-DB_PATH = data_dir() / 'snitch.db'
+DB_PATH = data_dir() / 'wiretap.db'
 
 # EN: Single shared connection guarded by a lock — sqlite3 is not thread-safe
 #     by default and we write from several threads.

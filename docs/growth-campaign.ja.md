@@ -1,4 +1,4 @@
-# Snitch — GitHub Trending & 10K ⭐ へのグロースキャンペーン
+# Wiretap — GitHub Trending & 10K ⭐ へのグロースキャンペーン
 
 [English](growth-campaign.md) | [Français](growth-campaign.md) | [Español](growth-campaign.es.md) | [Deutsch](growth-campaign.de.md) | [Русский](growth-campaign.ru.md) | **日本語** | [Português](growth-campaign.pt-BR.md) | [中文](growth-campaign.zh-CN.md)
 
@@ -37,7 +37,7 @@
 
 - リリース毎 = 投稿の口実（v1.x → 2-3 週毎に新しい波）
 - Changelog → dev.to/Medium クロスポスト
-- 月次「State of Snitch」投稿 — 実数値の透明性
+- 月次「State of Wiretap」投稿 — 実数値の透明性
 
 ## 層 4 — ロングテール
 

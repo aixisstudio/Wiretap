@@ -2,22 +2,22 @@
 
 [English](FIREWALL.md) | [Français](FIREWALL.md) | [Español](FIREWALL.es.md) | [Deutsch](FIREWALL.de.md) | [Русский](FIREWALL.ru.md) | **日本語** | [Português](FIREWALL.pt-BR.md) | [中文](FIREWALL.zh-CN.md)
 
-Snitch は受動的観察の上にスレットハンティング層を載せています。
+Wiretap は受動的観察の上にスレットハンティング層を載せています。
 **何をするか — そして同じくらい重要な、何をしないか:**
 
 ## 送信ファイアウォール連携
 
-Snitch はユーザースペースでパケットをフィルタ**しません**。ルールは
+Wiretap はユーザースペースでパケットをフィルタ**しません**。ルールは
 OS ネイティブファイアウォールへ best-effort で適用されます:
 
 | OS | 仕組み |
 |---|---|
 | Windows | `netsh advfirewall` の送信ブロックルール |
-| Linux | `iptables -A OUTPUT -j DROP`（lockdown 用に専用 `SNITCH_LOCK` チェーン） |
+| Linux | `iptables -A OUTPUT -j DROP`（lockdown 用に専用 `WIRETAP_LOCK` チェーン） |
 | macOS | 生成した `pf` アンカーを `pfctl` でロード |
 
 ルール種別: `ip`、`cidr`、`domain`（適用時に一度だけ解決）、`process`、
-`port`。ルールは `snitch.db` に永続化され起動時に再適用。
+`port`。ルールは `wiretap.db` に永続化され起動時に再適用。
 
 **正直な制限:**
 
@@ -35,7 +35,7 @@ OS ネイティブファイアウォールへ best-effort で適用されます:
 ## インシデント対応
 
 - `POST /processes/kill` / `POST /processes/suspend` — PID 指定。PID ≤ 3
-  と Snitch 自身は拒否。通常の OS 権限が適用。
+  と Wiretap 自身は拒否。通常の OS 権限が適用。
 - `POST /firewall/rules`、`DELETE /firewall/rules/{id}`、
   `POST /firewall/rules/{id}/toggle`、`POST /firewall/lockdown` —
   すべて認証必須。
@@ -85,7 +85,7 @@ OS ネイティブファイアウォールへ best-effort で適用されます:
 
 ### v1.2 の新機能 / Nouveautés v1.2
 
-- **`sinkhole` アクション** — `domain`/`ip` ルールはブロックの代わりに loopback へリダイレクト可能：ドメインは hosts ファイル内の `# snitch-sinkhole` マーカー付きブロックで（全 OS）、IP/CIDR は iptables `DNAT` で（Linux のみ）。`process`/`port` への `sinkhole` は拒否、非対応 OS では正直に `applied=False`。
+- **`sinkhole` アクション** — `domain`/`ip` ルールはブロックの代わりに loopback へリダイレクト可能：ドメインは hosts ファイル内の `# wiretap-sinkhole` マーカー付きブロックで（全 OS）、IP/CIDR は iptables `DNAT` で（Linux のみ）。`process`/`port` への `sinkhole` は拒否、非対応 OS では正直に `applied=False`。
 - **ドメイン再解決** — `domain` ルールは約10分ごとに再解決され、IP 差分が OS ごとに適用されるため、CDN ローテーションで名前のブロックが外れません。
 - **整合性監視**（デフォルト有効・読み取り専用・ローカル） — ネットワーク使用実行ファイルの SHA-256 ベースライン（`BINARY_CHANGED`）、名前/exe 不一致（`NAME_MISMATCH`）、Linux のみ `rwxp` スキャン（`MEM_RWX`、既知 JIT アプリは info レベル）。`GET /security/integrity`、`POST /security/integrity/check`。
 - **アラート説明** — `GET /security/explain?type=X` が手書きの二言語（EN/FR）説明を返します；決定的でオフライン動作 — モデルではありません。UI の「なぜ？」ボタンから表示。
@@ -110,7 +110,7 @@ OS ネイティブファイアウォールへ best-effort で適用されます:
 - **ブロックリストのインポート** — `POST /firewall/blocklist`: ローカルファイル（完全ローカル）またはオプトイン URL（≤4 MiB HTTPS、`remote_fetch` と明記）→ `domain` ルール。重複排除・上限 500–5000。
 - **PCAP エクスポート** — `GET /forensics/pcap`（`ip`/`process` フィルタ）: ~4 MiB リングバッファを Wireshark 用 `.pcap` で。
 - **リモートペアリング** — `POST /remote/pairing` が `lan_bind` を永続化（次回起動時適用）；トークンは引き続き必須。`GET /remote/pairing` が bind と LAN IP を報告。
-- **ネットワーク遮断サンドボックス** — `POST /security/sandbox` がバイナリを送信ゼロで実行（Linux `unshare -n`、macOS `sandbox-exec`；手動版 `contrib/snitch-contain`）。
+- **ネットワーク遮断サンドボックス** — `POST /security/sandbox` がバイナリを送信ゼロで実行（Linux `unshare -n`、macOS `sandbox-exec`；手動版 `contrib/wiretap-contain`）。
 - **埋め込みモデル** — `slm_mode=embedded` がユーザーの `.gguf` を `llama-cpp-python` で読込 — ネットワーク一切なし。
 - **ネイティブスケルトン** — `contrib/wfp-callout/`（C の WFP callout＋署名メモ）と `contrib/macos-filter/`（`NEFilterDataProvider` Swift＋entitlement メモ）：研究用スキャフォールド、出荷なし。
 - **ASN** — `GeoLite2-ASN.mmdb`/`dbip-asn-lite.mmdb` がある場合、ノードに `org` に加え `asn` を付与。
@@ -122,12 +122,12 @@ OS ネイティブファイアウォールへ best-effort で適用されます:
 - **ICMPトンネル検知** — ≥24 Bペイロードのエコーが5分で3回以上 → `ICMP_TUNNEL`。
 - **MLフロー異常** — 純Pythonのisolation forest（64本、依存ゼロ）が自フロー要約をスコアリング；384フロー未満では不活性、0.62で `ML_ANOMALY`。ベースライン偏差でありマルウェア分類器では**ありません**。
 - **Ask-on-Connect（Linux、オプトイン）** — `ask_enabled` + root + iptables：新規送信フローをNFQUEUE 7に `POST /security/ask/verdict` まで保留 — NFQUEUEクライアントは**純粋Python**（`detection/nfqueue.py`、AF_NETLINK）で `python-netfilterqueue` 不要；タイムアウト15秒、fail-closed（`ask_failopen=1`で反転）。Windows/macOSは `contrib/` の署名済みcallout/NetworkExtensionが必要。
-- **eBPF cgroupエンフォースメント（Linux、オプトイン）** — `POST /security/ebpf/isolate {pid}` + `/security/ebpf/block {ip}`：snitch cgroupへattach — カーネルdropは隔離プロセスのみ。
+- **eBPF cgroupエンフォースメント（Linux、オプトイン）** — `POST /security/ebpf/isolate {pid}` + `/security/ebpf/block {ip}`：wiretap cgroupへattach — カーネルdropは隔離プロセスのみ。
 - **ハロウィングチェック（Linux）** — `POST /security/hollow {pid}` が `/proc/<pid>/mem` のfile-backed実行可能ページをディスクと比較。
 - **IOCピア同期（オプトイン）** — `gossip_peers` ≤32 + `gossip_enabled`：Merkleプルーフパックを5分毎に認証HTTP(S)で — 探索なし、ZKプロトコルではありません。
 - **Syslog（オプトイン）** — `syslog_addr`（`host:port` UDPまたは `tcp://`）→ RFC 3164 `local4`。
 - **Firejailコンテインメント** — `firejail --net=none` 優先、`unshare` にフォールバック。
-- **nftablesバックエンド** — `nft` があれば専用 `inet snitch` テーブル（iptablesの代わり）。
+- **nftablesバックエンド** — `nft` があれば専用 `inet wiretap` テーブル（iptablesの代わり）。
 - **アクション可能アラート** — 構造化 `actions`（IPブロック、終了/一時停止、ask判定）をワンクリックボタンとして表示。
 - **カスタムルールの `asn`/`country`** — ローカルgeo DB、`action=block` と組み合わせてgeoフェンスに。
 - **DGAヒューリスティック** — 解決されたDNS名とTLS SNIを字彙特徴

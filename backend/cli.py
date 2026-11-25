@@ -1,5 +1,5 @@
 """
-Snitch — command-line entry point (`snitch`).
+Wiretap — command-line entry point (`wiretap`).
 
 EN: Starts the local API + bundled web UI on a free loopback port, prints the
     token URL once, and opens the browser. Runs headless in --no-browser mode
@@ -10,9 +10,9 @@ EN: Starts the local API + bundled web UI on a free loopback port, prints the
       - Linux   : root, or `sudo setcap cap_net_raw,cap_net_admin` on the binary
       - macOS   : read access to /dev/bpf*
 
-    Usage:  snitch [--port N] [--bind 127.0.0.1] [--no-browser]
+    Usage:  wiretap [--port N] [--bind 127.0.0.1] [--no-browser]
 
-FR: Point d'entrée en ligne de commande (`snitch`).
+FR: Point d'entrée en ligne de commande (`wiretap`).
 
     Lance l'API locale + l'UI web embarquée sur un port loopback libre, affiche
     l'URL avec jeton une fois, et ouvre le navigateur. Mode --no-browser pour
@@ -23,7 +23,7 @@ FR: Point d'entrée en ligne de commande (`snitch`).
       - Linux   : root, ou `sudo setcap cap_net_raw,cap_net_admin` sur le binaire
       - macOS   : accès en lecture aux /dev/bpf*
 
-    Usage :  snitch [--port N] [--bind 127.0.0.1] [--no-browser]
+    Usage :  wiretap [--port N] [--bind 127.0.0.1] [--no-browser]
 """
 
 import argparse
@@ -46,8 +46,8 @@ def main() -> int:
     """EN: CLI entry — parse args, boot uvicorn, open the browser.
     FR: Entrée CLI — parser les args, démarrer uvicorn, ouvrir le navigateur."""
     ap = argparse.ArgumentParser(
-        prog="snitch",
-        description="Snitch — application firewall and network monitor / "
+        prog="wiretap",
+        description="Wiretap — application firewall and network monitor / "
                     "pare-feu applicatif et moniteur réseau")
     ap.add_argument("--port", type=int, default=0,
                     help="port to bind (0 = pick a free one) / "
@@ -65,15 +65,15 @@ def main() -> int:
     if pkg_dir not in sys.path:
         sys.path.insert(0, pkg_dir)
 
-    os.environ["SNITCH_USER_DATA"] = "1"   # EN: per-OS data dir, not repo/data
+    os.environ["WIRETAP_USER_DATA"] = "1"   # EN: per-OS data dir, not repo/data
                                          # FR: dossier de données par OS
 
     from logging_config import setup_logging
     setup_logging(logging.INFO)
 
     port = args.port or _free_port()
-    os.environ["SNITCH_PORT"] = str(port)
-    os.environ["SNITCH_BIND"] = args.bind
+    os.environ["WIRETAP_PORT"] = str(port)
+    os.environ["WIRETAP_BIND"] = args.bind
 
     from api.main import app           # noqa: E402
     from api.security import get_token  # noqa: E402
@@ -85,7 +85,7 @@ def main() -> int:
     #     unflushed print would never reach their URL watchers.
     # FR: flush=True — les launchers (Pinokio, systemd) pipent stdout, donc un
     #     print non flushé n'atteindrait jamais leurs watchers d'URL.
-    print(f"\n  Snitch is running / Snitch tourne :\n\n    {url}\n",
+    print(f"\n  Wiretap is running / Wiretap tourne :\n\n    {url}\n",
           flush=True)
     print("  Keep this terminal open. Ctrl+C to stop. / "
           "Gardez ce terminal ouvert. Ctrl+C pour arrêter.\n",
@@ -96,11 +96,11 @@ def main() -> int:
         # FR: Ouvrir après un court délai pour qu'uvicorn écoute d'abord.
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
-    # EN: Same optional TLS as run_backend — SNITCH_TLS_CERT/SNITCH_TLS_KEY.
-    # FR: Même TLS optionnel que run_backend — SNITCH_TLS_CERT/SNITCH_TLS_KEY.
+    # EN: Same optional TLS as run_backend — WIRETAP_TLS_CERT/WIRETAP_TLS_KEY.
+    # FR: Même TLS optionnel que run_backend — WIRETAP_TLS_CERT/WIRETAP_TLS_KEY.
     uvicorn.run(app, host=args.bind, port=port, log_level="warning",
-                ssl_certfile=os.environ.get("SNITCH_TLS_CERT") or None,
-                ssl_keyfile=os.environ.get("SNITCH_TLS_KEY") or None)
+                ssl_certfile=os.environ.get("WIRETAP_TLS_CERT") or None,
+                ssl_keyfile=os.environ.get("WIRETAP_TLS_KEY") or None)
     return 0
 
 

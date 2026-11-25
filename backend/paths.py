@@ -1,14 +1,14 @@
 """
-Snitch — filesystem paths.
+Wiretap — filesystem paths.
 
 EN: Single source of truth for the writable data directory — shared by the
     DB, the API token file and the log file (each used to duplicate this
     logic). Resolution order:
-      1. SNITCH_DATA_DIR env var            (tests, custom deployments)
+      1. WIRETAP_DATA_DIR env var            (tests, custom deployments)
       2. per-OS user data dir               (frozen/Electron installs)
-           Windows : %LOCALAPPDATA%\\Snitch
-           macOS   : ~/Library/Application Support/Snitch
-           Linux   : $XDG_DATA_HOME/snitch or ~/.local/share/snitch
+           Windows : %LOCALAPPDATA%\\Wiretap
+           macOS   : ~/Library/Application Support/Wiretap
+           Linux   : $XDG_DATA_HOME/wiretap or ~/.local/share/wiretap
       3. <repo>/data                        (dev / Docker)
 
     NOTE: PyInstaller bundles are read-only — Path(__file__)-relative data
@@ -18,11 +18,11 @@ EN: Single source of truth for the writable data directory — shared by the
 FR: Source de vérité unique pour le dossier de données inscriptible — partagée
     par la BDD, le fichier de jeton API et le fichier de log (chacun dupliquait
     cette logique). Ordre de résolution :
-      1. variable SNITCH_DATA_DIR            (tests, déploiements personnalisés)
+      1. variable WIRETAP_DATA_DIR            (tests, déploiements personnalisés)
       2. dossier de données utilisateur par OS (installations figées/Electron)
-           Windows : %LOCALAPPDATA%\\Snitch
-           macOS   : ~/Library/Application Support/Snitch
-           Linux   : $XDG_DATA_HOME/snitch ou ~/.local/share/snitch
+           Windows : %LOCALAPPDATA%\\Wiretap
+           macOS   : ~/Library/Application Support/Wiretap
+           Linux   : $XDG_DATA_HOME/wiretap ou ~/.local/share/wiretap
       3. <dépôt>/data                        (dev / Docker)
 
     ATTENTION : les bundles PyInstaller sont en lecture seule — un dossier de
@@ -38,18 +38,18 @@ from pathlib import Path
 def _real_owner() -> tuple[int, int] | None:
     """
     EN: (uid, gid) of the desktop user who launched the app — passed via
-        SNITCH_OWNER_UID/SNITCH_OWNER_GID by the Electron launcher when it
+        WIRETAP_OWNER_UID/WIRETAP_OWNER_GID by the Electron launcher when it
         elevates the backend (osascript/pkexec). None when not elevated or
         not told — chown is then skipped.
     FR: (uid, gid) de l'utilisateur qui a lancé l'app — transmis via
-        SNITCH_OWNER_UID/SNITCH_OWNER_GID par le lanceur Electron quand il
+        WIRETAP_OWNER_UID/WIRETAP_OWNER_GID par le lanceur Electron quand il
         élève le backend (osascript/pkexec). None si non élevé ou non
         renseigné — le chown est alors sauté.
     """
     if not hasattr(os, "geteuid") or os.geteuid() != 0:
         return None
     try:
-        return int(os.environ["SNITCH_OWNER_UID"]), int(os.environ["SNITCH_OWNER_GID"])
+        return int(os.environ["WIRETAP_OWNER_UID"]), int(os.environ["WIRETAP_OWNER_GID"])
     except (KeyError, ValueError):
         return None
 
@@ -58,12 +58,12 @@ def chown_to_user(path: Path) -> None:
     """
     EN: Hand a file/dir we just created back to the real desktop user.
         Without this, an ELEVATED backend leaves root-owned files inside
-        ~/Library/Application Support/Snitch (or ~/.local/share/snitch) —
+        ~/Library/Application Support/Wiretap (or ~/.local/share/wiretap) —
         the next unprivileged launch then dies with EACCES because
         Chromium/the launcher can no longer write there.
     FR: Rendre un fichier/dossier qu'on vient de créer au vrai utilisateur.
         Sans ça, un backend ÉLEVÉ laisse des fichiers possédés par root dans
-        ~/Library/Application Support/Snitch (ou ~/.local/share/snitch) —
+        ~/Library/Application Support/Wiretap (ou ~/.local/share/wiretap) —
         le lancement non privilégié suivant meurt en EACCES car
         Chromium/le lanceur ne peut plus y écrire.
     """
@@ -103,16 +103,16 @@ def data_dir() -> Path:
     EN: Resolve (and create) the writable data directory.
     FR: Résoudre (et créer) le dossier de données inscriptible.
     """
-    env_dir = os.environ.get("SNITCH_DATA_DIR")
+    env_dir = os.environ.get("WIRETAP_DATA_DIR")
     if env_dir:
         d = Path(env_dir)
-    elif getattr(sys, "frozen", False) or os.environ.get("SNITCH_USER_DATA") == "1":
+    elif getattr(sys, "frozen", False) or os.environ.get("WIRETAP_USER_DATA") == "1":
         if sys.platform == "win32":
-            d = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "Snitch"
+            d = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "Wiretap"
         elif sys.platform == "darwin":
-            d = Path.home() / "Library" / "Application Support" / "Snitch"
+            d = Path.home() / "Library" / "Application Support" / "Wiretap"
         else:
-            d = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / "snitch"
+            d = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / "wiretap"
     else:
         d = Path(__file__).parent.parent / "data"
     d.mkdir(parents=True, exist_ok=True)

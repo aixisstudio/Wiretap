@@ -1,5 +1,5 @@
 """
-Snitch — parser tests (synthetic packets, no real captures).
+Wiretap — parser tests (synthetic packets, no real captures).
 
 EN: Every frame below is built byte-by-byte in the test — no pcap files, no
     real traffic, no Scapy. Coverage: Ethernet/IPv4/TCP, IPv6 + extension

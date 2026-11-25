@@ -2,7 +2,7 @@
 
 [English](CONTRIBUTING.md) | [Français](CONTRIBUTING.md) | [Español](CONTRIBUTING.es.md) | [Deutsch](CONTRIBUTING.de.md) | [Русский](CONTRIBUTING.ru.md) | [日本語](CONTRIBUTING.ja.md) | [Português](CONTRIBUTING.pt-BR.md) | **中文**
 
-感谢你的关注！Snitch 是一个双语（EN/FR）项目——代码注释和面向用户的
+感谢你的关注！Wiretap 是一个双语（EN/FR）项目——代码注释和面向用户的
 文本应尽可能同时提供两种语言版本。UI 在 `frontend/src/locales/` 下有
 8 个语言包——新增语言只需从 `en.js` 复制一个文件（保持键一致）并在
 `frontend/src/i18n.jsx` 的 `LANGS`/`LANG_NAMES` 中添加一项。非常欢迎

@@ -1,10 +1,10 @@
-# Snitch — корпоративные интеграции
+# Wiretap — корпоративные интеграции
 
 *Community translated — PRs welcome for refinement / Перевод сообщества — PR с правками приветствуются.*
 
-**RU:** Пошаговые рецепты подключения Snitch к SOC-стеку —
+**RU:** Пошаговые рецепты подключения Wiretap к SOC-стеку —
 Wazuh, Splunk, Graylog/Loki, Ansible, Docker/Kubernetes — всё бесплатно
-и self-hosted, в духе local-first Snitch. Snitch сам не отправляет
+и self-hosted, в духе local-first Wiretap. Wiretap сам не отправляет
 телеметрию; единственные исходящие соединения — те, что настроены здесь.
 
 ---
@@ -17,11 +17,11 @@ Wazuh, Splunk, Graylog/Loki, Ansible, Docker/Kubernetes — всё беспла�
 |---|---|---|
 | `syslog_addr` | `host:514` или `tcp://host:514` | Включает syslog-пересылку (UDP по умолчанию, TCP через префикс `tcp://`) |
 | `syslog_format` | `rfc3164` *(по умолчанию)* | Классический BSD syslog — читается любым коллектором |
-| | `cef` | `CEF:0|Snitch|…` — ArcSight/Wazuh/Splunk автоматически парсят `src`, `dst`, `dpt`, `cs1` (процесс) |
+| | `cef` | `CEF:0|Wiretap|…` — ArcSight/Wazuh/Splunk автоматически парсят `src`, `dst`, `dpt`, `cs1` (процесс) |
 | `webhook_url` + `webhook_enabled` | URL | Универсальный JSON `POST` (или автоопределяемые payload-ы Discord/Slack/Telegram) |
 | `GET /forensics/export?format=…` | `json`, `csv`, `stix`, `ecs` | Разовые форензик-бандлы — `ecs` выдаёт Elastic Common Schema в NDJSON |
 
-Настраивается в UI (Настройки → Безопасность) или в `snitch.toml`:
+Настраивается в UI (Настройки → Безопасность) или в `wiretap.toml`:
 
 ```toml
 syslog_addr = "siem.example.com:514"
@@ -41,14 +41,14 @@ syslog_format = "cef"
    </remote>
    ```
 
-2. Направьте каждого агента Snitch — Ansible:
+2. Направьте каждого агента Wiretap — Ansible:
 
    ```yaml
-   snitch_syslog_addr: "wazuh.example.com:514"
-   snitch_syslog_format: "cef"
+   wiretap_syslog_addr: "wazuh.example.com:514"
+   wiretap_syslog_format: "cef"
    ```
 
-3. CEF-декодер Wazuh подхватит `CEF:0|Snitch|…`; `severity` маппируется
+3. CEF-декодер Wazuh подхватит `CEF:0|Wiretap|…`; `severity` маппируется
    в syslog PRI (critical→2, warning→4, info→6).
 
 ## 3. Splunk
@@ -69,8 +69,8 @@ syslog_format = "cef"
 
 ## 5. Декларативная конфигурация (Security-as-Code)
 
-Бэкенд применяет **один файл** при старте — `$SNITCH_CONFIG`, либо
-`snitch.toml`/`snitch.json` в каталоге данных. Каждый объявленный ключ
+Бэкенд применяет **один файл** при старте — `$WIRETAP_CONFIG`, либо
+`wiretap.toml`/`wiretap.json` в каталоге данных. Каждый объявленный ключ
 переопределяет значение UI/DB — файл является источником истины флота:
 
 ```toml
@@ -82,7 +82,7 @@ gossip_peers = ["sec-01:8000"]
 ports = [80, 443]
 ```
 
-Полный словарь: `packaging/snitch.toml.example`.
+Полный словарь: `packaging/wiretap.toml.example`.
 
 ## 6. Ansible / Puppet / Salt / GPO
 
@@ -92,15 +92,15 @@ ports = [80, 443]
   ansible-playbook -i inventory deploy/ansible/site.yml
   ```
 
-  Ставит `/opt/snitch`, venv, `/etc/snitch/snitch.toml` и усиленный
-  systemd-юнит, затем включает `snitch.service`.
+  Ставит `/opt/wiretap`, venv, `/etc/wiretap/wiretap.toml` и усиленный
+  systemd-юнит, затем включает `wiretap.service`.
 
 - **Puppet / SaltStack** — комьюнити-скелеты в `deploy/puppet/` и
   `deploy/salt/` (label `help wanted`): те же три примитива —
-  развернуть дерево backend, отрендерить `snitch.toml`, управлять
-  `snitch.service`.
+  развернуть дерево backend, отрендерить `wiretap.toml`, управлять
+  `wiretap.service`.
 
-- **Windows GPO** — `deploy/gpo/Install-Snitch.ps1` выполняет тихую
+- **Windows GPO** — `deploy/gpo/Install-Wiretap.ps1` выполняет тихую
   установку (конфиг в ProgramData, venv, SYSTEM-задача на 127.0.0.1).
   Ask-on-connect в Windows дополнительно требует подписанный
   WFP-коллаут — см. `docs/SIGNING.md`.
@@ -109,13 +109,13 @@ ports = [80, 443]
 
 - **Один хост**: `docker compose up` — `network_mode: host` +
   `cap_add: NET_RAW/NET_ADMIN` уже в `docker-compose.yml`.
-- **Флит-консоль**: `deploy/helm/snitch` — `mode: collector` запускает
+- **Флит-консоль**: `deploy/helm/wiretap` — `mode: collector` запускает
   ClusterIP-Deployment, сливающий аудиты всех настроенных агентов в
   `GET /remote/fleet`; `mode: agent` рендерит host-network DaemonSet
   с `NET_RAW`/`NET_ADMIN`.
 
   ```bash
-  helm install snitch ./deploy/helm/snitch \
+  helm install wiretap ./deploy/helm/wiretap \
       --set token=$(openssl rand -hex 32) \
       --set config.gossip_peers='["agent-1:8000","agent-2:8000"]'
   ```
@@ -125,7 +125,7 @@ ports = [80, 443]
 `POST /alerts/rules/sigma` принимает Sigma YAML и компилирует
 поддерживаемое подмножество (селекции поле→значение, `|contains`/
 `|startswith`/`|endswith`/`|re`/`|cidr`/`|gt`/`|lt`/`|all`, условия
-`1 of`/`all of`) в кастомные правила Snitch — только алерты, причины
+`1 of`/`all of`) в кастомные правила Wiretap — только алерты, причины
 `skipped` возвращаются для всего вне подмножества. Поля маппируются на
 то, что видит *пакетный* сенсор (`DestinationIp→remote_ip`,
 `Image→process_name`, `Domain→host`, …).
@@ -134,7 +134,7 @@ YARA-L для Google SecOps/Chronicle: `GET /alerts/rules/yaral`
 экспортирует все правила (включая импортированные из Sigma) в файл
 `.yar` — путь Sigma→YARA-L закрыт.
 
-## 9. Удалённые агенты (snitch-agent/1)
+## 9. Удалённые агенты (wiretap-agent/1)
 
 `agent/` содержит лёгкий Rust-демон (ноль зависимостей, один бинарник
 ~1 МБ), наблюдающий таблицу сокетов хоста (`/proc/net/*`) и пушащий
@@ -164,5 +164,5 @@ Opt-in провайдеры (AbuseIPDB / OTX / VirusTotal) доступны че
 
 GUI опционален: бэкенд — это весь продукт. Запускайте напрямую
 (`uvicorn api.main:app`), под прилагаемым systemd-юнитом или в
-контейнере — все функции выше работают без фронтенда. `SNITCH_DEMO=1`
+контейнере — все функции выше работают без фронтенда. `WIRETAP_DEMO=1`
 по-прежнему даёт синтетический фид без root для обучения и CTF.

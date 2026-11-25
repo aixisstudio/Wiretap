@@ -58,7 +58,7 @@ _HASHES = 4                  # EN: k hash functions / FR: k fonctions de hachage
 #     0,02 garde ~8 % de ratés par indicateur (0,98⁴) tout en offrant un
 #     déni plausible (ε ≈ ln(99) ≈ 4,6 par bit).
 _FLIP = 0.02
-_FORMAT = "snitch-ioc-pack/1"
+_FORMAT = "wiretap-ioc-pack/1"
 
 
 def _positions(item: str) -> list[int]:
@@ -146,7 +146,7 @@ def check_pack(pack: dict, candidates: list[str]) -> dict:
 #     l'appartenance — zéro faux-positif. Schéma d'engagement, PAS un
 #     protocole ZK interactif.
 
-_PROOF_FORMAT = "snitch-ioc-proof/1"
+_PROOF_FORMAT = "wiretap-ioc-proof/1"
 
 
 def _leaf(salt: bytes, indicator: str) -> bytes:

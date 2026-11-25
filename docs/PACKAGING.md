@@ -6,9 +6,9 @@
 
 | Format | File | Notes |
 |---|---|---|
-| AppImage | `Snitch-x86_64.AppImage` | portable, needs `libfuse2`; update info via `latest-linux.yml` |
-| deb | `snitch-linux-amd64.deb` | standard Debian/Ubuntu install |
-| snap | `Snitch-amd64.snap` | strict confinement — see below |
+| AppImage | `Wiretap-x86_64.AppImage` | portable, needs `libfuse2`; update info via `latest-linux.yml` |
+| deb | `wiretap-linux-amd64.deb` | standard Debian/Ubuntu install |
+| snap | `Wiretap-amd64.snap` | strict confinement — see below |
 
 ## Snap — packet capture under confinement
 
@@ -18,8 +18,8 @@ strict confinement. Packet capture uses `AF_PACKET` sockets, which the
 uses). After installing a local `.snap`:
 
 ```bash
-sudo snap install --dangerous Snitch-amd64.snap
-sudo snap connect snitch:network-observe   # grants AF_PACKET read access
+sudo snap install --dangerous Wiretap-amd64.snap
+sudo snap connect wiretap:network-observe   # grants AF_PACKET read access
 ```
 
 Without the `network-observe` connection the UI still runs but capture
@@ -33,10 +33,10 @@ runs four publish jobs:
 
 | Job | Output |
 |---|---|
-| `nfpm` | `snitch-linux-amd64.rpm` — native build via nfpm v2.48 (`packaging/nfpm.yaml` + `packaging/postinstall.sh`) |
-| `homebrew` | pushes `Formula/snitch.rb` to `aixisstudio/homebrew-tap` — installs the headless `snitchd` daemon (`brew install aixisstudio/tap/snitch`). Requires `HOMEBREW_TAP_TOKEN`. |
-| `winget` | submits `Snitch-Setup-*.exe` via winget-releaser when the asset exists; skips cleanly otherwise. Requires `WINGET_TOKEN`. |
-| `chocolatey` | `choco pack`/`push` of `installer/Snitch.nuspec` when `CHOCO_API_KEY` is set. |
+| `nfpm` | `wiretap-linux-amd64.rpm` — native build via nfpm v2.48 (`packaging/nfpm.yaml` + `packaging/postinstall.sh`) |
+| `homebrew` | pushes `Formula/wiretap.rb` to `aixisstudio/homebrew-tap` — installs the headless `wiretapd` daemon (`brew install aixisstudio/tap/wiretap`). Requires `HOMEBREW_TAP_TOKEN`. |
+| `winget` | submits `Wiretap-Setup-*.exe` via winget-releaser when the asset exists; skips cleanly otherwise. Requires `WINGET_TOKEN`. |
+| `chocolatey` | `choco pack`/`push` of `installer/Wiretap.nuspec` when `CHOCO_API_KEY` is set. |
 
 ## Flatpak — deliberately not shipped
 
@@ -55,9 +55,9 @@ capture-capable permission, revisit.
 
 | Format | Fichier | Notes |
 |---|---|---|
-| AppImage | `Snitch-x86_64.AppImage` | portable, requiert `libfuse2` ; info de mise à jour via `latest-linux.yml` |
-| deb | `snitch-linux-amd64.deb` | installation Debian/Ubuntu standard |
-| snap | `Snitch-amd64.snap` | confinement strict — voir ci-dessous |
+| AppImage | `Wiretap-x86_64.AppImage` | portable, requiert `libfuse2` ; info de mise à jour via `latest-linux.yml` |
+| deb | `wiretap-linux-amd64.deb` | installation Debian/Ubuntu standard |
+| snap | `Wiretap-amd64.snap` | confinement strict — voir ci-dessous |
 
 ### Snap — capture de paquets sous confinement
 
@@ -67,8 +67,8 @@ Le snap est construit par electron-builder (`linux.target` inclut
 que le snap `tcpdump`). Après installation d'un `.snap` local :
 
 ```bash
-sudo snap install --dangerous Snitch-amd64.snap
-sudo snap connect snitch:network-observe   # autorise la lecture AF_PACKET
+sudo snap install --dangerous Wiretap-amd64.snap
+sudo snap connect wiretap:network-observe   # autorise la lecture AF_PACKET
 ```
 
 Sans cette connexion, l'UI tourne mais la capture reste vide. Une
@@ -92,7 +92,7 @@ exécute quatre jobs de publication :
 
 | Job | Sortie |
 |---|---|
-| `nfpm` | `snitch-linux-amd64.rpm` — build natif via nfpm v2.48 (`packaging/nfpm.yaml` + `packaging/postinstall.sh`) |
-| `homebrew` | pousse `Formula/snitch.rb` vers `aixisstudio/homebrew-tap` — installe le daemon headless `snitchd` (`brew install aixisstudio/tap/snitch`). Exige `HOMEBREW_TAP_TOKEN`. |
-| `winget` | soumet `Snitch-Setup-*.exe` via winget-releaser quand l'asset existe ; sinon saute proprement. Exige `WINGET_TOKEN`. |
-| `chocolatey` | `choco pack`/`push` de `installer/Snitch.nuspec` si `CHOCO_API_KEY` est posé. |
+| `nfpm` | `wiretap-linux-amd64.rpm` — build natif via nfpm v2.48 (`packaging/nfpm.yaml` + `packaging/postinstall.sh`) |
+| `homebrew` | pousse `Formula/wiretap.rb` vers `aixisstudio/homebrew-tap` — installe le daemon headless `wiretapd` (`brew install aixisstudio/tap/wiretap`). Exige `HOMEBREW_TAP_TOKEN`. |
+| `winget` | soumet `Wiretap-Setup-*.exe` via winget-releaser quand l'asset existe ; sinon saute proprement. Exige `WINGET_TOKEN`. |
+| `chocolatey` | `choco pack`/`push` de `installer/Wiretap.nuspec` si `CHOCO_API_KEY` est posé. |

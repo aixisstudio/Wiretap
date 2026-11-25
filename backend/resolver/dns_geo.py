@@ -1,5 +1,5 @@
 """
-Snitch — DNS/domain resolution + IP geolocation.
+Wiretap — DNS/domain resolution + IP geolocation.
 
 EN: Enrichment pipeline for remote IPs:
       1. observed DNS answers — captured DNS responses map IP → real domain
@@ -62,7 +62,7 @@ from typing import Optional
 
 from paths import data_dir
 
-logger = logging.getLogger("snitch.resolver")
+logger = logging.getLogger("wiretap.resolver")
 
 try:
     import maxminddb
@@ -167,26 +167,26 @@ def lookup_domain(ip: str) -> Optional[str]:
 
 # ── Reverse DNS / DNS inverse ────────────────────────────────────────────────
 
-# EN: SNITCH_DISABLE_PTR=1 turns reverse-DNS lookups off entirely. PTR
+# EN: WIRETAP_DISABLE_PTR=1 turns reverse-DNS lookups off entirely. PTR
 #     queries go to YOUR configured resolver — they reveal nothing the
 #     resolver does not already see from your forward lookups, but they are
 #     still outbound traffic, so the strictest setups can opt out.
-# FR: SNITCH_DISABLE_PTR=1 désactive totalement le DNS inverse. Les requêtes
+# FR: WIRETAP_DISABLE_PTR=1 désactive totalement le DNS inverse. Les requêtes
 #     PTR partent vers VOTRE résolveur configuré — elles ne révèlent rien que
 #     le résolveur ne voie déjà via vos requêtes directes, mais restent du
 #     trafic sortant, donc les configurations les plus strictes peuvent
 #     s'en passer.
-_DISABLE_PTR = os.environ.get("SNITCH_DISABLE_PTR") == "1"
+_DISABLE_PTR = os.environ.get("WIRETAP_DISABLE_PTR") == "1"
 
 
 @lru_cache(maxsize=2048)
 def resolve_hostname(ip: str) -> Optional[str]:
     """
     EN: Reverse DNS — None on NXDOMAIN/timeout, and always None when
-        SNITCH_DISABLE_PTR=1. lru_cache caches negatives too: PTR absence is
+        WIRETAP_DISABLE_PTR=1. lru_cache caches negatives too: PTR absence is
         stable, so that's the desired behavior.
     FR: DNS inverse — None sur NXDOMAIN/timeout, et toujours None avec
-        SNITCH_DISABLE_PTR=1. lru_cache met aussi en cache les échecs :
+        WIRETAP_DISABLE_PTR=1. lru_cache met aussi en cache les échecs :
         l'absence de PTR est stable, c'est le comportement voulu.
     """
     if _DISABLE_PTR:

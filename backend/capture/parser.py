@@ -1,8 +1,8 @@
 """
-Snitch — packet parser (pure Python, no Scapy).
+Wiretap — packet parser (pure Python, no Scapy).
 
 EN: Decodes raw link-layer frames into a normalized `ParsedPacket`. This is
-    what frees Snitch from Scapy's GPL-2.0-only license and gives us IPv6,
+    what frees Wiretap from Scapy's GPL-2.0-only license and gives us IPv6,
     DNS answers and TLS SNI — all of which Scapy imports never actually used.
 
     Supported link types : Ethernet, BSD loopback (NULL), raw IP, Linux SLL
@@ -13,7 +13,7 @@ EN: Decodes raw link-layer frames into a normalized `ParsedPacket`. This is
                            TTL), TLS ClientHello SNI (single-segment case).
 
 FR: Décode les trames de couche liaison brutes en `ParsedPacket` normalisé.
-    C'est ce qui affranchit Snitch de la licence GPL-2.0-only de Scapy et nous
+    C'est ce qui affranchit Wiretap de la licence GPL-2.0-only de Scapy et nous
     donne IPv6, les réponses DNS et le SNI TLS — que les imports Scapy
     n'utilisaient jamais vraiment.
 

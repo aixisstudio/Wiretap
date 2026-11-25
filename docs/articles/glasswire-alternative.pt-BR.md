@@ -1,10 +1,10 @@
 Se você procurou um monitor de rede no Windows, esbarrou no GlassWire. É polido, bonito — e aí começam os paywalls: histórico atrás de assinatura, firewall por níveis, uma conta que vive sendo sugerida, sync cloud "elite".
 
-Nada contra pagar por software. Mas "me mostre com o que meu computador se conecta" é higiene básica — discutivelmente não deveria nem ser bloqueado. Sou o autor do [Snitch](https://github.com/aixisstudio/Snitch), uma alternativa gratuita e open source (AGPL), então aqui vai a comparação honesta em vez de um pitch de vendas.
+Nada contra pagar por software. Mas "me mostre com o que meu computador se conecta" é higiene básica — discutivelmente não deveria nem ser bloqueado. Sou o autor do [Wiretap](https://github.com/aixisstudio/Wiretap), uma alternativa gratuita e open source (AGPL), então aqui vai a comparação honesta em vez de um pitch de vendas.
 
-## Snitch vs GlassWire, feature por feature
+## Wiretap vs GlassWire, feature por feature
 
-| | **Snitch** | **GlassWire** |
+| | **Wiretap** | **GlassWire** |
 |---|---|---|
 | Preço | Grátis, para sempre | Freemium — features-chave no paywall |
 | Licença | AGPL open source | Proprietária |
@@ -27,13 +27,13 @@ Nada contra pagar por software. Mas "me mostre com o que meu computador se conec
 
 Sendo justo:
 
-- **Maturidade do bloqueio.** O firewall de aplicação do GlassWire tem uma década de refinamento — o bloqueio de saída do Snitch (adicionado na v1.2) orquestra o firewall nativo do SO em best-effort e precisa de privilégios de captura para aplicar regras de verdade. Se prompts interativos de "negar este app" são sua necessidade central, GlassWire (ou o gratuito Portmaster) continua sendo a escolha mais polida.
-- **Polimento.** GlassWire teve uma década de trabalho de UI. O Snitch é bem mais jovem — o grafo é ótimo, as configurações funcionais, espere arestas.
-- **Retenção longa de histórico** — o Snitch guarda 24h por design (privacy-first também significa *não* acumular seu tráfego).
+- **Maturidade do bloqueio.** O firewall de aplicação do GlassWire tem uma década de refinamento — o bloqueio de saída do Wiretap (adicionado na v1.2) orquestra o firewall nativo do SO em best-effort e precisa de privilégios de captura para aplicar regras de verdade. Se prompts interativos de "negar este app" são sua necessidade central, GlassWire (ou o gratuito Portmaster) continua sendo a escolha mais polida.
+- **Polimento.** GlassWire teve uma década de trabalho de UI. O Wiretap é bem mais jovem — o grafo é ótimo, as configurações funcionais, espere arestas.
+- **Retenção longa de histórico** — o Wiretap guarda 24h por design (privacy-first também significa *não* acumular seu tráfego).
 
 ## A diferença de arquitetura que importa
 
-O modelo do GlassWire é o da indústria: nível grátis → irritação → assinatura → features cloud. O do Snitch é o oposto: o binário que você roda é o produto inteiro. Nada a desbloquear porque nada está bloqueado. Seu histórico vive num arquivo SQLite local — e o código é AGPL, então não pode começar a telefonar pra casa sem o diff ficar público.
+O modelo do GlassWire é o da indústria: nível grátis → irritação → assinatura → features cloud. O do Wiretap é o oposto: o binário que você roda é o produto inteiro. Nada a desbloquear porque nada está bloqueado. Seu histórico vive num arquivo SQLite local — e o código é AGPL, então não pode começar a telefonar pra casa sem o diff ficar público.
 
 Concretamente: API em loopback com auth por token, zero endpoints de telemetria, nenhum SDK de analytics no código (pode dar grep — é open source).
 
@@ -42,9 +42,9 @@ Concretamente: API em loopback com auth por token, zero endpoints de telemetria,
 ```bash
 # Windows: instale o Npcap, depois rode o exe da release como Administrador
 # Linux/Docker:
-docker run --network host ghcr.io/aixisstudio/snitch
+docker run --network host ghcr.io/aixisstudio/wiretap
 # macOS: app empacotado ou brew
-# Modo demo sem admin: SNITCH_DEMO=1
+# Modo demo sem admin: WIRETAP_DEMO=1
 ```
 
-Repo: https://github.com/aixisstudio/Snitch — issues e feature requests bem-vindos, o próprio port de Windows foi contribuição da comunidade. Se substituir uma assinatura que você não queria, é esse o ponto. ⭐ se sim.
+Repo: https://github.com/aixisstudio/Wiretap — issues e feature requests bem-vindos, o próprio port de Windows foi contribuição da comunidade. Se substituir uma assinatura que você não queria, é esse o ponto. ⭐ se sim.

@@ -1,5 +1,5 @@
 """
-Snitch — network containment sandbox / bac à sable réseau.
+Wiretap — network containment sandbox / bac à sable réseau.
 
 EN: The honest user-mode slice of "micro-VM containment": run a suspect
     binary in a network-less sandbox so an analyst can observe its
@@ -18,7 +18,7 @@ EN: The honest user-mode slice of "micro-VM containment": run a suspect
 
     Safety: the binary runs UNPRIVILEGED with NO network; the wrapper
     itself only launches it and caps runtime + captured output. The
-    caller decides what to detonate — Snitch never auto-detonates.
+    caller decides what to detonate — Wiretap never auto-detonates.
 
 FR: La tranche user-mode honnête du « confinement micro-VM » : exécuter
     un binaire suspect dans un bac à sable sans réseau pour observer son
@@ -29,7 +29,7 @@ FR: La tranche user-mode honnête du « confinement micro-VM » : exécuter
     encore appliqué). Sous Windows aucun équivalent user-mode n'existe —
     le statut est honnête. Sécurité : le binaire tourne non privilégié et
     sans réseau ; le wrapper ne fait que le lancer avec bornes temps +
-    sortie. Snitch ne détone jamais rien tout seul.
+    sortie. Wiretap ne détone jamais rien tout seul.
 """
 
 from __future__ import annotations

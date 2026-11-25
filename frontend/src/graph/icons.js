@@ -1,5 +1,5 @@
 /**
- * Snitch — node icon renderer.
+ * Wiretap — node icon renderer.
  *
  * EN: D3 nodes are plain SVG, so we can't use React icons inside them.
  *     This module hand-embeds Lucide path data (viewBox 0 0 24 24,

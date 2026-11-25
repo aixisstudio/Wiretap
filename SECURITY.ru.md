@@ -14,7 +14,7 @@ vulnerability» (вкладка Security) или по email мейнтейнер
 API раскрывает весь ваш граф трафика — он защищён по дизайну:
 
 - **Токен-аутентификация** на каждом REST-endpoint и WebSocket
-  (`X-Snitch-Token` или `?token=`). Под Electron генерируется при каждом
+  (`X-Wiretap-Token` или `?token=`). Под Electron генерируется при каждом
   запуске, в остальных режимах сохраняется с правами 0600.
 - **Привязка к loopback** (`127.0.0.1`) по умолчанию во всех режимах.
 - **Белый список Origin** на handshake WebSocket (loopback-хосты + `null`)

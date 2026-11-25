@@ -1,5 +1,5 @@
 """
-Snitch — pure-Python NFQUEUE client (Linux AF_NETLINK) / client NFQUEUE
+Wiretap — pure-Python NFQUEUE client (Linux AF_NETLINK) / client NFQUEUE
 pur Python (AF_NETLINK Linux).
 
 EN: Zero-dependency implementation of the netfilter-queue userspace

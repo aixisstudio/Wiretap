@@ -1,9 +1,9 @@
-// EN: Snitch install — two halves:
+// EN: Wiretap install — two halves:
 //       1. Python backend into backend/env (uv venv, managed by shell.run).
 //       2. Frontend build → frontend_dist/ at repo root, which the backend
 //          then serves at http://127.0.0.1:<port>/ (single-port app).
 //     Everything runs local-only; the only downloads are pip/npm deps.
-// FR: Installation de Snitch — deux moitiés :
+// FR: Installation de Wiretap — deux moitiés :
 //       1. Backend Python dans backend/env (venv uv, géré par shell.run).
 //       2. Build frontend → frontend_dist/ à la racine, que le backend sert
 //          ensuite sur http://127.0.0.1:<port>/ (appli mono-port).

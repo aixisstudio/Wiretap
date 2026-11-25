@@ -2,7 +2,7 @@
 
 [English](threat-model.md) | [Français](threat-model.md) | [Español](threat-model.es.md) | [Deutsch](threat-model.de.md) | [Русский](threat-model.ru.md) | **日本語** | [Português](threat-model.pt-BR.md) | [中文](threat-model.zh-CN.md)
 
-## Snitch とは
+## Wiretap とは
 
 ローカルファーストのネットワークトラフィック・ビジュアライザ。ホスト上で
 パケットをキャプチャし、プロセスへ帰属させ、**オフライン**でエンリッチ
@@ -15,13 +15,13 @@
 - あなたのトラフィックメタデータ（宛先 IP、ポート、容量、プロセス名）。
 - API トークン（Electron では起動ごと、CLI/Docker ではインストールごと）。
 - ローカル SQLite DB（`traffic`、`alerts_log`、履歴、設定）。
-- マシン自体の完全性（侵害された Snitch はあなたに嘘をつき得る）。
+- マシン自体の完全性（侵害された Wiretap はあなたに嘘をつき得る）。
 
 ## 信頼境界
 
 | 境界 | 脅威 | 緩和策 |
 |---|---|---|
-| ブラウザ/リモートクライアント → REST | LAN 上の攻撃者や悪意あるページがトラフィックビューを読み/操作する | **全** endpoint でトークン必須（`Authorization: Bearer`）。デフォルト `127.0.0.1` バインド。Docker で `0.0.0.0` は `SNITCH_TOKEN` 明示設定必須。 |
+| ブラウザ/リモートクライアント → REST | LAN 上の攻撃者や悪意あるページがトラフィックビューを読み/操作する | **全** endpoint でトークン必須（`Authorization: Bearer`）。デフォルト `127.0.0.1` バインド。Docker で `0.0.0.0` は `WIRETAP_TOKEN` 明示設定必須。 |
 | Web ページ → `/ws` | クロスサイト WebSocket ハイジャック（CSWSH） | トークン**＋**`Origin` 許可リスト（loopback＋Electron の `null` origin のみ）。 |
 | ホスト → 第三者 | プライバシー漏洩 | デフォルトで外向き呼び出しゼロ。GeoIP ダウンロード、threat intel、webhook、更新確認はすべて **オプトイン**で PRIVACY.md に記載。 |
 | キャプチャドライバ → パーサ | 不正フレームでプロセスが落ちる | パーサは全オフセットを境界チェック；不正パケットは `None` を返し、キャプチャループに例外を投げない。 |

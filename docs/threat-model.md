@@ -6,7 +6,7 @@
 
 ## English
 
-### What Snitch is
+### What Wiretap is
 
 A local-first network traffic visualizer. It captures packets on the host,
 attributes them to processes, enriches them **offline** (local `.mmdb`
@@ -18,13 +18,13 @@ same process. There is **no cloud component** and **no telemetry**.
 - Your traffic metadata (destination IPs, ports, volumes, process names).
 - The API token (per-launch in Electron, per-install in CLI/Docker mode).
 - The local SQLite history DB (`traffic`, `alerts_log`, histories, settings).
-- Integrity of the machine itself (a compromised Snitch could lie to you).
+- Integrity of the machine itself (a compromised Wiretap could lie to you).
 
 ### Trust boundaries
 
 | Boundary | Threat | Mitigation |
 |---|---|---|
-| Browser/remote client → REST `/`, `/settings`, `/alerts`, `/history/*`, `/geo/*`, `/capture/*` | An attacker on the LAN or a malicious web page reads/controls your traffic view | Token required on **every** endpoint (`Authorization: Bearer`). Bind is `127.0.0.1` by default. In Docker, `0.0.0.0` requires `SNITCH_TOKEN` to be explicitly set. |
+| Browser/remote client → REST `/`, `/settings`, `/alerts`, `/history/*`, `/geo/*`, `/capture/*` | An attacker on the LAN or a malicious web page reads/controls your traffic view | Token required on **every** endpoint (`Authorization: Bearer`). Bind is `127.0.0.1` by default. In Docker, `0.0.0.0` requires `WIRETAP_TOKEN` to be explicitly set. |
 | Web page → `/ws` | Cross-site WebSocket hijacking (CSWSH) | Token **and** `Origin` allowlist (loopback + Electron `null` origin only). |
 | Host → third parties | Privacy leak | Zero outbound calls by default. The **only** possible outbound call is the DB-IP Lite download, gated behind `/geo/download` with `consent: true` — a deliberate user click. |
 | Capture driver → parser | Malformed frames crash the process | The parser bounds-checks every offset; malformed packets return `None`, never raise into the capture loop. |
@@ -53,7 +53,7 @@ a rogue administrator.
 
 ## Français
 
-### Ce qu'est Snitch
+### Ce qu'est Wiretap
 
 Un visualiseur de trafic réseau local d'abord. Il capture les paquets sur
 l'hôte, les attribue aux processus, les enrichit **hors ligne** (base `.mmdb`
@@ -65,13 +65,13 @@ le même processus. **Aucun composant cloud, aucune télémétrie.**
 - Vos métadonnées de trafic (IP de destination, ports, volumes, processus).
 - Le jeton API (par lancement sous Electron, par installation en CLI/Docker).
 - La base SQLite locale (`traffic`, `alerts_log`, historiques, réglages).
-- L'intégrité de la machine (un Snitch compromis pourrait vous mentir).
+- L'intégrité de la machine (un Wiretap compromis pourrait vous mentir).
 
 ### Frontières de confiance
 
 | Frontière | Menace | Atténuation |
 |---|---|---|
-| Navigateur/client distant → REST | Un attaquant LAN ou une page web malveillante lit/contrôle votre vue du trafic | Jeton exigé sur **chaque** endpoint (`Authorization: Bearer`). Bind `127.0.0.1` par défaut. En Docker, `0.0.0.0` exige `SNITCH_TOKEN` explicite. |
+| Navigateur/client distant → REST | Un attaquant LAN ou une page web malveillante lit/contrôle votre vue du trafic | Jeton exigé sur **chaque** endpoint (`Authorization: Bearer`). Bind `127.0.0.1` par défaut. En Docker, `0.0.0.0` exige `WIRETAP_TOKEN` explicite. |
 | Page web → `/ws` | Détournement de WebSocket cross-site (CSWSH) | Jeton **et** liste blanche d'`Origin` (loopback + origine `null` d'Electron). |
 | Hôte → tiers | Fuite de vie privée | Zéro appel sortant par défaut. Le **seul** appel possible est le téléchargement DB-IP Lite, conditionné à `/geo/download` avec `consent: true` — un clic délibéré. |
 | Driver de capture → parseur | Des trames malformées plantent le processus | Le parseur borne chaque offset ; les paquets malformés renvoient `None`, jamais d'exception dans la boucle. |

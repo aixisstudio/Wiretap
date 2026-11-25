@@ -1,5 +1,5 @@
 """
-Snitch — tests for the v1.5 hardening modules / tests des modules de
+Wiretap — tests for the v1.5 hardening modules / tests des modules de
 durcissement v1.5.
 
 EN: Coverage: ICMP payload parsing (type/code→flags, head→app_head),
@@ -435,7 +435,7 @@ def test_syslog_udp_rfc3164():
         data, _ = srv.recvfrom(2048)
         text = data.decode()
         assert text.startswith("<156>")              # local4(19)*8 + warning(4)
-        assert "snitch[BEACON]" in text
+        assert "wiretap[BEACON]" in text
         assert "test beacon" in text
     finally:
         srv.close()
@@ -555,11 +555,11 @@ def test_gossip_push_calls_import_endpoint(monkeypatch):
     monkeypatch.setattr(gossip.urllib.request, "urlopen", fake_urlopen)
     ps = gossip.PeerSync(lambda: "TOKEN")
     ps.configure(["peer1:1"])
-    res = ps.push_pack({"format": "snitch-ioc-proof/1"})
+    res = ps.push_pack({"format": "wiretap-ioc-proof/1"})
     assert res["ok"] is True
     assert calls[0][0] == "http://peer1:1/security/iocpack/import"
     assert calls[0][1] == "Bearer TOKEN"
-    assert b"snitch-ioc-proof" in calls[0][2]
+    assert b"wiretap-ioc-proof" in calls[0][2]
 
 
 # ── Capability probes / Sondes de capacité ──────────────────────────────────
@@ -620,10 +620,10 @@ def test_askmode_configure_clamps():
 
 
 def test_ebpf_enforce_scoped_attach(monkeypatch):
-    """EN: start() must attach to the DEDICATED snitch cgroup, never the
+    """EN: start() must attach to the DEDICATED wiretap cgroup, never the
     cgroup2 root — a root attach would make every block host-wide,
     silently contradicting the per-process promise.
-    FR: start() doit attacher au cgroup snitch DÉDIÉ, jamais la racine —
+    FR: start() doit attacher au cgroup wiretap DÉDIÉ, jamais la racine —
     un attach racine rendrait chaque blocage global."""
     import platform
     if platform.system().lower() != "linux":

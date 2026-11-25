@@ -1,28 +1,28 @@
-# Snitch — Enterprise-Integrationen
+# Wiretap — Enterprise-Integrationen
 
 *Community translated — PRs welcome for refinement / Von der Community übersetzt — PRs zur Verbesserung willkommen.*
 
-**DE:** Schritt-für-Schritt-Anleitungen, um Snitch in einen SOC-Stack
+**DE:** Schritt-für-Schritt-Anleitungen, um Wiretap in einen SOC-Stack
 einzubinden — Wazuh, Splunk, Graylog/Loki, Ansible, Docker/Kubernetes —
-alles kostenlos und selbst gehostet, passend zu Snitches Local-first-Ansatz.
-Snitch sendet keine eigene Telemetrie; die einzigen ausgehenden
+alles kostenlos und selbst gehostet, passend zu Wiretaps Local-first-Ansatz.
+Wiretap sendet keine eigene Telemetrie; die einzigen ausgehenden
 Verbindungen sind die hier konfigurierten.
 
 ---
 
 ## 1. SIEM-Ausgabe
 
-Snitch bietet drei native Formate für die Alarm-Weiterleitung:
+Wiretap bietet drei native Formate für die Alarm-Weiterleitung:
 
 | Einstellung | Werte | Wirkung |
 |---|---|---|
 | `syslog_addr` | `host:514` oder `tcp://host:514` | Aktiviert Syslog-Weiterleitung (UDP Standard, TCP mit `tcp://`-Präfix) |
 | `syslog_format` | `rfc3164` *(Standard)* | Klassisches BSD-Syslog — von jedem Kollektor lesbar |
-| | `cef` | `CEF:0|Snitch|…` — ArcSight/Wazuh/Splunk parsen `src`, `dst`, `dpt`, `cs1` (Prozess) automatisch |
+| | `cef` | `CEF:0|Wiretap|…` — ArcSight/Wazuh/Splunk parsen `src`, `dst`, `dpt`, `cs1` (Prozess) automatisch |
 | `webhook_url` + `webhook_enabled` | URL | Generischer JSON-`POST` (oder automatisch erkannte Discord/Slack/Telegram-Payloads) |
 | `GET /forensics/export?format=…` | `json`, `csv`, `stix`, `ecs` | Einmalige Forensik-Bundles — `ecs` erzeugt zeilenweise Elastic Common Schema |
 
-In der UI setzen (Einstellungen → Sicherheit) oder in `snitch.toml`:
+In der UI setzen (Einstellungen → Sicherheit) oder in `wiretap.toml`:
 
 ```toml
 syslog_addr = "siem.example.com:514"
@@ -42,14 +42,14 @@ syslog_format = "cef"
    </remote>
    ```
 
-2. Jeden Snitch-Agenten darauf zeigen lassen — Ansible:
+2. Jeden Wiretap-Agenten darauf zeigen lassen — Ansible:
 
    ```yaml
-   snitch_syslog_addr: "wazuh.example.com:514"
-   snitch_syslog_format: "cef"
+   wiretap_syslog_addr: "wazuh.example.com:514"
+   wiretap_syslog_format: "cef"
    ```
 
-3. Der CEF-Decoder von Wazuh übernimmt die `CEF:0|Snitch|…`-Meldungen;
+3. Der CEF-Decoder von Wazuh übernimmt die `CEF:0|Wiretap|…`-Meldungen;
    `severity` wird auf syslog-PRI abgebildet (critical→2, warning→4, info→6).
 
 ## 3. Splunk
@@ -69,8 +69,8 @@ syslog_format = "cef"
 
 ## 5. Deklarative Konfiguration (Security-as-Code)
 
-Das Backend wendet **eine Datei** beim Start an — `$SNITCH_CONFIG`, sonst
-`snitch.toml`/`snitch.json` im Datenverzeichnis. Jede deklarierte
+Das Backend wendet **eine Datei** beim Start an — `$WIRETAP_CONFIG`, sonst
+`wiretap.toml`/`wiretap.json` im Datenverzeichnis. Jede deklarierte
 Einstellung überschreibt den UI/DB-Wert — die Datei ist die
 Wahrheitsquelle der Flotte:
 
@@ -83,7 +83,7 @@ gossip_peers = ["sec-01:8000"]
 ports = [80, 443]
 ```
 
-Vollständiges Vokabular: `packaging/snitch.toml.example`.
+Vollständiges Vokabular: `packaging/wiretap.toml.example`.
 
 ## 6. Ansible / Puppet / Salt / GPO
 
@@ -93,14 +93,14 @@ Vollständiges Vokabular: `packaging/snitch.toml.example`.
   ansible-playbook -i inventory deploy/ansible/site.yml
   ```
 
-  Installiert `/opt/snitch`, das venv, `/etc/snitch/snitch.toml` und die
-  gehärtete systemd-Unit, aktiviert dann `snitch.service`.
+  Installiert `/opt/wiretap`, das venv, `/etc/wiretap/wiretap.toml` und die
+  gehärtete systemd-Unit, aktiviert dann `wiretap.service`.
 
 - **Puppet / SaltStack** — Community-Skelette in `deploy/puppet/` und
   `deploy/salt/` (Label `help wanted`): dieselben drei Primitive —
-  Backend-Baum kopieren, `snitch.toml` rendern, `snitch.service` verwalten.
+  Backend-Baum kopieren, `wiretap.toml` rendern, `wiretap.service` verwalten.
 
-- **Windows GPO** — `deploy/gpo/Install-Snitch.ps1` führt die
+- **Windows GPO** — `deploy/gpo/Install-Wiretap.ps1` führt die
   Silent-Installation aus (ProgramData-Config, venv, SYSTEM-Aufgabe auf
   127.0.0.1). Ask-on-connect unter Windows braucht zusätzlich den
   signierten WFP-Callout — siehe `docs/SIGNING.md`.
@@ -109,13 +109,13 @@ Vollständiges Vokabular: `packaging/snitch.toml.example`.
 
 - **Einzelhost**: `docker compose up` — `network_mode: host` +
   `cap_add: NET_RAW/NET_ADMIN` bereits in `docker-compose.yml`.
-- **Flotten-Konsole**: `deploy/helm/snitch` — `mode: collector` startet
+- **Flotten-Konsole**: `deploy/helm/wiretap` — `mode: collector` startet
   ein ClusterIP-Deployment, das die Audits aller konfigurierten Agenten
   in `GET /remote/fleet` zusammenführt; `mode: agent` rendert ein
   Host-Network-DaemonSet mit `NET_RAW`/`NET_ADMIN`.
 
   ```bash
-  helm install snitch ./deploy/helm/snitch \
+  helm install wiretap ./deploy/helm/wiretap \
       --set token=$(openssl rand -hex 32) \
       --set config.gossip_peers='["agent-1:8000","agent-2:8000"]'
   ```
@@ -125,7 +125,7 @@ Vollständiges Vokabular: `packaging/snitch.toml.example`.
 `POST /alerts/rules/sigma` akzeptiert ein Sigma-YAML und kompiliert die
 unterstützte Teilmenge (Feld→Wert-Selektionen, `|contains`/`|startswith`/
 `|endswith`/`|re`/`|cidr`/`|gt`/`|lt`/`|all`, `1 of`/`all of`-Bedingungen)
-in Snitch-Custom-Rules — nur Alarme, `skipped`-Gründe für alles
+in Wiretap-Custom-Rules — nur Alarme, `skipped`-Gründe für alles
 außerhalb der Teilmenge. Felder werden auf das gemappt, was ein
 *Paket*-Sensor sieht (`DestinationIp→remote_ip`, `Image→process_name`,
 `Domain→host`, …).
@@ -134,7 +134,7 @@ YARA-L für Google SecOps/Chronicle: `GET /alerts/rules/yaral` exportiert
 alle Regeln (inkl. importierter Sigma-Regeln) als `.yar`-Datei — der
 Weg Sigma→YARA-L ist damit abgedeckt.
 
-## 9. Remote-Agenten (snitch-agent/1)
+## 9. Remote-Agenten (wiretap-agent/1)
 
 `agent/` enthält einen leichten Rust-Daemon (null Abhängigkeiten, ein
 ~1-MB-Binary), der die Socket-Tabelle des Hosts (`/proc/net/*`)
@@ -165,5 +165,5 @@ Opt-in-API-Anbieter (AbuseIPDB / OTX / VirusTotal) bleiben über
 Die GUI ist optional: das Backend ist das gesamte Produkt. Direkt
 (`uvicorn api.main:app`), unter der mitgelieferten systemd-Unit oder im
 Container — alle Funktionen oben laufen ohne Frontend.
-`SNITCH_DEMO=1` liefert weiterhin einen root-freien synthetischen Feed
+`WIRETAP_DEMO=1` liefert weiterhin einen root-freien synthetischen Feed
 für Schulungen und CTFs.

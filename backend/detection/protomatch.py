@@ -1,5 +1,5 @@
 """
-Snitch — protocol/port mismatch classifier / classifieur protocole↔port.
+Wiretap — protocol/port mismatch classifier / classifieur protocole↔port.
 
 EN: "Disguised protocol" detection for the classic well-known ports —
     when the first payload bytes on a socket do NOT look like the protocol
@@ -7,7 +7,7 @@ EN: "Disguised protocol" detection for the classic well-known ports —
     tunnel past firewalls (HTTP/80, DNS/53, SSH/22, TLS/443, mail…).
 
     Checks are cheap signature tests on the ≤64-byte app head only — no
-    payload is stored, matching Snitch's privacy model:
+    payload is stored, matching Wiretap's privacy model:
 
       tcp/80    expects an HTTP method or "HTTP/" status line
       udp+tcp/53 expects a plausible DNS header (id, flags, qdcount>0,

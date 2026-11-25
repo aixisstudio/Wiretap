@@ -1,4 +1,4 @@
-# Snitch —— 冲击 GitHub Trending 与 10K ⭐ 的增长战役
+# Wiretap —— 冲击 GitHub Trending 与 10K ⭐ 的增长战役
 
 [English](growth-campaign.md) | [Français](growth-campaign.md) | [Español](growth-campaign.es.md) | [Deutsch](growth-campaign.de.md) | [Русский](growth-campaign.ru.md) | [日本語](growth-campaign.ja.md) | [Português](growth-campaign.pt-BR.md) | **中文**
 
@@ -37,7 +37,7 @@
 
 - 每次发布 = 发帖理由（v1.x → 每 2-3 周一波）
 - Changelog → dev.to/Medium 交叉发布
-- 每月「State of Snitch」帖——真实数据透明
+- 每月「State of Wiretap」帖——真实数据透明
 
 ## 层 4 —— 长尾
 

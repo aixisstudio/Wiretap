@@ -1,5 +1,5 @@
 /**
- * Snitch — generic dropdown component.
+ * Wiretap — generic dropdown component.
  *
  * EN: Reusable wrapper replacing the four copy-pasted "open state + outside
  *     click" blocks that used to live in App.jsx. `useClickOutside` is the

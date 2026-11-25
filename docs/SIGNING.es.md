@@ -4,7 +4,7 @@
 
 ## Estado actual
 
-Los builds de Snitch están **sin firmar** en Windows y macOS. Es honesto y
+Los builds de Wiretap están **sin firmar** en Windows y macOS. Es honesto y
 deliberado: no publicaremos certificados autofirmados que anularían el
 sentido de la firma, ni compraremos un certificado mientras exista una vía
 gratuita legítima para el open source.
@@ -20,10 +20,10 @@ SmartScreen deja de avisar cuando se construye reputación.
 
 1. Solicitar en <https://signpath.org/apply> — formulario con nombre,
    email, proyecto, URL del repositorio y descripción. Aprobación manual
-   (días). Snitch cumple cada condición publicada: AGPL-3.0 (aprobada OSI,
+   (días). Wiretap cumple cada condición publicada: AGPL-3.0 (aprobada OSI,
    sin doble licencia), fuente pública, mantenido, ya publicado en GitHub
    Releases, documentado. **Candidatura enviada — pendiente de revisión.**
-2. Crear la organización SignPath, un **proyecto** (slug, p.ej. `Snitch`),
+2. Crear la organización SignPath, un **proyecto** (slug, p.ej. `Wiretap`),
    vincular el build system de confianza *GitHub.com* e instalar la app
    GitHub SignPath en este repositorio (requerida para verificación de
    origen).
@@ -46,7 +46,7 @@ certificado Developer ID + notarización. No hay alternativa gratuita
 legal. Mientras tanto:
 
 - los builds `.zip`/`.dmg` quedan sin firmar — primer arranque con
-  **clic derecho → Abrir**, o `xattr -d com.apple.quarantine Snitch.app`
+  **clic derecho → Abrir**, o `xattr -d com.apple.quarantine Wiretap.app`
 - los checksums SHA256 de cada release permiten verificar la integridad
 - los logs CI públicos dan procedencia (pipeline reproducible)
 

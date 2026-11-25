@@ -1,5 +1,5 @@
 /**
- * Snitch — React entry point.
+ * Wiretap — React entry point.
  *
  * EN: Mounts the App inside StrictMode and wraps it in the I18nProvider so
  *     every component can call `useT()` for EN/FR translations.

@@ -1,36 +1,36 @@
 <div align="center">
 
-# Snitch
+# Wiretap
 
 **隠れたネットワーク接続をすべて追跡。**
 
 [English](README.md#english) | [Français](README.md#français) | [Español](README.es.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | **日本語** | [Português](README.pt-BR.md) | [中文](README.zh-CN.md)
 
-⭐ **Snitch が役に立ったら、スターをいただけると嬉しいです！** ⭐
+⭐ **Wiretap が役に立ったら、スターをいただけると嬉しいです！** ⭐
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-blue.svg)]()
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)]()
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20(Docker)-blue.svg)]()
-[![GitHub release](https://img.shields.io/github/v/release/aixisstudio/Snitch?include_prereleases&label=release)](https://github.com/aixisstudio/Snitch/releases/latest)
-[![GitHub stars](https://img.shields.io/github/stars/aixisstudio/Snitch?style=flat-square&logo=github)](https://github.com/aixisstudio/Snitch/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/aixisstudio/Wiretap?include_prereleases&label=release)](https://github.com/aixisstudio/Wiretap/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/aixisstudio/Wiretap?style=flat-square&logo=github)](https://github.com/aixisstudio/Wiretap/stargazers)
 
-<!-- JA: デモモード (SNITCH_DEMO=1) のライブキャプチャ — 合成トラフィックのみ。 -->
-![Snitch live graph — LAN perimeter, geolocated hosts, alerts](docs/assets/demo.gif)
+<!-- JA: デモモード (WIRETAP_DEMO=1) のライブキャプチャ — 合成トラフィックのみ。 -->
+![Wiretap live graph — LAN perimeter, geolocated hosts, alerts](docs/assets/demo.gif)
 
 </div>
 
 ---
 
-**Snitch** はリアルタイムのネットワークトラフィック・ビジュアライザです。
+**Wiretap** はリアルタイムのネットワークトラフィック・ビジュアライザです。
 コンピュータの全接続が見えます — 誰と通信しているか、相手はどこか、どのアプリが原因か。
 
 UI 全体は **English、Français、Español、Deutsch、Русский、日本語、Português (BR)、简体中文** で利用可能。右上ツールバーの言語セレクタを使ってください。
 
-### なぜ Snitch？
+### なぜ Wiretap？
 
-- **vs Little Snitch / Lulu** — 同じ発想（アプリ別可視化＋外向きブロックルール）ですが、Snitch はクロスプラットフォーム・無料・オープンソース。ブロックは OS ネイティブファイアウォール（`netsh` / `iptables` / `pf`）でオーケストレート — ユーザースペースでのフィルタリングはしません。
-- **vs GlassWire** — Snitch は無料・オープンソース（AGPL）・アカウント不要で、オプトインなしの**外向き呼び出しはゼロ**。ジオロケーションさえオフライン。
+- **vs Little Snitch / Lulu** — 同じ発想（アプリ別可視化＋外向きブロックルール）ですが、Wiretap はクロスプラットフォーム・無料・オープンソース。ブロックは OS ネイティブファイアウォール（`netsh` / `iptables` / `pf`）でオーケストレート — ユーザースペースでのフィルタリングはしません。
+- **vs GlassWire** — Wiretap は無料・オープンソース（AGPL）・アカウント不要で、オプトインなしの**外向き呼び出しはゼロ**。ジオロケーションさえオフライン。
 - **vs Wireshark** — 生のパケット解析ではなく、誰でも読めるライブな高レベル概要を提供。
 - **vs クラウド監視** — すべて `127.0.0.1` でトークン認証の内側。トラフィックデータはマシンから出ません。
 
@@ -60,7 +60,7 @@ UI 全体は **English、Français、Español、Deutsch、Русский、日�
 | 帯域モニタ | ライブ MB/s スパークライン |
 | 8 言語 UI | EN · FR · ES · DE · RU · JA · PT-BR · ZH-CN — ワンクリック切替、ロケールは `frontend/src/locales/` |
 | ライト/ダークテーマ | デフォルトで OS 設定に追従、手動切替は永続化 |
-| 自動更新 | デスクトップアプリが GitHub Releases を確認（設定で無効化可；`SNITCH_NO_UPDATE=1`） |
+| 自動更新 | デスクトップアプリが GitHub Releases を確認（設定で無効化可；`WIRETAP_NO_UPDATE=1`） |
 | QUIC / HTTP/3 | UDP/443 フローを正直にラベル付け — QUIC の SNI は暗号化され読みません |
 | ウォッチリスト | IP/ドメインをピン留め — 接触した瞬間に専用アラート |
 | アップロードスパイク警報 | プロセス別 MB/分上限、閾値調整可 |
@@ -72,15 +72,15 @@ UI 全体は **English、Français、Español、Deutsch、Русский、日�
 
 | プラットフォーム | パッケージ |
 |---|---|
-| **macOS (Apple Silicon)** | `brew install --cask aixisstudio/tap/snitch` — または [最新リリース](https://github.com/aixisstudio/Snitch/releases/latest) の **Snitch.app** zip/dmg |
-| **Linux** | [最新リリース](https://github.com/aixisstudio/Snitch/releases/latest) の **Snitch AppImage / .deb / .rpm / .snap** — または `sudo docker compose up --build`（[Docker (Linux)](#docker-linux) 参照） |
-| **ヘッドレス（全OS）** | `brew install aixisstudio/tap/snitch` → `snitchd` デーモン（サーバー/VM、GUI なし） |
-| **Windows** | **Snitch Setup** `.exe` — ワンクリック NSIS インストーラ（ネイティブアプリ、起動時 UAC、Npcap チェック内蔵）。[最新リリース](https://github.com/aixisstudio/Snitch/releases/latest) から。Lite 代替: `Snitch-Lite-Setup`（バックエンド＋ブラウザ UI）。[Npcap](https://npcap.com/) が必要 |
-| **すべて (1 クリック)** | [Pinokio](https://pinokio.co/apps/github-com-aixisstudio-snitch) — 依存関係をインストール、バックエンド起動、UI を開く |
+| **macOS (Apple Silicon)** | `brew install --cask aixisstudio/tap/wiretap` — または [最新リリース](https://github.com/aixisstudio/Wiretap/releases/latest) の **Wiretap.app** zip/dmg |
+| **Linux** | [最新リリース](https://github.com/aixisstudio/Wiretap/releases/latest) の **Wiretap AppImage / .deb / .rpm / .snap** — または `sudo docker compose up --build`（[Docker (Linux)](#docker-linux) 参照） |
+| **ヘッドレス（全OS）** | `brew install aixisstudio/tap/wiretap` → `wiretapd` デーモン（サーバー/VM、GUI なし） |
+| **Windows** | **Wiretap Setup** `.exe` — ワンクリック NSIS インストーラ（ネイティブアプリ、起動時 UAC、Npcap チェック内蔵）。[最新リリース](https://github.com/aixisstudio/Wiretap/releases/latest) から。Lite 代替: `Wiretap-Lite-Setup`（バックエンド＋ブラウザ UI）。[Npcap](https://npcap.com/) が必要 |
+| **すべて (1 クリック)** | [Pinokio](https://pinokio.co/apps/github-com-aixisstudio-wiretap) — 依存関係をインストール、バックエンド起動、UI を開く |
 
-最新リリースはこちら: **[github.com/aixisstudio/Snitch/releases](https://github.com/aixisstudio/Snitch/releases)**
+最新リリースはこちら: **[github.com/aixisstudio/Wiretap/releases](https://github.com/aixisstudio/Wiretap/releases)**
 
-> **macOS 初回起動** — Snitch は ad-hoc 署名で、ノータライズされていません（有償 Apple Developer ID なし）。`brew install --cask` は quarantine フラグを自動で除去します。手動 zip の場合：右クリック → **開く**、または `xattr -dr com.apple.quarantine /Applications/Snitch.app`。初回起動時に管理者パスワードを**一度だけ**聞きます — tcpdump/Wireshark と同様、パケットキャプチャに必要です。UI 自体は非特権のまま。
+> **macOS 初回起動** — Wiretap は ad-hoc 署名で、ノータライズされていません（有償 Apple Developer ID なし）。`brew install --cask` は quarantine フラグを自動で除去します。手動 zip の場合：右クリック → **開く**、または `xattr -dr com.apple.quarantine /Applications/Wiretap.app`。初回起動時に管理者パスワードを**一度だけ**聞きます — tcpdump/Wireshark と同様、パケットキャプチャに必要です。UI 自体は非特権のまま。
 >
 > **Windows コード署名** — Windows ビルドは [SignPath Foundation](https://signpath.org) 提供の無料 OSS 証明書で [SignPath.io](https://signpath.io) 経由の Authenticode 署名予定（申請済み・承認待ち）。署名ビルド公開までは SmartScreen が警告する場合があります — **詳細 → 実行** をクリック。
 
@@ -97,10 +97,10 @@ UI 全体は **English、Français、Español、Deutsch、Русский、日�
 ### セキュリティとプライバシー
 
 - **API トークン** — 全 REST エンドポイントと WebSocket がトークン必須。Electron は起動ごとに生成；Docker/ブラウザではバックエンドログに一度だけ表示され `data/api_token.txt` に保存。`http://localhost:8000/?token=<TOKEN>` で UI を開く。
-- **デフォルト loopback のみ** — API は全モードで `127.0.0.1` にバインド。LAN アクセスが必要な場合のみ `SNITCH_BIND=0.0.0.0`（トークンは依然必須）。
+- **デフォルト loopback のみ** — API は全モードで `127.0.0.1` にバインド。LAN アクセスが必要な場合のみ `WIRETAP_BIND=0.0.0.0`（トークンは依然必須）。
 - **CORS/WebSocket Origin 許可リスト** — `localhost:5173`、バックエンド自身の origin、Electron の `file://` ページのみ接続可。
 - **ジオロケーションは 100% オフライン** — オンライン参照は*一切なし*。DB-IP Lite ([CC BY 4.0](https://db-ip.com/db/lite.php)) は `<data_dir>/geo/` へ自動展開。新しい `.mmdb` を置くか設定から DB-IP Lite をダウンロード可（明示的同意；他のオプトイン外向き呼び出し — threat intel・webhook・更新確認 — は [PRIVACY.md](PRIVACY.md) に記載）。
-- **すべてのデータはローカル** — `snitch.db`（24 時間スライディング、`retention_hours`）と `data/logs/snitch.log` はマシンから出ません。テレメトリなし。外向き呼び出しはすべてオプトイン。
+- **すべてのデータはローカル** — `wiretap.db`（24 時間スライディング、`retention_hours`）と `data/logs/wiretap.log` はマシンから出ません。テレメトリなし。外向き呼び出しはすべてオプトイン。
 - **設定の永続化** — ポートフィルタ、除外プロセス、IP ホワイトリスト、ファイアウォールルール、言語、保持期間は SQLite に保存され再起動時に復元。
 - **ファイアウォールルールは best-effort** — バックエンドが OS ファイアウォール（`netsh advfirewall`、`iptables`、`pf` アンカー）を駆動。権限不足時はルールを保持し*可視化*のためにマッチング（BLOCKED_ATTEMPT アラート）＋「未適用」と正直に表示。ロックダウン中も loopback＋LAN は維持。
 - **Threat intel・webhook はオプトイン** — デフォルト無効。有効化すると外向き呼び出しが追加されます（[PRIVACY.md](PRIVACY.md)）。
@@ -119,7 +119,7 @@ Docker デプロイは Docker 以外何もインストールしたくない Linu
 
 ```bash
 sudo docker run --network host --cap-add NET_ADMIN --cap-add NET_RAW \
-  -v snitch-data:/app/data ghcr.io/aixisstudio/snitch
+  -v wiretap-data:/app/data ghcr.io/aixisstudio/wiretap
 ```
 
 > **注意:** Mac/Windows の Docker Desktop は VM 内で動作しホストトラフィックをキャプチャできません。これらのプラットフォームでは Electron アプリを使用。
@@ -133,7 +133,7 @@ Docker の制限: プロセス帰属はコンテナ内プロセスのみ；LAN �
 
 要件: Python 3.11+、Node.js 18+、[Npcap](https://npcap.com/)（Windows のみ）、バックエンド用管理者ターミナル。
 
-> **デモモード** — `SNITCH_DEMO=1` で合成トラフィックを実パイプラインに流す：root 不要、libpcap 不要、実パケット不問。スクリーンショットやテストに最適。
+> **デモモード** — `WIRETAP_DEMO=1` で合成トラフィックを実パイプラインに流す：root 不要、libpcap 不要、実パケット不問。スクリーンショットやテストに最適。
 
 ```bash
 cd backend && pip install -r requirements.txt && python run_backend.py
@@ -151,7 +151,7 @@ cd frontend && npm test
 ### プロジェクト構成
 
 ```
-snitch/
+wiretap/
 ├── backend/       FastAPI + libpcap キャプチャ（ctypes、独自パーサ）
 ├── frontend/      React + D3.js UI（8 言語）
 ├── electron/      Electron ラッパー（main、splash、preload）
@@ -163,12 +163,12 @@ snitch/
 
 ### エンタープライズ & フリート
 
-Snitch は SOC 向けにヘッドレスでも動作します — すべてファイル駆動で無料:
+Wiretap は SOC 向けにヘッドレスでも動作します — すべてファイル駆動で無料:
 
-- **Security-as-Code** — `snitch.toml`（または `$SNITCH_CONFIG`）が起動時に全設定を上書き。Ansible（`deploy/ansible/`）、Puppet、Salt、GPO でフリートをプロビジョニング。
+- **Security-as-Code** — `wiretap.toml`（または `$WIRETAP_CONFIG`）が起動時に全設定を上書き。Ansible（`deploy/ansible/`）、Puppet、Salt、GPO でフリートをプロビジョニング。
 - **Rust エージェント** — ゼロ依存デーモン（`agent/`）がソケットを `POST /ingest/events` にストリームし、Linux では `/proc`→PID 帰属。`POST /ingest/enroll` が一回限りの `sagt_…` トークンを発行（ハッシュ保存、失効可能）。
 - **SIEM ネイティブ** — CEF または RFC 3164 syslog、汎用 webhook、`GET /forensics/export?format=ecs`（ECS NDJSON）で Wazuh、Splunk、Graylog、Loki、Elastic に連携。Sigma インポート（`POST /alerts/rules/sigma`）、YARA-L エクスポート（`GET /alerts/rules/yaral`）。
-- **フリートビュー** — `GET /remote/fleet` が全ピアのハードニング監査を統合。Helm チャート（`deploy/helm/snitch`）でコレクターをクラスタ内に配置。
+- **フリートビュー** — `GET /remote/fleet` が全ピアのハードニング監査を統合。Helm チャート（`deploy/helm/wiretap`）でコレクターをクラスタ内に配置。
 - **無料 TI フィード** — `POST /firewall/blocklist` でドメイン（StevenBlack）・IP（Blocklist.de、URLhaus/Feodo）リストを取り込み。`ti_feeds` で自動更新をスケジュール。
 
 手順レシピは [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) を参照。
@@ -179,4 +179,4 @@ AGPL v3 — [LICENSE](LICENSE) 参照。自由に使用・学習・改変可；�
 
 ## スター履歴
 
-[![Star History Chart](https://api.star-history.com/svg?repos=aixisstudio/Snitch&type=Date)](https://star-history.com/#aixisstudio/Snitch&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=aixisstudio/Wiretap&type=Date)](https://star-history.com/#aixisstudio/Wiretap&Date)

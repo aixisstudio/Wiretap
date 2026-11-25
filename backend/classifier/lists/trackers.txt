@@ -1,4 +1,4 @@
-# Snitch — tracker / analytics domain list.
+# Wiretap — tracker / analytics domain list.
 #
 # EN: One registrable domain per line. Matching is by domain SUFFIX
 #     (foo.example.com matches example.com; notexample.com does NOT).

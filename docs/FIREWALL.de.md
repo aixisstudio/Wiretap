@@ -2,22 +2,22 @@
 
 [English](FIREWALL.md) | [Français](FIREWALL.md) | [Español](FIREWALL.es.md) | **Deutsch** | [Русский](FIREWALL.ru.md) | [日本語](FIREWALL.ja.md) | [Português](FIREWALL.pt-BR.md) | [中文](FIREWALL.zh-CN.md)
 
-Snitch bringt eine Threat-Hunting-Schicht über der passiven Beobachtung.
+Wiretap bringt eine Threat-Hunting-Schicht über der passiven Beobachtung.
 **Was sie tut — und ebenso wichtig, was sie nicht tut:**
 
 ## Orchestrierung der Ausgangs-Firewall
 
-Snitch filtert **keine** Pakete im User-Space. Regeln werden best-effort
+Wiretap filtert **keine** Pakete im User-Space. Regeln werden best-effort
 an die OS-native Firewall übergeben:
 
 | OS | Mechanismus |
 |---|---|
 | Windows | ausgehende Blockregeln via `netsh advfirewall` |
-| Linux | `iptables -A OUTPUT -j DROP` (eigene `SNITCH_LOCK`-Chain für Lockdown) |
+| Linux | `iptables -A OUTPUT -j DROP` (eigene `WIRETAP_LOCK`-Chain für Lockdown) |
 | macOS | generierter `pf`-Anchor, geladen mit `pfctl` |
 
 Regelarten: `ip`, `cidr`, `domain` (einmalig beim Anwenden aufgelöst),
-`process`, `port`. Regeln persistieren in `snitch.db` und werden beim
+`process`, `port`. Regeln persistieren in `wiretap.db` und werden beim
 Start erneut angewendet.
 
 **Ehrliche Grenzen:**
@@ -36,7 +36,7 @@ Start erneut angewendet.
 ## Incident Response
 
 - `POST /processes/kill` / `POST /processes/suspend` — per PID, lehnt
-  PIDs ≤ 3 und Snitch selbst ab. Übliche OS-Privilegien gelten.
+  PIDs ≤ 3 und Wiretap selbst ab. Übliche OS-Privilegien gelten.
 - `POST /firewall/rules`, `DELETE /firewall/rules/{id}`,
   `POST /firewall/rules/{id}/toggle`, `POST /firewall/lockdown` —
   authentifiziert wie jeder Endpoint.
@@ -87,7 +87,7 @@ in Klartext. Ein *Befundbericht*, keine Zertifizierung.
 
 ### Neu in v1.2 / Nouveautés v1.2
 
-- **Aktion `sinkhole`** — `domain`-/`ip`-Regeln können auf Loopback umleiten statt blockieren: Domains über einen markierten `# snitch-sinkhole`-Block in der hosts-Datei (alle OS), IPs/CIDRs über iptables-`DNAT` (nur Linux). `sinkhole` bei `process`/`port` wird abgelehnt; nicht unterstützte Plattformen → ehrliches `applied=False`.
+- **Aktion `sinkhole`** — `domain`-/`ip`-Regeln können auf Loopback umleiten statt blockieren: Domains über einen markierten `# wiretap-sinkhole`-Block in der hosts-Datei (alle OS), IPs/CIDRs über iptables-`DNAT` (nur Linux). `sinkhole` bei `process`/`port` wird abgelehnt; nicht unterstützte Plattformen → ehrliches `applied=False`.
 - **Domain-Re-Auflösung** — `domain`-Regeln werden alle ~10 Min neu aufgelöst; das IP-Delta wird je OS angewendet, damit CDN-Rotation einen Namen nicht stillschweigend freigibt.
 - **Integritätswache** (standardmäßig an, schreibgeschützt, lokal) — SHA-256-Baselines vernetzter Executables (`BINARY_CHANGED`), Name/Exe-Mismatches (`NAME_MISMATCH`), `rwxp`-Scan nur Linux (`MEM_RWX`, Info-Stufe für bekannte JIT-Apps). `GET /security/integrity`, `POST /security/integrity/check`.
 - **Alert-Erklärungen** — `GET /security/explain?type=X` liefert handgeschriebene zweisprachige (EN/FR) Erklärungen; deterministisch und offline — kein Modell. Die UI zeigt sie hinter der „Warum?“-Schaltfläche.
@@ -112,7 +112,7 @@ Alle sind **standardmäßig aus oder selbstlimitierend**, degradieren ehrlich un
 - **Blocklisten-Import** — `POST /firewall/blocklist`: lokale Datei (rein lokal) oder opt-in URL (HTTPS-Fetch ≤4 MiB, als `remote_fetch` markiert) → `domain`-Regeln, dedupliziert, Limit 500–5000.
 - **PCAP-Export** — `GET /forensics/pcap` (Filter `ip`/`process`): ~4-MiB-Ringpuffer als Wireshark-`.pcap`.
 - **Fernkopplung** — `POST /remote/pairing` persistiert `lan_bind` für den nächsten Start; Token bleibt Pflicht. `GET /remote/pairing` meldet Bind + LAN-IPs.
-- **Sandbox ohne Netzwerk** — `POST /security/sandbox` führt Binärdateien mit null Egress aus (`unshare -n` Linux, `sandbox-exec` macOS; `contrib/snitch-contain` manuell).
+- **Sandbox ohne Netzwerk** — `POST /security/sandbox` führt Binärdateien mit null Egress aus (`unshare -n` Linux, `sandbox-exec` macOS; `contrib/wiretap-contain` manuell).
 - **Eingebettetes Modell** — `slm_mode=embedded` lädt ein Nutzer-`.gguf` via `llama-cpp-python` — null Netzwerk.
 - **Native Skelette** — `contrib/wfp-callout/` (WFP-Callout in C + Signierung) und `contrib/macos-filter/` (`NEFilterDataProvider` Swift + Entitlements): Forschungs-Scaffolding, nicht ausgeliefert.
 - **ASN** — mit `GeoLite2-ASN.mmdb`/`dbip-asn-lite.mmdb` tragen Knoten `asn` neben `org`.
@@ -124,12 +124,12 @@ Alle sind **standardmäßig aus oder selbstlimitierend**, degradieren ehrlich un
 - **ICMP-Tunnel-Heuristik** — Echo-Typen mit ≥24 B Payload, ≥3× in 5 Min → `ICMP_TUNNEL`.
 - **ML-Flow-Anomalie** — Isolation Forest pur Python (64 Bäume, null Deps) über eigene Flow-Summaries; inert <384 Flows, `ML_ANOMALY` ab 0,62. Baseline-Abweichung, **kein** Malware-Klassifikator.
 - **Ask-on-Connect (Linux, opt-in)** — `ask_enabled` + root + iptables: neue Ausgangsflüsse werden auf NFQUEUE 7 gehalten bis `POST /security/ask/verdict` — der NFQUEUE-Client ist **reines Python** (`detection/nfqueue.py`, AF_NETLINK), kein `python-netfilterqueue` nötig; Timeout 15 s, fail-closed (`ask_failopen=1` umgekehrt). Windows/macOS brauchen die signierten Callout-/NetworkExtension-Skelette aus `contrib/`.
-- **eBPF-Cgroup-Enforcement (Linux, opt-in)** — `POST /security/ebpf/isolate {pid}` + `/security/ebpf/block {ip}`: Programm an den snitch-Cgroup attachiert — Kernel-Drops gelten NUR für isolierte Prozesse.
+- **eBPF-Cgroup-Enforcement (Linux, opt-in)** — `POST /security/ebpf/isolate {pid}` + `/security/ebpf/block {ip}`: Programm an den wiretap-Cgroup attachiert — Kernel-Drops gelten NUR für isolierte Prozesse.
 - **Hollowing-Check (Linux)** — `POST /security/hollow {pid}` diff't ausführbare file-backed Seiten aus `/proc/<pid>/mem` gegen Disk.
 - **IOC-Peer-Sync (opt-in)** — `gossip_peers` ≤32 + `gossip_enabled`: Merkle-Proof-Pakete alle 5 Min per authentifiziertem HTTP(S) — kein Discovery, kein ZK-Protokoll.
 - **Syslog (opt-in)** — `syslog_addr` (`host:port` UDP oder `tcp://`) → RFC 3164 `local4`.
 - **Firejail-Containment** — `firejail --net=none` bevorzugt, `unshare` als Fallback.
-- **nftables-Backend** — eigene `inet snitch`-Tabelle statt iptables, wo `nft` existiert.
+- **nftables-Backend** — eigene `inet wiretap`-Tabelle statt iptables, wo `nft` existiert.
 - **Actionable Alerts** — strukturierte `actions` (Block IP, Kill/Suspend, Ask-Verdict) als Ein-Klick-Buttons.
 - **`asn`/`country` in Custom Rules** — lokale Geo-DB, kombinierbar mit `action=block` als Geo-Fence.
 - **DGA-Heuristik** — aufgelöste DNS-Namen und TLS-SNIs werden lexikalisch

@@ -8,4 +8,4 @@ labels: enhancement
 
 **A funcionalidade** :
 
-**Impacto na privacidade** : (toda chamada de saída no Snitch é opt-in — este recurso precisa de uma nova?)
+**Impacto na privacidade** : (toda chamada de saída no Wiretap é opt-in — este recurso precisa de uma nova?)

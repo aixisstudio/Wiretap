@@ -1,5 +1,5 @@
 """
-Snitch — FastAPI application.
+Wiretap — FastAPI application.
 
 EN: Heart of the backend. Owns the in-memory graph state (nodes / edges /
     LAN devices), receives packets from the libpcap sniffer thread, enriches
@@ -22,7 +22,7 @@ EN: Heart of the backend. Owns the in-memory graph state (nodes / edges /
     and are restored at startup.
 
     Security model (see api/security.py):
-      - every REST endpoint requires the API token (X-Snitch-Token header or
+      - every REST endpoint requires the API token (X-Wiretap-Token header or
         ?token= param)
       - the WebSocket requires the token AND a whitelisted Origin header
       - CORS is restricted to the dev server / self-origin / file:// (Electron)
@@ -51,7 +51,7 @@ FR: Cœur du backend. Détenir l'état du graphe en mémoire (nœuds / arêtes /
     dans SQLite et sont restaurés au démarrage.
 
     Modèle de sécurité (voir api/security.py) :
-      - chaque endpoint REST exige le jeton API (en-tête X-Snitch-Token ou
+      - chaque endpoint REST exige le jeton API (en-tête X-Wiretap-Token ou
         paramètre ?token=)
       - le WebSocket exige le jeton ET un en-tête Origin autorisé
       - CORS restreint au serveur de dev / à l'origine propre / file:// (Electron)
@@ -120,7 +120,7 @@ import storage.db as db
 from version import __version__
 from procutils import spawn_kwargs
 
-logger = logging.getLogger("snitch.api")
+logger = logging.getLogger("wiretap.api")
 
 # ── Shared state / État partagé ──────────────────────────────────────────────
 # EN: All mutable application state lives here at module level.
@@ -1956,10 +1956,10 @@ def _sniffer_failed(msg: str) -> None:
 
 def _start_capture() -> None:
     """EN: (Re)start sniffer + ARP-table scanner in daemon threads.
-        With SNITCH_DEMO=1 the sniffer is replaced by the synthetic demo
+        With WIRETAP_DEMO=1 the sniffer is replaced by the synthetic demo
         feeder — no root, no libpcap, no real traffic touched.
     FR: (Re)démarrer sniffer + scanner de table ARP dans des threads daemon.
-        Avec SNITCH_DEMO=1 le sniffer est remplacé par le générateur de démo
+        Avec WIRETAP_DEMO=1 le sniffer est remplacé par le générateur de démo
         — ni root ni libpcap ni trafic réel."""
     global _sniffer, _scanner, _capturing
     if demo.enabled():
@@ -2056,11 +2056,11 @@ def _load_settings() -> None:
         whitelist et exclusions de processus survivent aux redémarrages.
     """
     global _port_filter, _excluded_processes, _whitelisted_ips, _watchlist
-    # EN: Security-as-Code — a snitch.toml/snitch.json in the data dir (or
-    #     $SNITCH_CONFIG) is applied FIRST, so fleet provisioning works
+    # EN: Security-as-Code — a wiretap.toml/wiretap.json in the data dir (or
+    #     $WIRETAP_CONFIG) is applied FIRST, so fleet provisioning works
     #     without touching the UI. Declared keys override the DB.
-    # FR: Security-as-Code — un snitch.toml/snitch.json dans le data dir
-    #     (ou $SNITCH_CONFIG) s'applique EN PREMIER : le provisionnement de
+    # FR: Security-as-Code — un wiretap.toml/wiretap.json dans le data dir
+    #     (ou $WIRETAP_CONFIG) s'applique EN PREMIER : le provisionnement de
     #     flotte marche sans toucher l'UI. Les clés déclarées priment.
     try:
         import configfile
@@ -2160,14 +2160,14 @@ async def _startup() -> None:
 
     # EN: 10 s default — on Linux each tick walks every process's open
     #     files, which is real work on a busy host; mic-state latency does
-    #     not need sub-second freshness. SNITCH_MEDIA_INTERVAL overrides.
+    #     not need sub-second freshness. WIRETAP_MEDIA_INTERVAL overrides.
     # FR: 10 s par défaut — sous Linux chaque tick parcourt les fichiers
     #     ouverts de tous les processus, un vrai coût sur hôte chargé ;
     #     la fraîcheur du micro n'exige pas la seconde.
-    #     SNITCH_MEDIA_INTERVAL permet d'ajuster.
+    #     WIRETAP_MEDIA_INTERVAL permet d'ajuster.
     try:
         _media_iv = max(3, min(300, int(os.environ.get(
-            "SNITCH_MEDIA_INTERVAL", "10"))))
+            "WIRETAP_MEDIA_INTERVAL", "10"))))
     except ValueError:
         _media_iv = 10
     _media_monitor = MediaMonitor(callback=_on_media_change,
@@ -2233,7 +2233,7 @@ async def lifespan(app: FastAPI):
         await _shutdown_all()
 
 
-app = FastAPI(title="Snitch API", lifespan=lifespan)
+app = FastAPI(title="Wiretap API", lifespan=lifespan)
 
 # EN: Restricted CORS — dev server, self-origin, and `null` (Electron file://).
 #     No `*`, no credentials. Combined with the token check this kills the
@@ -2247,7 +2247,7 @@ app.add_middleware(
     allow_origins=["null"],              # EN: file:// pages (Electron renderer)
                                          # FR: pages file:// (renderer Electron)
     allow_methods=["GET", "POST", "DELETE"],   # EN: DELETE needed for /alerts/ignore / FR: DELETE requis pour /alerts/ignore
-    allow_headers=["X-Snitch-Token", "Content-Type"],
+    allow_headers=["X-Wiretap-Token", "Content-Type"],
 )
 
 # EN: Applied to every route via `dependencies` AND checked explicitly on the
@@ -2387,9 +2387,9 @@ async def post_settings(body: SettingsBody) -> dict:
 
 def _lan_addresses() -> list[str]:
     """EN: This machine's non-loopback IPv4 addresses — the addresses a
-    remote device could reach Snitch on. / FR: Adresses IPv4 non-loopback
+    remote device could reach Wiretap on. / FR: Adresses IPv4 non-loopback
     de la machine — celles par lesquelles un appareil distant peut
-    joindre Snitch."""
+    joindre Wiretap."""
     out = []
     try:
         import psutil
@@ -2409,8 +2409,8 @@ def _current_bind() -> tuple[str, str]:
     default) — mirrors run_backend.py's precedence.
     FR: Adresse d'écoute effective + sa source (env > argv > réglage >
     défaut) — reflète la priorité de run_backend.py."""
-    if os.environ.get("SNITCH_BIND"):
-        return os.environ["SNITCH_BIND"], "env"
+    if os.environ.get("WIRETAP_BIND"):
+        return os.environ["WIRETAP_BIND"], "env"
     args = sys.argv[1:]
     for i, a in enumerate(args):
         if a == "--bind" and i + 1 < len(args):
@@ -2433,7 +2433,7 @@ async def remote_pairing_status() -> dict:
     n'élargit que l'adresse d'écoute."""
     bind, source = _current_bind()
     persisted = db.get_setting("lan_bind", "") or ""
-    port = int(os.environ.get("SNITCH_PORT") or "8000")
+    port = int(os.environ.get("WIRETAP_PORT") or "8000")
     return {
         "active": not bind.startswith("127.") and bind not in ("::1", "localhost"),
         "bind": bind, "bind_source": source, "port": port,
@@ -2830,7 +2830,7 @@ async def get_diagnostics() -> dict:
     from paths import data_dir
 
     log_tail = []
-    log_file = data_dir() / "logs" / "snitch.log"
+    log_file = data_dir() / "logs" / "wiretap.log"
     try:
         if log_file.exists():
             log_tail = log_file.read_text(errors="replace").splitlines()[-200:]
@@ -2843,7 +2843,7 @@ async def get_diagnostics() -> dict:
         logger.exception("diagnostics: could not read log tail")
         log_tail = ["<log read failed>"]
 
-    db_file = data_dir() / "snitch.db"
+    db_file = data_dir() / "wiretap.db"
     return {
         "version": __version__,
         "python": platform.python_version(),
@@ -2910,7 +2910,7 @@ def _download_dbip() -> dict:
     for remote, local in files.items():
         url = f"https://download.db-ip.com/free/{remote}"
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Snitch/1.1"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Wiretap/1.1"})
             with urllib.request.urlopen(req, timeout=60) as resp:
                 # EN: Read at most cap+1 so an oversize body is detected, not
                 #     silently truncated into a corrupt database.
@@ -2944,9 +2944,9 @@ def _download_dbip() -> dict:
 async def geo_download(body: GeoDownloadBody) -> dict:
     """
     EN: Consent-gated GeoIP DB download. Without consent=true the endpoint
-        refuses — the default state of Snitch makes ZERO outbound calls.
+        refuses — the default state of Wiretap makes ZERO outbound calls.
     FR: Téléchargement de base GeoIP sous consentement. Sans consent=true le
-        endpoint refuse — l'état par défaut de Snitch n'émet AUCUN appel
+        endpoint refuse — l'état par défaut de Wiretap n'émet AUCUN appel
         sortant.
     """
     if not body.consent:
@@ -3098,7 +3098,7 @@ async def firewall_blocklist(body: BlocklistBody) -> dict:
     """EN: Import a blocklist into `domain` / `ip` rules. `path` reads a local
         file (purely local); `url` performs an OPT-IN outbound HTTPS
         fetch — surfaced as `remote_fetch: true` in the response so the
-        UI can show that Snitch emitted traffic; `preset` loads a curated
+        UI can show that Wiretap emitted traffic; `preset` loads a curated
         public threat feed (e.g. "threatfox"). Entries deduplicated
         against existing rules and capped at `max_entries` (<= 5000).
     FR: Importer une blocklist en règles `domain` / `ip`. `path` lit un fichier
@@ -3340,9 +3340,9 @@ async def alert_rules_toggle(rule_id: str, body: FirewallToggleBody) -> dict:
 @app.post("/processes/kill", dependencies=_AUTH)
 async def kill_process(body: PidBody) -> dict:
     """EN: Kill a process by PID — incident-response action. Refuses to kill
-        PIDs 0..3 and Snitch itself. Requires normal OS privileges.
+        PIDs 0..3 and Wiretap itself. Requires normal OS privileges.
     FR: Tuer un processus par PID — action de réponse à incident. Refuse les
-        PID 0..3 et Snitch lui-même. Exige les privilèges OS usuels."""
+        PID 0..3 et Wiretap lui-même. Exige les privilèges OS usuels."""
     import psutil
     if body.pid <= 3 or body.pid == os.getpid():
         raise HTTPException(400, "refusing to kill a system/critical pid")
@@ -3512,11 +3512,11 @@ async def sandbox_run(body: SandboxBody) -> dict:
         Linux `unshare -U -n` (unprivileged userns) or macOS
         `sandbox-exec` deny-network. Bounded runtime + output; the binary
         runs unprivileged with zero egress. Explicit user action only —
-        Snitch never detonates on its own.
+        Wiretap never detonates on its own.
     FR: Détoner un exécutable dans la sandbox sans réseau — `unshare -U -n`
         Linux ou `sandbox-exec` deny-network macOS. Durée + sortie bornées ;
         le binaire tourne non privilégié, égress zéro. Action utilisateur
-        explicite uniquement — Snitch ne détone jamais seul."""
+        explicite uniquement — Wiretap ne détone jamais seul."""
     import os
     from detection.contain import run_sandboxed
     if not os.path.isabs(body.path):
@@ -3591,7 +3591,7 @@ async def iocpack_import(body: IocImportBody) -> dict:
         pour proof ; jamais de blocage automatique."""
     candidates = [ip for ip in nodes if ip != "local"]
     loop = asyncio.get_running_loop()
-    if isinstance(body.pack, dict) and body.pack.get("format") == "snitch-ioc-proof/1":
+    if isinstance(body.pack, dict) and body.pack.get("format") == "wiretap-ioc-proof/1":
         return await loop.run_in_executor(
             None, iocshare.check_proof_pack, body.pack, candidates)
     return await loop.run_in_executor(
@@ -3621,7 +3621,7 @@ def _collect_indicators() -> list[str]:
     return list(dict.fromkeys(out))[:4096]
 
 
-# ── Agent ingestion (snitch-agent/1) / Ingestion d'agents ─────────────────────
+# ── Agent ingestion (wiretap-agent/1) / Ingestion d'agents ─────────────────────
 
 _MAX_AGENT_EVENTS = 1000          # EN: per request / FR: par requête
 _MAX_AGENT_FIELD = 253            # EN: chars per string field / FR: caractères
@@ -3645,17 +3645,17 @@ def _agent_lookup(token: str) -> Optional[str]:
 
 async def agent_or_master(request: Request) -> str:
     """EN: Ingest auth — the master token always works (single-box or
-    admin pushes); `X-Snitch-Agent: <enrolled-token>` resolves to the
+    admin pushes); `X-Wiretap-Agent: <enrolled-token>` resolves to the
     enrolled agent's name, which is then authoritative for event tagging
     (the body's `host` field stays a hint only). 401 otherwise.
-    FR: Auth ingest — le jeton maître marche toujours ; `X-Snitch-Agent`
+    FR: Auth ingest — le jeton maître marche toujours ; `X-Wiretap-Agent`
     résout le nom de l'agent enrôlé, qui fait foi pour le tagging
     (le `host` du corps reste un indice). 401 sinon."""
     from api.security import _extract_token, API_TOKEN
     master = _extract_token(request)
     if master and secrets.compare_digest(master, API_TOKEN):
         return ""
-    agent_tok = request.headers.get("x-snitch-agent", "")
+    agent_tok = request.headers.get("x-wiretap-agent", "")
     name = _agent_lookup(agent_tok)
     if name:
         return name
@@ -3666,10 +3666,10 @@ async def agent_or_master(request: Request) -> str:
 async def ingest_enroll(body: dict) -> dict:
     """EN: Enroll a remote agent — mint a per-agent bearer token
         (`sagt_…`, returned ONCE, stored hashed). The agent then sends it
-        as `X-Snitch-Agent` on /ingest/events; revocation = deleting the
+        as `X-Wiretap-Agent` on /ingest/events; revocation = deleting the
         hash. Enrolling requires the MASTER token.
     FR: Enrôler un agent — mint un jeton bearer dédié (`sagt_…`, rendu
-        UNE fois, stocké hashé). L'agent l'envoie en `X-Snitch-Agent`
+        UNE fois, stocké hashé). L'agent l'envoie en `X-Wiretap-Agent`
         sur /ingest/events ; révocation = suppression du hash. L'enrôlement
         exige le jeton MAÎTRE."""
     name = str((body or {}).get("name", "")).strip()[:80]
@@ -3717,7 +3717,7 @@ class AgentBatchBody(BaseModel):
         léger parle. `events` = observations de sockets/flux, pas des
         paquets : le backend les traite en entrée de détection (règles
         custom + historique), jamais comme du trafic parsé."""
-    agent: str = ""                                  # EN: e.g. "snitch-agent/1" / FR: ex.
+    agent: str = ""                                  # EN: e.g. "wiretap-agent/1" / FR: ex.
     host: str = ""                                   # EN: reporting host / FR: hôte émetteur
     # EN: untyped on purpose — malformed items are skipped per-item,
     #     not rejected with a 422 that drops the whole batch.
@@ -3731,7 +3731,7 @@ async def ingest_events(body: AgentBatchBody,
                         agent_name: str = Depends(agent_or_master)) -> dict:
     """EN: Ingest normalized flow events from remote agents.
 
-        Contract `snitch-agent/1` — each event: {src_ip, dst_ip,
+        Contract `wiretap-agent/1` — each event: {src_ip, dst_ip,
         src_port?, dst_port?, proto?, direction?, bytes?, process?,
         pid?, sni?, ts?}. Events are validated, bounded (≤1000/request,
         ≤253 chars/string, numbers coerced), then fed to the SAME
@@ -3741,11 +3741,11 @@ async def ingest_events(body: AgentBatchBody,
         `agent:<host>:<ip>`/`agent:<host>:<process>`. Unknown fields are
         ignored; nothing here trusts the agent beyond the bearer token.
 
-        Auth: master `X-Snitch-Token` (host name taken from the body) or
-        an enrolled `X-Snitch-Agent` token (enrolled name is
+        Auth: master `X-Wiretap-Token` (host name taken from the body) or
+        an enrolled `X-Wiretap-Agent` token (enrolled name is
         authoritative — a compromised agent can't spoof another).
     FR: Ingérer des événements de flux normalisés d'agents distants.
-        Auth : `X-Snitch-Token` maître (nom du corps) ou `X-Snitch-Agent`
+        Auth : `X-Wiretap-Token` maître (nom du corps) ou `X-Wiretap-Agent`
         enrôlé (le nom enrôlé fait foi — un agent compromis ne peut pas
         usurper un autre).
     """
@@ -3845,7 +3845,7 @@ async def fleet_view() -> dict:
     """EN: Lightweight fleet console — merges every configured peer's
         /security/audit into one dashboard view (agent count, worst and
         mean hardening score, per-agent findings). The "regroup N agents"
-        feature in its honest minimal form: any Snitch instance can act
+        feature in its honest minimal form: any Wiretap instance can act
         as the collector; peers come from `gossip_peers`.
     FR: Console de flotte légère — fusion des /security/audit de chaque
         pair configuré (nombre d'agents, pire et moyenne des scores,
@@ -3957,11 +3957,11 @@ async def ebpf_enforce_status() -> dict:
 
 @app.post("/security/ebpf/isolate", dependencies=_AUTH)
 async def ebpf_isolate(body: PidBody) -> dict:
-    """EN: Move a process into the snitch cgroup — its egress then flows
+    """EN: Move a process into the wiretap cgroup — its egress then flows
         through the kernel drop program (block rules added via
         /security/ebpf/block apply to it specifically, host untouched).
         Lazy-starts the enforcer; failure is honest, never fake success.
-    FR: Déplace un processus dans le cgroup snitch — son egress passe
+    FR: Déplace un processus dans le cgroup wiretap — son egress passe
         alors par le programme de drop noyau (les blocages ajoutés via
         /security/ebpf/block s'appliquent à lui seul, l'hôte intact)."""
     if body.pid <= 3 or body.pid == os.getpid():
@@ -3979,9 +3979,9 @@ async def ebpf_isolate(body: PidBody) -> dict:
 @app.post("/security/ebpf/block", dependencies=_AUTH)
 async def ebpf_block(body: ThreatCheckBody) -> dict:
     """EN: Add a destination IP to the kernel drop map — drops apply only
-        to processes inside the snitch cgroup (see /security/ebpf/isolate).
+        to processes inside the wiretap cgroup (see /security/ebpf/isolate).
     FR: Ajoute une IP destination à la map de drop noyau — les drops ne
-        s'appliquent qu'aux processus du cgroup snitch (voir
+        s'appliquent qu'aux processus du cgroup wiretap (voir
         /security/ebpf/isolate)."""
     loop = asyncio.get_running_loop()
     if not ebpf_enforcer.status()["attached"]:
@@ -4248,7 +4248,7 @@ def _forensics_ecs(bundle: dict) -> PlainTextResponse:
         portent file.hash.sha256 pour la chasse par hash."""
     base = {
         "ecs": {"version": "8.11"},
-        "observer": {"vendor": "Cognition", "product": "Snitch",
+        "observer": {"vendor": "Cognition", "product": "Wiretap",
                      "version": bundle["version"], "type": "firewall"},
         "host": {"name": bundle["host"]},
     }
@@ -4259,7 +4259,7 @@ def _forensics_ecs(bundle: dict) -> PlainTextResponse:
         ev["@timestamp"] = a.get("timestamp") or bundle["generated_at"]
         ev["event"] = {
             "kind": "alert", "category": ["network"],
-            "type": ["indicator"], "dataset": "snitch.alerts",
+            "type": ["indicator"], "dataset": "wiretap.alerts",
             "action": a.get("type", "ALERT"),
             "severity": {"critical": 80, "warning": 50}.get(
                 a.get("severity"), 21),
@@ -4279,7 +4279,7 @@ def _forensics_ecs(bundle: dict) -> PlainTextResponse:
         ev = dict(base)
         ev["@timestamp"] = bundle["generated_at"]
         ev["event"] = {"kind": "event", "category": ["process"],
-                       "type": ["info"], "dataset": "snitch.forensics"}
+                       "type": ["info"], "dataset": "wiretap.forensics"}
         proc = {"name": p.get("name"), "pid": p.get("pid"),
                 "executable": p.get("exe"),
                 "command_line": " ".join(p.get("cmdline") or [])}
@@ -4295,7 +4295,7 @@ def _forensics_ecs(bundle: dict) -> PlainTextResponse:
     return PlainTextResponse(
         "\n".join(lines) + "\n", media_type="application/x-ndjson",
         headers={"Content-Disposition":
-                 'attachment; filename="snitch-forensics.ndjson"'})
+                 'attachment; filename="wiretap-forensics.ndjson"'})
 
 
 def _forensics_csv(bundle: dict) -> PlainTextResponse:
@@ -4328,25 +4328,25 @@ def _forensics_csv(bundle: dict) -> PlainTextResponse:
     return PlainTextResponse(
         buf.getvalue(), media_type="text/csv",
         headers={"Content-Disposition":
-                 'attachment; filename="snitch-forensics.csv"'})
+                 'attachment; filename="wiretap-forensics.csv"'})
 
 
 def _forensics_stix(bundle: dict, ip: Optional[str] = None) -> dict:
-    """EN: Minimal STIX 2.1 bundle — an identity for Snitch, indicators for
+    """EN: Minimal STIX 2.1 bundle — an identity for Wiretap, indicators for
         the flagged IPs/hashes and observed-data sightings. Enough for a
         SIEM to ingest; deliberately not a full graph.
-    FR: Bundle STIX 2.1 minimal — une identity pour Snitch, des indicateurs
+    FR: Bundle STIX 2.1 minimal — une identity pour Wiretap, des indicateurs
         pour les IP/hashes signalés et des observed-data. Suffisant pour un
         SIEM ; volontairement pas un graphe complet."""
     import uuid
     ts = bundle["generated_at"]
     def _uid(s: str) -> str:
-        return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"snitch.local/{s}"))
+        return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"wiretap.local/{s}"))
     objects: list[dict] = [{
         "type": "identity", "spec_version": "2.1",
         "id": f"identity--{_uid('exporter')}",
         "created": ts, "modified": ts,
-        "name": "Snitch local forensics export",
+        "name": "Wiretap local forensics export",
         "identity_class": "system",
     }]
     # EN: One indicator per flagged IP (alert node_id that looks like an
@@ -4367,7 +4367,7 @@ def _forensics_stix(bundle: dict, ip: Optional[str] = None) -> dict:
             "type": "indicator", "spec_version": "2.1",
             "id": f"indicator--{_uid(node)}",
             "created": ts, "modified": ts,
-            "name": f"Snitch alert: {a.get('type', 'ALERT')} → {node}",
+            "name": f"Wiretap alert: {a.get('type', 'ALERT')} → {node}",
             "description": a.get("message", "")[:500],
             "pattern": f"[ipv4-addr:value = '{node}']"
                        if ":" not in node
@@ -4398,7 +4398,7 @@ def _forensics_stix(bundle: dict, ip: Optional[str] = None) -> dict:
             "type": "indicator", "spec_version": "2.1",
             "id": f"indicator--{_uid('sha256/' + p['sha256'])}",
             "created": ts, "modified": ts,
-            "name": f"Snitch process: {p.get('name')}",
+            "name": f"Wiretap process: {p.get('name')}",
             "pattern": f"[file:hashes.'SHA-256' = '{p['sha256']}']",
             "pattern_type": "stix",
             "valid_from": ts,
@@ -4438,8 +4438,8 @@ async def forensics_pcap(ip: Optional[str] = None,
     return Response(
         content=body, media_type="application/vnd.tcpdump.pcap",
         headers={"Content-Disposition":
-                 'attachment; filename="snitch-forensics.pcap"',
-                 "X-Snitch-Frames": str(len(frames))})
+                 'attachment; filename="wiretap-forensics.pcap"',
+                 "X-Wiretap-Frames": str(len(frames))})
 
 
 # ── WebSocket ────────────────────────────────────────────────────────────────

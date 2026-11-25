@@ -8,7 +8,7 @@ EN: External alert webhooks — OPT-IN. When the user configures a webhook URL
     Payloads are auto-shaped:
       * Discord/Slack → {"content": "**[warning]** BEACON — …"}
       * Telegram      → {"chat_id": <from `telegram_chat_id` setting>, "text": "…"}
-      * generic       → full alert JSON {"alert": {...}, "source": "snitch"}
+      * generic       → full alert JSON {"alert": {...}, "source": "wiretap"}
       * syslog        → `syslog_addr` setting ("host:port" or
                         "tcp://host:port") sends RFC 3164 datagrams —
                         <PRI>TIME HOST TAG: MSG — the SIEM/Wazuh path.
@@ -30,17 +30,17 @@ import urllib.parse
 import urllib.request
 from datetime import datetime
 
-logger = logging.getLogger("snitch.notify")
+logger = logging.getLogger("wiretap.notify")
 
 # EN: Only these severities are forwarded — info alerts would spam channels.
 # FR: Seules ces sévérités sont relayées — les infos spammeraient les canaux.
 _FORWARD = {"warning", "critical"}
 _TIMEOUT_S = 8
 
-# EN: RFC 3164 severity mapping — local4 facility (19) so Snitch alerts can
+# EN: RFC 3164 severity mapping — local4 facility (19) so Wiretap alerts can
 #     be routed/filtered inside a SIEM: warning→4, critical→2.
 # FR: Mapping de sévérité RFC 3164 — facilité local4 (19) pour router les
-#     alertes Snitch dans un SIEM : warning→4, critical→2.
+#     alertes Wiretap dans un SIEM : warning→4, critical→2.
 _SEV_TO_SYSLOG = {"warning": 4, "critical": 2}
 
 # EN: CEF (ArcSight Common Event Format) 0–10 scale — SIEM connectors
@@ -74,7 +74,7 @@ def to_cef(alert: dict, version: str) -> str:
         "cs2Label": "reasons", "cs2": ",".join(det.get("reasons") or []),
     }
     ext_s = " ".join(f"{k}={_cef_escape(v)}" for k, v in ext.items() if v)
-    return "CEF:0|Cognition|Snitch|{}|{}|{}|{}|{}".format(
+    return "CEF:0|Cognition|Wiretap|{}|{}|{}|{}|{}".format(
         _cef_escape(version, True), _cef_escape(alert.get("type"), True),
         _cef_escape(alert.get("message"), True), sev, ext_s)
 
@@ -156,7 +156,7 @@ class WebhookNotifier:
             if chat_id:
                 payload["chat_id"] = chat_id
         else:
-            payload = {"alert": alert, "source": "snitch", "text": text}
+            payload = {"alert": alert, "source": "wiretap", "text": text}
         try:
             req = urllib.request.Request(
                 url, data=json.dumps(payload).encode(),
@@ -181,7 +181,7 @@ class WebhookNotifier:
             pri = 19 * 8 + sev                          # EN: local4.<sev>
             ts = datetime.now().strftime("%b %d %H:%M:%S")
             msg = f"<{pri}>{ts} {_socket.gethostname()} " \
-                  f"snitch[{alert.get('type','?')}]: {text}".encode(
+                  f"wiretap[{alert.get('type','?')}]: {text}".encode(
                       "utf-8", "replace")
             if tcp:
                 with _socket.create_connection(

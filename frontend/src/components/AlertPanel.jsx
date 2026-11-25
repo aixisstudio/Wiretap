@@ -1,5 +1,5 @@
 /**
- * Snitch — alert UI components.
+ * Wiretap — alert UI components.
  *
  * EN: Three exports:
  *       AlertBell   — toolbar bell with an unread counter

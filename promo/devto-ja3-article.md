@@ -6,7 +6,7 @@ tags: security, python, opensource, networking
 
 Most app firewalls tell you *which process* opened a connection. That's useful — but the interesting question for defenders is different: **does this TLS handshake look like a known malware family?**
 
-We just shipped that in Snitch v1.6.5 — and it required zero decryption, zero cloud calls, and no heavyweight dependencies.
+We just shipped that in Wiretap v1.6.5 — and it required zero decryption, zero cloud calls, and no heavyweight dependencies.
 
 ## The idea in 60 seconds
 
@@ -16,7 +16,7 @@ Cobalt Strike's beacon, Sliver, Mythic — they don't look like Chrome or curl a
 
 ## The parser: bounded, passive, no dependencies
 
-Snitch ships its own bounded packet parsers (we dropped Scapy early on — GPL-2.0-only doesn't mix with AGPL shipping). The ClientHello parser is ~150 lines of `struct` unpacking:
+Wiretap ships its own bounded packet parsers (we dropped Scapy early on — GPL-2.0-only doesn't mix with AGPL shipping). The ClientHello parser is ~150 lines of `struct` unpacking:
 
 ```python
 def parse_tls_client_hello(payload):
@@ -51,10 +51,10 @@ One thing we got bitten by during review: the first version of that JSON contain
 ## Try it
 
 ```
-pip install snitch  # or scoop install extras/snitch on Windows
-snitch --demo       # synthetic traffic, no root needed
+pip install wiretap  # or scoop install extras/wiretap on Windows
+wiretap --demo       # synthetic traffic, no root needed
 ```
 
 Then watch the live graph flag a `THREAT_HIT` alert when a fingerprint matches. Everything runs on loopback — the API is authenticated and nothing leaves your machine.
 
-Repo: https://github.com/aixisstudio/Snitch — AGPL-3.0, macOS/Windows/Linux. Contributions welcome; the JA3/JA4 work came from an external contributor and it shows in the quality.
+Repo: https://github.com/aixisstudio/Wiretap — AGPL-3.0, macOS/Windows/Linux. Contributions welcome; the JA3/JA4 work came from an external contributor and it shows in the quality.

@@ -1,8 +1,8 @@
-# snitch-agent — lightweight remote sensor / capteur distant léger
+# wiretap-agent — lightweight remote sensor / capteur distant léger
 
 **EN:** A minimal-dependency Rust daemon that watches the host's socket
 table (`/proc/net/*`, Linux) and pushes newly-observed outbound flows to
-a Snitch collector's `POST /ingest/events` — contract `snitch-agent/1`.
+a Wiretap collector's `POST /ingest/events` — contract `wiretap-agent/1`.
 One `cargo build --release` produces a single binary whose only crates
 are the pure-Rust TLS stack (rustls) — no OpenSSL, no runtime deps —
 so it deploys via a plain file copy or `nfpm`.
@@ -18,13 +18,13 @@ Scope, honestly:
   `GetExtendedTcpTable`/`libproc` paths land — they are NOT silently
   wrong, just un-attributed;
 - transport is plain HTTP by default for loopback/mesh-VPN collectors,
-  **with opt-in TLS** (`SNITCH_TLS=1`, `SNITCH_CA=/path/ca.pem` for a
+  **with opt-in TLS** (`WIRETAP_TLS=1`, `WIRETAP_CA=/path/ca.pem` for a
   private CA) backed by rustls + webpki roots — no system TLS needed.
 
 **FR :** Un daemon Rust à dépendances minimales qui surveille la table de
 sockets de l'hôte (`/proc/net/*`, Linux) et pousse les nouveaux flux
 sortants vers `POST /ingest/events` du collecteur — contrat
-`snitch-agent/1`. Un seul `cargo build --release` → binaire dont les
+`wiretap-agent/1`. Un seul `cargo build --release` → binaire dont les
 seules crates sont la pile TLS pur-Rust (rustls) — pas d'OpenSSL, pas
 de dépendance runtime — déployable par simple copie ou `nfpm`.
 
@@ -32,7 +32,7 @@ Périmètre honnête : SOCKETS seulement (pas de payloads/SNI/DNS),
 attribution de processus fonctionnelle sous Linux via `/proc/*/fd`
 (reporte `pid: 0` sous Windows/macOS tant que leurs chemins
 `GetExtendedTcpTable`/`libproc` ne sont pas livrés), transport HTTP par
-défaut **avec TLS opt-in** (`SNITCH_TLS=1`, `SNITCH_CA` pour CA privée).
+défaut **avec TLS opt-in** (`WIRETAP_TLS=1`, `WIRETAP_CA` pour CA privée).
 
 ## Enroll & run / Enrôler & lancer
 
@@ -40,49 +40,49 @@ défaut **avec TLS opt-in** (`SNITCH_TLS=1`, `SNITCH_CA` pour CA privée).
 # EN: mint a per-agent token on the collector (master token required)
 # FR: mint un jeton par agent sur le collecteur (jeton maître requis)
 curl -X POST http://collector:8000/ingest/enroll \
-  -H "X-Snitch-Token: <master token>" \
+  -H "X-Wiretap-Token: <master token>" \
   -H "Content-Type: application/json" \
   -d '{"name": "agent-01"}'          # → {"token": "sagt_…"}  (shown once)
 
 cargo build --release
-SNITCH_SERVER="collector:8000" \
-SNITCH_TOKEN="sagt_…" \
-SNITCH_HOST="agent-01" \
-./target/release/snitch-agent
+WIRETAP_SERVER="collector:8000" \
+WIRETAP_TOKEN="sagt_…" \
+WIRETAP_HOST="agent-01" \
+./target/release/wiretap-agent
 ```
 
-`SNITCH_TOKEN` accepts either an enrolled `sagt_…` credential (sent as
-`X-Snitch-Agent`, the enrolled name is authoritative — the agent cannot
-spoof another) or the collector master token (sent as `X-Snitch-Token`).
+`WIRETAP_TOKEN` accepts either an enrolled `sagt_…` credential (sent as
+`X-Wiretap-Agent`, the enrolled name is authoritative — the agent cannot
+spoof another) or the collector master token (sent as `X-Wiretap-Token`).
 Revoke with `POST /ingest/revoke {"name": "agent-01"}`.
 
 ## TLS / chiffrement
 
 ```bash
-# EN: agent side — pure-Rust TLS (rustls + WebPKI roots); SNITCH_CA adds
+# EN: agent side — pure-Rust TLS (rustls + WebPKI roots); WIRETAP_CA adds
 #     a private-CA bundle for collectors on self-signed/internal certs.
-# FR: côté agent — TLS pur-Rust (rustls + racines WebPKI) ; SNITCH_CA ajoute
+# FR: côté agent — TLS pur-Rust (rustls + racines WebPKI) ; WIRETAP_CA ajoute
 #     un bundle CA privé pour les collecteurs en cert auto-signé/interne.
-SNITCH_SERVER="collector:8443" SNITCH_TLS=1 \
-SNITCH_CA="/etc/snitch/ca.pem" SNITCH_TOKEN="sagt_…" \
-./target/release/snitch-agent
+WIRETAP_SERVER="collector:8443" WIRETAP_TLS=1 \
+WIRETAP_CA="/etc/wiretap/ca.pem" WIRETAP_TOKEN="sagt_…" \
+./target/release/wiretap-agent
 
 # EN: collector side — uvicorn terminates TLS when both env vars are set.
 # FR: côté collecteur — uvicorn termine TLS quand les deux variables sont posées.
-SNITCH_TLS_CERT="/etc/snitch/cert.pem" \
-SNITCH_TLS_KEY="/etc/snitch/key.pem" \
+WIRETAP_TLS_CERT="/etc/wiretap/cert.pem" \
+WIRETAP_TLS_KEY="/etc/wiretap/key.pem" \
 python run_backend.py
 ```
 
-Without `SNITCH_TLS` the agent speaks plain HTTP — fine over loopback,
+Without `WIRETAP_TLS` the agent speaks plain HTTP — fine over loopback,
 localhost or a WireGuard/Tailscale mesh, NOT over a hostile link.
 
-Sans `SNITCH_TLS` l'agent parle HTTP clair — acceptable sur loopback ou
+Sans `WIRETAP_TLS` l'agent parle HTTP clair — acceptable sur loopback ou
 un mesh WireGuard/Tailscale, PAS sur un lien hostile.
 
 ## systemd / service
 
-`deploy/systemd/snitch-agent.service` runs it unprivileged — the agent
+`deploy/systemd/wiretap-agent.service` runs it unprivileged — the agent
 only needs to read `/proc/net` + `/proc/*/fd`, no capabilities at all.
 
 ## CI
@@ -94,8 +94,8 @@ only needs to read `/proc/net` + `/proc/*/fd`, no capabilities at all.
 ## Wire format / format fil
 
 ```json
-POST /ingest/events   X-Snitch-Agent: sagt_…
-{"agent":"snitch-agent/1","host":"agent-01","events":[
+POST /ingest/events   X-Wiretap-Agent: sagt_…
+{"agent":"wiretap-agent/1","host":"agent-01","events":[
  {"ts":1718000000,"src_ip":"10.0.0.5","dst_ip":"93.184.216.34",
   "src_port":51822,"dst_port":443,"proto":"tcp","direction":"out",
   "bytes":0,"process":"curl","pid":1337,"sni":""}]}

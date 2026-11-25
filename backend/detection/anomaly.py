@@ -1,5 +1,5 @@
 """
-Snitch — anomaly detector.
+Wiretap — anomaly detector.
 
 EN: Stateful, rule-based detector fed with every captured packet and every
     ARP-discovered device. Emits `Alert` objects broadcast to the UI and
@@ -85,7 +85,7 @@ from typing import Optional
 from capture.sniffer import Packet
 from scanner.arp_scanner import Device
 
-logger = logging.getLogger("snitch.detection")
+logger = logging.getLogger("wiretap.detection")
 
 # ── Constants / Constantes ───────────────────────────────────────────────────
 
@@ -199,9 +199,9 @@ BEACON_WHITELIST = {
     "129.6.15.28", "129.6.15.29",            # NIST NTP
 }
 
-# EN: Caps on long-lived state — a Snitch instance running for days must not
+# EN: Caps on long-lived state — a Wiretap instance running for days must not
 #     leak memory through unbounded sets/dicts.
-# FR: Plafonds sur l'état longue durée — une instance Snitch tournant des jours
+# FR: Plafonds sur l'état longue durée — une instance Wiretap tournant des jours
 #     ne doit pas fuiter de mémoire via des ensembles/dicts non bornés.
 MAX_SEEN_HOSTS = 50_000
 MAX_SEEN_PROC_CONNS = 50_000

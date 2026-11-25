@@ -2,7 +2,7 @@
 
 [English](THIRD_PARTY_NOTICES.md) | [Français](THIRD_PARTY_NOTICES.md) | **Español** | [Deutsch](THIRD_PARTY_NOTICES.de.md) | [Русский](THIRD_PARTY_NOTICES.ru.md) | [日本語](THIRD_PARTY_NOTICES.ja.md) | [Português](THIRD_PARTY_NOTICES.pt-BR.md) | [中文](THIRD_PARTY_NOTICES.zh-CN.md)
 
-Snitch está licenciado bajo AGPL-3.0-or-later. Abajo, los componentes y fuentes de datos de terceros que usa, con sus licencias. Eliminamos deliberadamente el código GPL-2.0-only (Scapy) para mantener las dependencias compatibles con AGPL.
+Wiretap está licenciado bajo AGPL-3.0-or-later. Abajo, los componentes y fuentes de datos de terceros que usa, con sus licencias. Eliminamos deliberadamente el código GPL-2.0-only (Scapy) para mantener las dependencias compatibles con AGPL.
 
 ## Dependencias de ejecución
 
@@ -36,7 +36,7 @@ Snitch está licenciado bajo AGPL-3.0-or-later. Abajo, los componentes y fuentes
 | Component | License | Notes |
 |---|---|---|
 | libpcap | BSD-3-Clause | Linux/macOS packet capture — loaded via ctypes, not bundled |
-| Npcap | Npcap License | Windows capture driver — **NOT bundled**; user installs from [npcap.com](https://npcap.com). The free version is not redistributable; Snitch only links to the official site. |
+| Npcap | Npcap License | Windows capture driver — **NOT bundled**; user installs from [npcap.com](https://npcap.com). The free version is not redistributable; Wiretap only links to the official site. |
 
 ## Fuentes de datos
 

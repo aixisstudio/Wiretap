@@ -4,35 +4,35 @@
 
 ## English
 
-Snitch ships a threat-hunting layer on top of passive observation. **What it
+Wiretap ships a threat-hunting layer on top of passive observation. **What it
 does and — just as important — what it does not do:**
 
 ### Outbound firewall orchestration
 
-Snitch does **not** filter packets in user-space. Rules you create are
+Wiretap does **not** filter packets in user-space. Rules you create are
 applied to the OS-native firewall, best-effort:
 
 | OS | Mechanism |
 |---|---|
 | Windows | **WFP user-mode filters** via `fwpuclnt.dll` (ctypes, elevated) — `netsh advfirewall` remains the fallback |
-| Linux | `nftables` when available (dedicated `inet snitch` table, rules removed by handle/comment), `iptables -A OUTPUT -j DROP` otherwise (`SNITCH_LOCK` chain for lockdown); `tc` clsact/flower for throttling |
+| Linux | `nftables` when available (dedicated `inet wiretap` table, rules removed by handle/comment), `iptables -A OUTPUT -j DROP` otherwise (`WIRETAP_LOCK` chain for lockdown); `tc` clsact/flower for throttling |
 | macOS | generated `pf` anchor loaded with `pfctl` |
 
 On Windows, `detection/wfp.py` talks to the **Windows Filtering Platform**
 directly — no `netsh` subprocess, no kernel driver: outbound ALE filters
 matched on app path, remote IP/CIDR and remote port, created with
 deterministic keys so a removed rule deletes exactly its own filters, and
-an enumeration sweep purges filters Snitch created but forgot. It is
-*filter management* — Snitch does not run a WFP callout, does not inspect
+an enumeration sweep purges filters Wiretap created but forgot. It is
+*filter management* — Wiretap does not run a WFP callout, does not inspect
 payloads in-kernel, and reports `applied=False` when not elevated.
 
 Rule kinds: `ip`, `cidr`, `domain`, `process`, `port`. Rules persist in
-`snitch.db` and are re-applied at startup. `domain` rules are re-resolved
+`wiretap.db` and are re-applied at startup. `domain` rules are re-resolved
 every ~10 minutes — the resolved IP delta is applied so CDN rotation can't
 silently unblock a name.
 
 Rule actions: `block` (default) drops the traffic; `sinkhole` redirects it
-to loopback instead — domains via a marked `# snitch-sinkhole` block in the
+to loopback instead — domains via a marked `# wiretap-sinkhole` block in the
 hosts file (all OSes), IPs/CIDRs via iptables `DNAT` in the nat OUTPUT chain
 (Linux only). A sinkholed destination keeps "answering" from 127.0.0.1 so an
 analyst can watch what the process expects instead of severing the call.
@@ -57,7 +57,7 @@ suspect process without tipping it off.
 ### Incident response
 
 - `POST /processes/kill` / `POST /processes/suspend` — by PID, refuses
-  PIDs ≤ 3 and Snitch itself. Normal OS privileges apply (you can't kill a
+  PIDs ≤ 3 and Wiretap itself. Normal OS privileges apply (you can't kill a
   root process as a normal user).
 - `POST /firewall/rules`, `DELETE /firewall/rules/{id}`,
   `POST /firewall/rules/{id}/toggle`, `POST /firewall/lockdown` —
@@ -190,7 +190,7 @@ never ship data off the machine:
   remote IP (deduped per rule+target) — the opt-in kill-switch.
 - **Blocklist import** — `POST /firewall/blocklist` turns a local
   hosts/domain file (a pure local read) or an opt-in URL (bounded
-  4 MiB HTTPS fetch — one of the few outbound requests Snitch can ever
+  4 MiB HTTPS fetch — one of the few outbound requests Wiretap can ever
   emit, flagged `remote_fetch` in the response) into `domain` rules.
   Deduplicated, capped 500–5000 entries.
 - **PCAP export** — `GET /forensics/pcap` (optional `ip=`/`process=`
@@ -205,15 +205,15 @@ never ship data off the machine:
   runs a chosen executable with **zero egress**: unprivileged
   `unshare --user --net` on Linux, `sandbox-exec` deny-network on
   macOS. Bounded runtime + output; honest unsupported-error elsewhere.
-  `contrib/snitch-contain` is the manual equivalent.
+  `contrib/wiretap-contain` is the manual equivalent.
 - **Embedded model** — `slm_mode=embedded` loads a user-provided
   `.gguf` via optional `llama-cpp-python` — explanations fully
-  in-process, zero network. Snitch never downloads weights.
+  in-process, zero network. Wiretap never downloads weights.
 - **Native filter skeletons** — `contrib/wfp-callout/` (C WFP kernel
   callout + signing notes) and `contrib/macos-filter/` (Swift
   `NEFilterDataProvider` + entitlements notes). Research scaffolding
   for anyone who wants to build the signed/platform components;
-  not shipped, not loaded by Snitch.
+  not shipped, not loaded by Wiretap.
 - **ASN attribution** — when `GeoLite2-ASN.mmdb`/`dbip-asn-lite.mmdb`
   is present, nodes carry `asn` (AS number) alongside `org`.
 
@@ -224,7 +224,7 @@ never ship data off the machine:
   `Certificate` handshake message: issuer/subject CN+O, self-signed
   flag, DNS SANs, validity window, and `san_mismatch` against the
   observed SNI → `TLS_CERT` alerts. **TLS 1.3 stays opaque** — its
-  certificates are encrypted, Snitch reports nothing rather than
+  certificates are encrypted, Wiretap reports nothing rather than
   guessing. No MITM, no decryption, no injected CA.
 - **High-entropy cleartext watch** — payloads ≥48 B on non-TLS
   channels scoring ≥4.7 bits/byte raise `HIGH_ENTROPY` (covert
@@ -253,7 +253,7 @@ never ship data off the machine:
   reads executable file-backed pages from `/proc/<pid>/mem` and diffs
   them against the on-disk binary → bounded mismatch evidence.
 - **IOC peer sync (opt-in)** — `gossip_peers` lists up to 32 explicit
-  `host:port` Snitch instances; salted-Merkle proof packs are pushed
+  `host:port` Wiretap instances; salted-Merkle proof packs are pushed
   over authenticated HTTP(S), 8 s timeout. No discovery, no central
   server — and it is **not** a zero-knowledge protocol: commitments
   prove exact membership only.
@@ -263,7 +263,7 @@ never ship data off the machine:
 - **Firejail containment** — `security/sandbox` prefers
   `firejail --net=none` when present, falls back to `unshare`.
 - **nftables backend** — where `nft` exists, rules land in a dedicated
-  `inet snitch` table instead of iptables; `iptables-nft` hosts are
+  `inet wiretap` table instead of iptables; `iptables-nft` hosts are
   detected and keep the iptables path.
 - **Actionable alerts** — every alert carries structured `actions`
   (block IP, kill/suspend process, ask verdict, inspect memory); the
@@ -293,19 +293,19 @@ never ship data off the machine:
 
 ## Français
 
-Snitch embarque une couche de chasse aux menaces au-dessus de
+Wiretap embarque une couche de chasse aux menaces au-dessus de
 l'observation passive. **Ce qu'elle fait — et, aussi important, ce qu'elle
 ne fait pas :**
 
 ### Orchestration du pare-feu sortant
 
-Snitch ne filtre **pas** les paquets en user-space. Les règles créées sont
+Wiretap ne filtre **pas** les paquets en user-space. Les règles créées sont
 appliquées au pare-feu natif de l'OS, au mieux :
 
 | OS | Mécanisme |
 |---|---|
 | Windows | **filtres WFP user-mode** via `fwpuclnt.dll` (ctypes, élevé) — `netsh advfirewall` reste le repli |
-| Linux | `iptables -A OUTPUT -j DROP` (chaîne dédiée `SNITCH_LOCK` pour le lockdown) ; `tc` clsact/flower pour le bridage |
+| Linux | `iptables -A OUTPUT -j DROP` (chaîne dédiée `WIRETAP_LOCK` pour le lockdown) ; `tc` clsact/flower pour le bridage |
 | macOS | ancre `pf` générée chargée avec `pfctl` |
 
 Sous Windows, `detection/wfp.py` dialogue avec la **Windows Filtering
@@ -313,16 +313,16 @@ Platform** directement — sans subprocess `netsh`, sans driver noyau :
 filtres ALE sortants par chemin d'appli, IP/CIDR et port, créés avec des
 clés déterministes pour qu'une règle supprimée efface exactement ses
 filtres, plus une purge par énumération des filtres orphelins. C'est de la
-*gestion de filtres* — Snitch ne fait pas de callout WFP, n'inspecte pas
+*gestion de filtres* — Wiretap ne fait pas de callout WFP, n'inspecte pas
 les payloads en noyau et rapporte `applied=False` sans élévation.
 
 Types de règles : `ip`, `cidr`, `domain`, `process`, `port`. Les règles
-persistent dans `snitch.db` et sont réappliquées au démarrage. Les règles
+persistent dans `wiretap.db` et sont réappliquées au démarrage. Les règles
 `domain` sont re-résolues toutes les ~10 min — le delta d'IP est appliqué
 pour que la rotation CDN ne débloque pas un nom en silence.
 
 Actions : `block` (défaut) droppe le trafic ; `sinkhole` le redirige vers
-loopback — domaines via un bloc marqué `# snitch-sinkhole` dans le fichier
+loopback — domaines via un bloc marqué `# wiretap-sinkhole` dans le fichier
 hosts (tous OS), IP/CIDR via `DNAT` iptables dans la table nat OUTPUT
 (Linux seulement). Une destination sinkholée continue de « répondre »
 depuis 127.0.0.1 : l'analyste observe ce que le processus attend au lieu
@@ -347,7 +347,7 @@ utile pour étouffer un processus suspect sans l'alerter.
 ### Réponse à incident
 
 - `POST /processes/kill` / `POST /processes/suspend` — par PID, refuse les
-  PID ≤ 3 et Snitch lui-même. Privilèges OS usuels (on ne tue pas un
+  PID ≤ 3 et Wiretap lui-même. Privilèges OS usuels (on ne tue pas un
   processus root en simple utilisateur).
 - `POST /firewall/rules`, `DELETE /firewall/rules/{id}`,
   `POST /firewall/rules/{id}/toggle`, `POST /firewall/lockdown` —
@@ -487,7 +487,7 @@ honnêtement et n'envoient jamais de données hors de la machine :
 - **Import de blocklist** — `POST /firewall/blocklist` convertit un
   fichier hosts/domaines local (lecture purement locale) ou une URL
   opt-in (fetch HTTPS borné à 4 Mio — l'une des rares requêtes sortantes
-  que Snitch puisse émettre, signalée `remote_fetch`) en règles
+  que Wiretap puisse émettre, signalée `remote_fetch`) en règles
   `domain`. Dédupliquées, plafonnées à 500–5000 entrées.
 - **Export PCAP** — `GET /forensics/pcap` (filtres `ip=`/`process=`
   optionnels) sert l'anneau de trames brutes ~4 Mio en `.pcap` prêt
@@ -501,16 +501,16 @@ honnêtement et n'envoient jamais de données hors de la machine :
   exécute un binaire choisi avec **zéro égress** : `unshare
   --user --net` non privilégié sous Linux, `sandbox-exec` deny-network
   sous macOS. Durée + sortie bornées ; erreur honnête ailleurs.
-  `contrib/snitch-contain` est l'équivalent manuel.
+  `contrib/wiretap-contain` est l'équivalent manuel.
 - **Modèle embarqué** — `slm_mode=embedded` charge un `.gguf` fourni
   par l'utilisateur via `llama-cpp-python` optionnel — explications
-  entièrement en processus, zéro réseau. Snitch ne télécharge jamais
+  entièrement en processus, zéro réseau. Wiretap ne télécharge jamais
   de poids.
 - **Squelettes de filtres natifs** — `contrib/wfp-callout/` (callout
   WFP noyau en C + notes de signature) et `contrib/macos-filter/`
   (`NEFilterDataProvider` Swift + notes entitlements). Échafaudage de
   recherche pour qui veut construire les composants signés ;
-  non livrés, non chargés par Snitch.
+  non livrés, non chargés par Wiretap.
 - **Attribution ASN** — quand `GeoLite2-ASN.mmdb`/`dbip-asn-lite.mmdb`
   est présente, les nœuds portent `asn` (numéro d'AS) en plus de `org`.
 
@@ -520,7 +520,7 @@ honnêtement et n'envoient jamais de données hors de la machine :
   bornés (≤16 Kio/flux, TTL 30 s) et lit le message `Certificate` :
   CN+O émetteur/sujet, drapeau auto-signé, SANs DNS, fenêtre de
   validité, `san_mismatch` vs le SNI observé → alertes `TLS_CERT`.
-  **TLS 1.3 reste opaque** — ses certificats sont chiffrés, Snitch ne
+  **TLS 1.3 reste opaque** — ses certificats sont chiffrés, Wiretap ne
   rapporte rien plutôt que deviner. Pas de MITM, pas de déchiffrement.
 - **Veille d'entropie en clair** — payloads ≥48 o hors TLS à ≥4,7
   bits/octet → `HIGH_ENTROPY` (indice de chiffrement couvert/stégo).
@@ -549,7 +549,7 @@ honnêtement et n'envoient jamais de données hors de la machine :
   lit les pages exécutables fichier-mappées de `/proc/<pid>/mem` et
   les compare au binaire disque → preuve de mismatch bornée.
 - **Sync IOC entre pairs (opt-in)** — `gossip_peers` liste jusqu'à
-  32 instances Snitch `host:port` explicites ; les packs de preuves
+  32 instances Wiretap `host:port` explicites ; les packs de preuves
   Merkle salés sont poussés en HTTP(S) authentifié, timeout 8 s. Ni
   découverte ni serveur central — et ce n'est **pas** du zero-knowledge :
   les engagements prouvent seulement l'appartenance exacte.
@@ -559,7 +559,7 @@ honnêtement et n'envoient jamais de données hors de la machine :
 - **Containment Firejail** — `security/sandbox` préfère
   `firejail --net=none` s'il est présent, repli `unshare`.
 - **Backend nftables** — là où `nft` existe, les règles vont dans une
-  table `inet snitch` dédiée plutôt que iptables ; les hôtes
+  table `inet wiretap` dédiée plutôt que iptables ; les hôtes
   `iptables-nft` sont détectés et gardent le chemin iptables.
 - **Alertes actionnables** — chaque alerte porte des `actions`
   structurées (bloquer IP, tuer/suspendre, verdict ask, inspecter la

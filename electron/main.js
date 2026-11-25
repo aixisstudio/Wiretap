@@ -1,5 +1,5 @@
 /**
- * Snitch — Electron main process.
+ * Wiretap — Electron main process.
  *
  * EN: Orchestrates the desktop app:
  *       1. check for Npcap (Windows only, needed for raw capture) — NOT
@@ -8,12 +8,12 @@
  *       2. show a splash screen
  *       3. pick a FREE loopback port, generate a per-launch API token
  *          (crypto-random) and spawn the PyInstaller backend with
- *          SNITCH_PORT + SNITCH_TOKEN in its environment
+ *          WIRETAP_PORT + WIRETAP_TOKEN in its environment
  *       4. wait for the API to answer, then open the main window
  *       5. kill only OUR backend child on quit — never a port sweep
  *
  *     Token + port reach the renderer ONLY via the preload bridge
- *     (ipcMain.handle → window.snitch.getToken() / getPort()) — never in the
+ *     (ipcMain.handle → window.wiretap.getToken() / getPort()) — never in the
  *     page, the URL, or logs.
  *
  *     Why the free port: the old code bound a fixed :8000 and ran a netstat
@@ -28,13 +28,13 @@
  *       2. afficher un écran de démarrage
  *       3. choisir un port loopback LIBRE, générer un jeton API par lancement
  *          (crypto-aléatoire) et lancer le backend PyInstaller avec
- *          SNITCH_PORT + SNITCH_TOKEN dans son environnement
+ *          WIRETAP_PORT + WIRETAP_TOKEN dans son environnement
  *       4. attendre que l'API réponde, puis ouvrir la fenêtre principale
  *       5. tuer uniquement NOTRE enfant backend à la fermeture — jamais de
  *          balayage de port
  *
  *     Jeton + port arrivent au renderer UNIQUEMENT via le pont preload
- *     (ipcMain.handle → window.snitch.getToken() / getPort()) — jamais dans
+ *     (ipcMain.handle → window.wiretap.getToken() / getPort()) — jamais dans
  *     la page, l'URL ou les logs.
  *
  *     Pourquoi le port libre : l'ancien code fixait :8000 et lançait un
@@ -62,12 +62,12 @@ const isDev        = !app.isPackaged
 const resourcesDir = isDev ? path.join(__dirname, '..') : process.resourcesPath
 
 const isWindows = process.platform === 'win32'
-const backendName = isWindows ? 'snitch-backend.exe' : 'snitch-backend'
-// EN: ONEDIR PyInstaller layout — the exe lives inside a snitch-backend/ dir.
-// FR: Layout ONEDIR de PyInstaller — l'exe vit dans un dossier snitch-backend/.
+const backendName = isWindows ? 'wiretap-backend.exe' : 'wiretap-backend'
+// EN: ONEDIR PyInstaller layout — the exe lives inside a wiretap-backend/ dir.
+// FR: Layout ONEDIR de PyInstaller — l'exe vit dans un dossier wiretap-backend/.
 const backendExe = isDev
-  ? path.join(resourcesDir, 'dist', 'backend', 'snitch-backend', backendName)
-  : path.join(resourcesDir, 'snitch-backend', backendName)
+  ? path.join(resourcesDir, 'dist', 'backend', 'wiretap-backend', backendName)
+  : path.join(resourcesDir, 'wiretap-backend', backendName)
 
 const frontendDist   = isDev
   ? path.join(resourcesDir, 'frontend', 'dist')
@@ -77,15 +77,15 @@ const iconPath = isDev
   ? path.join(__dirname, 'icon.png')
   : path.join(resourcesDir, 'icon.png')
 
-// EN: Log dir = the backend's own data dir (LOCALAPPDATA\Snitch on Windows,
+// EN: Log dir = the backend's own data dir (LOCALAPPDATA\Wiretap on Windows,
 //     etc.) so "Open logs" and the /diagnostics log_tail read the SAME file
 //     the backend writes to — even when the backend runs elevated and gets
-//     no SNITCH_USER_DATA env (frozen builds resolve the platform dir).
+//     no WIRETAP_USER_DATA env (frozen builds resolve the platform dir).
 // FR: Dossier de logs = le dossier de données du backend lui-même
-//     (LOCALAPPDATA\Snitch sous Windows, etc.) pour que « Ouvrir les logs »
+//     (LOCALAPPDATA\Wiretap sous Windows, etc.) pour que « Ouvrir les logs »
 //     et le log_tail de /diagnostics lisent le MÊME fichier que celui écrit
 //     par le backend — même quand il tourne élevé et ne reçoit pas
-//     SNITCH_USER_DATA (les builds figés résolvent le dossier plateforme).
+//     WIRETAP_USER_DATA (les builds figés résolvent le dossier plateforme).
 // EN: backendDataDir() is hoisted (function declaration below) — safe to
 //     call here at module level.
 // FR: backendDataDir() est hissée (déclaration de fonction plus bas) —
@@ -121,24 +121,24 @@ let backendElevated = false     // EN: Elevated spawn (RunAs/osascript/pkexec)
 
 // ── API token + port / Jeton API + port ─────────────────────────────────────
 // EN: 48-hex-char secret generated once per app launch. Passed to the backend
-//     via SNITCH_TOKEN and served to the renderer through ipcMain — the web
+//     via WIRETAP_TOKEN and served to the renderer through ipcMain — the web
 //     page can only obtain it via the preload bridge.
 // FR: Secret hexadécimal de 48 caractères généré une fois par lancement.
-//     Transmis au backend via SNITCH_TOKEN et servi au renderer via ipcMain —
+//     Transmis au backend via WIRETAP_TOKEN et servi au renderer via ipcMain —
 //     la page web ne peut l'obtenir que par le pont preload.
 const API_TOKEN = crypto.randomBytes(24).toString('hex')
 
 // EN: IPC handlers — the ONLY way the renderer learns token/port/version.
 // FR: Handlers IPC — la SEULE façon pour le renderer d'apprendre jeton/port/version.
-ipcMain.handle('snitch:get-token',   () => API_TOKEN)
-ipcMain.handle('snitch:get-port',    () => backendPort)
-ipcMain.handle('snitch:get-version', () => app.getVersion())
+ipcMain.handle('wiretap:get-token',   () => API_TOKEN)
+ipcMain.handle('wiretap:get-port',    () => backendPort)
+ipcMain.handle('wiretap:get-version', () => app.getVersion())
 // EN: "Open logs" — opens the platform log dir in the file manager. Returns
 //     a non-empty error string on failure (shell.openPath contract).
 // FR: « Ouvrir les logs » — ouvre le dossier de logs dans le gestionnaire de
 //     fichiers. Renvoie une chaîne d'erreur non vide en cas d'échec
 //     (contrat de shell.openPath).
-ipcMain.handle('snitch:open-logs', () => shell.openPath(logDir))
+ipcMain.handle('wiretap:open-logs', () => shell.openPath(logDir))
 
 // EN: "Launch at login" toggle — app.setLoginItemSettings is cross-platform
 //     (Windows registry Run key, macOS login items); a no-op on Linux where
@@ -146,9 +146,9 @@ ipcMain.handle('snitch:open-logs', () => shell.openPath(logDir))
 // FR: Bascule « lancer au démarrage » — app.setLoginItemSettings est
 //     multi-OS (clé Run Windows, login items macOS) ; sans effet sous Linux
 //     où l'API ne s'applique pas. Le renderer lit l'état via le même IPC.
-ipcMain.handle('snitch:get-auto-launch', () =>
+ipcMain.handle('wiretap:get-auto-launch', () =>
   process.platform === 'linux' ? false : app.getLoginItemSettings().openAtLogin)
-ipcMain.handle('snitch:set-auto-launch', (_evt, enabled) => {
+ipcMain.handle('wiretap:set-auto-launch', (_evt, enabled) => {
   if (process.platform === 'linux') return false
   app.setLoginItemSettings({ openAtLogin: !!enabled })
   return app.getLoginItemSettings().openAtLogin
@@ -160,19 +160,19 @@ ipcMain.handle('snitch:set-auto-launch', (_evt, enabled) => {
 //     by CI). Privacy note: checking for updates is an OUTBOUND call to
 //     github.com — it is on by default but can be disabled in Settings,
 //     persisted in userData/update-prefs.json, or killed wholesale via
-//     SNITCH_NO_UPDATE=1. Never runs in unpackaged dev builds.
+//     WIRETAP_NO_UPDATE=1. Never runs in unpackaged dev builds.
 // FR: electron-updater sur le flux GitHub Releases public
 //     (latest.yml / latest-mac.yml / latest-linux.yml déjà publiés par la
 //     CI). Note vie privée : la vérification de mise à jour est un appel
 //     SORTANT vers github.com — activée par défaut mais désactivable dans
 //     les Réglages, persistée dans userData/update-prefs.json, ou coupée
-//     entièrement via SNITCH_NO_UPDATE=1. Jamais en dev non empaqueté.
+//     entièrement via WIRETAP_NO_UPDATE=1. Jamais en dev non empaqueté.
 let autoUpdater = null
 let updateStatus = { state: 'idle' }   // EN: idle|checking|available|downloading|downloaded|none|error|dev
 const updatePrefsPath = path.join(app.getPath('userData'), 'update-prefs.json')
 
 function updateCheckEnabled() {
-  if (process.env.SNITCH_NO_UPDATE) return false
+  if (process.env.WIRETAP_NO_UPDATE) return false
   try {
     return JSON.parse(fs.readFileSync(updatePrefsPath, 'utf8')).enabled !== false
   } catch { return true }   // EN: default on / FR: activé par défaut
@@ -192,7 +192,7 @@ function reportUpdate(state, extra = {}) {
   // FR: Relayer au renderer (le panneau Réglages l'affiche) — protégé, la
   //     fenêtre peut ne pas encore exister au premier contrôle.
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('snitch:update-status', updateStatus)
+    mainWindow.webContents.send('wiretap:update-status', updateStatus)
   }
   rebuildTrayMenu()
 }
@@ -231,11 +231,11 @@ function checkForUpdates(manual = false) {
   })
 }
 
-ipcMain.handle('snitch:get-update-status', () => updateStatus)
-ipcMain.handle('snitch:get-update-check', () => updateCheckEnabled())
-ipcMain.handle('snitch:set-update-check', (_e, on) => { setUpdateCheckEnabled(on); return on })
-ipcMain.handle('snitch:check-updates', () => { checkForUpdates(true); return updateStatus })
-ipcMain.handle('snitch:install-update', () => {
+ipcMain.handle('wiretap:get-update-status', () => updateStatus)
+ipcMain.handle('wiretap:get-update-check', () => updateCheckEnabled())
+ipcMain.handle('wiretap:set-update-check', (_e, on) => { setUpdateCheckEnabled(on); return on })
+ipcMain.handle('wiretap:check-updates', () => { checkForUpdates(true); return updateStatus })
+ipcMain.handle('wiretap:install-update', () => {
   if (autoUpdater && updateStatus.state === 'downloaded') autoUpdater.quitAndInstall()
 })
 
@@ -288,11 +288,11 @@ function isNpcapInstalled() {
  */
 async function offerNpcapDownload() {
   const choice = await dialog.showMessageBox({
-    type: 'info', title: 'Snitch — Npcap required / Npcap requis',
-    message: 'Snitch needs Npcap to capture network traffic on Windows.\n' +
-             'Snitch a besoin de Npcap pour capturer le trafic réseau sous Windows.\n\n' +
-             'Download it free from npcap.com, install it, then restart Snitch.\n' +
-             'Téléchargez-le gratuitement sur npcap.com, installez-le, puis relancez Snitch.',
+    type: 'info', title: 'Wiretap — Npcap required / Npcap requis',
+    message: 'Wiretap needs Npcap to capture network traffic on Windows.\n' +
+             'Wiretap a besoin de Npcap pour capturer le trafic réseau sous Windows.\n\n' +
+             'Download it free from npcap.com, install it, then restart Wiretap.\n' +
+             'Téléchargez-le gratuitement sur npcap.com, installez-le, puis relancez Wiretap.',
     buttons: ['Open npcap.com / Ouvrir npcap.com', 'Quit / Quitter'], defaultId: 0,
   })
   if (choice.response === 0) {
@@ -344,7 +344,7 @@ function createMain() {
    *      d'ipcRenderer. */
   mainWindow = new BrowserWindow({
     width: 1400, height: 860, minWidth: 900, minHeight: 600,
-    show: false, title: 'Snitch', backgroundColor: '#000000',
+    show: false, title: 'Wiretap', backgroundColor: '#000000',
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -390,7 +390,7 @@ function rebuildTrayMenu() {
   if (!tray) return
   const items = [
     {
-      label: 'Show Snitch / Afficher Snitch',
+      label: 'Show Wiretap / Afficher Wiretap',
       click: () => { if (mainWindow) { mainWindow.show(); mainWindow.focus() } },
     },
   ]
@@ -427,7 +427,7 @@ function rebuildTrayMenu() {
 
 function createTray() {
   tray = new Tray(iconPath)
-  tray.setToolTip('Snitch')
+  tray.setToolTip('Wiretap')
   rebuildTrayMenu()
   // EN: A plain click (Windows/Linux) or double-click restores the window.
   // FR: Un simple clic (Windows/Linux) ou double-clic restaure la fenêtre.
@@ -447,7 +447,7 @@ function waitForBackend(maxAttempts = 40) {
     function poll() {
       const req = http.request(
         `http://127.0.0.1:${backendPort}/graph`,
-        { headers: { 'X-Snitch-Token': API_TOKEN } },
+        { headers: { 'X-Wiretap-Token': API_TOKEN } },
         res => { res.resume(); res.statusCode === 200 ? resolve() : retry() }
       )
       req.on('error', retry)
@@ -491,16 +491,16 @@ function killBackend() {
 /**
  * EN: The writable dir the FROZEN backend resolves on each platform —
  *     mirrors paths.py so the token file we drop lands where it looks.
- *     Windows: %LOCALAPPDATA%\Snitch. macOS: ~/Library/Application Support/Snitch.
- *     Linux: $XDG_DATA_HOME/snitch or ~/.local/share/snitch.
+ *     Windows: %LOCALAPPDATA%\Wiretap. macOS: ~/Library/Application Support/Wiretap.
+ *     Linux: $XDG_DATA_HOME/wiretap or ~/.local/share/wiretap.
  * FR: Le dossier inscriptible que le backend FIGÉ résout sur chaque
  *     plateforme — reflète paths.py pour que le fichier de jeton qu'on
  *     dépose atterrisse là où il le cherche.
  */
 function backendDataDir() {
-  if (isWindows) return path.join(process.env.LOCALAPPDATA || path.join(app.getPath('home'), 'AppData', 'Local'), 'Snitch')
-  if (process.platform === 'darwin') return path.join(app.getPath('home'), 'Library', 'Application Support', 'Snitch')
-  return path.join(process.env.XDG_DATA_HOME || path.join(app.getPath('home'), '.local', 'share'), 'snitch')
+  if (isWindows) return path.join(process.env.LOCALAPPDATA || path.join(app.getPath('home'), 'AppData', 'Local'), 'Wiretap')
+  if (process.platform === 'darwin') return path.join(app.getPath('home'), 'Library', 'Application Support', 'Wiretap')
+  return path.join(process.env.XDG_DATA_HOME || path.join(app.getPath('home'), '.local', 'share'), 'wiretap')
 }
 
 /**
@@ -512,7 +512,7 @@ function backendDataDir() {
  *                 (native password dialog — same as sudo, GUI-flavoured)
  *       Linux   : pkexec                      (polkit dialog)
  *
- *     Elevated processes get a different $HOME (root), so SNITCH_DATA_DIR is
+ *     Elevated processes get a different $HOME (root), so WIRETAP_DATA_DIR is
  *     passed explicitly on macOS/Linux — the token file, DB and logs must
  *     land in the USER's data dir, not /var/root. On Windows env can't
  *     cross UAC, so the pre-written api_token.txt does the job and the
@@ -531,7 +531,7 @@ function backendDataDir() {
  *       Linux   : pkexec                      (dialogue polkit)
  *
  *     Les processus élevés reçoivent un $HOME différent (root), donc
- *     SNITCH_DATA_DIR est passé explicitement sous macOS/Linux — le fichier
+ *     WIRETAP_DATA_DIR est passé explicitement sous macOS/Linux — le fichier
  *     de jeton, la DB et les logs doivent atterrir dans le dossier de
  *     données de L'UTILISATEUR, pas dans /var/root. Sous Windows l'env ne
  *     traverse pas l'UAC, donc le api_token.txt pré-écrit fait le travail
@@ -573,12 +573,12 @@ function launchBackendElevated() {
   } else if (process.platform === 'darwin') {
     // EN: Escape for the AppleScript double-quoted string, then the shell.
     //     The token normally travels via the api_token.txt file written above
-    //     so it never appears in `ps`; the SNITCH_TOKEN env prefix is only a
+    //     so it never appears in `ps`; the WIRETAP_TOKEN env prefix is only a
     //     fallback for when that write failed (root-owned data dir).
     // FR: Échapper pour la chaîne AppleScript entre guillemets, puis le shell.
     //     Le jeton voyage normalement via le fichier api_token.txt écrit
     //     ci-dessus et n'apparaît donc jamais dans `ps` ; le préfixe
-    //     SNITCH_TOKEN n'est qu'un repli quand cette écriture a échoué
+    //     WIRETAP_TOKEN n'est qu'un repli quand cette écriture a échoué
     //     (dossier de données possédé par root).
     const esc = s => s.replace(/(["\\$`])/g, '\\$1')
     // EN: TWO escaping layers — the command crosses AppleScript THEN
@@ -592,15 +592,15 @@ function launchBackendElevated() {
     //     shell → échapper d'abord à la couche shell en apostrophes
     //     (' → '\''), incassables pour sh.
     const shq = s => `'${String(s).replace(/'/g, `'\\''`)}'`
-    const tokenPrefix = tokenFileWritten ? '' : `SNITCH_TOKEN=${shq(API_TOKEN)} `
-    // EN: SNITCH_OWNER_* tells the ELEVATED backend which real uid/gid to
+    const tokenPrefix = tokenFileWritten ? '' : `WIRETAP_TOKEN=${shq(API_TOKEN)} `
+    // EN: WIRETAP_OWNER_* tells the ELEVATED backend which real uid/gid to
     //     chown its files back to — otherwise logs/db/token stay root-owned
     //     inside the user's data dir and the next launch dies with EACCES.
-    // FR: SNITCH_OWNER_* indique au backend ÉLEVÉ vers quel uid/gid réel
+    // FR: WIRETAP_OWNER_* indique au backend ÉLEVÉ vers quel uid/gid réel
     //     chown ses fichiers — sinon logs/db/jeton restent en root dans le
     //     dossier utilisateur et le lancement suivant meurt en EACCES.
-    const ownerPrefix = `SNITCH_OWNER_UID=${process.getuid()} SNITCH_OWNER_GID=${process.getgid()} `
-    const shellCmd = `SNITCH_DATA_DIR=${shq(dataDir)} ${ownerPrefix}${tokenPrefix}${shq(backendExe)} --port ${backendPort}`
+    const ownerPrefix = `WIRETAP_OWNER_UID=${process.getuid()} WIRETAP_OWNER_GID=${process.getgid()} `
+    const shellCmd = `WIRETAP_DATA_DIR=${shq(dataDir)} ${ownerPrefix}${tokenPrefix}${shq(backendExe)} --port ${backendPort}`
     backendProc = spawn('osascript', [
       '-e', `do shell script "${esc(shellCmd)}" with administrator privileges`,
     ], { stdio: 'ignore' })
@@ -620,13 +620,13 @@ function launchBackendElevated() {
     //     affectation d'env visible dans /proc/<pid>/cmdline ; l'env sert
     //     seulement si l'écriture a échoué.
     const envArgs = [
-      `SNITCH_DATA_DIR=${dataDir}`,
+      `WIRETAP_DATA_DIR=${dataDir}`,
       // EN: same ownership hand-back as macOS (see above)
       // FR: même rétrocession de propriété que macOS (voir ci-dessus)
-      `SNITCH_OWNER_UID=${process.getuid()}`,
-      `SNITCH_OWNER_GID=${process.getgid()}`,
+      `WIRETAP_OWNER_UID=${process.getuid()}`,
+      `WIRETAP_OWNER_GID=${process.getgid()}`,
     ]
-    if (!tokenFileWritten) envArgs.push(`SNITCH_TOKEN=${API_TOKEN}`)
+    if (!tokenFileWritten) envArgs.push(`WIRETAP_TOKEN=${API_TOKEN}`)
     backendProc = spawn(pkexecBin, [
       'env', ...envArgs,
       backendExe, '--port', String(backendPort),
@@ -636,7 +636,7 @@ function launchBackendElevated() {
 
   backendProc.on('error', err => {
     if (isQuitting) return
-    dialog.showErrorBox('Snitch', `Failed to start backend / Échec du démarrage du backend :\n${err.message}`)
+    dialog.showErrorBox('Wiretap', `Failed to start backend / Échec du démarrage du backend :\n${err.message}`)
     app.quit()
   })
   // EN: No 'exit' crash-watch here — the wrapper exits as soon as the
@@ -653,7 +653,7 @@ function launchBackend() {
    *      OS (la capture l'exige) ; le mode dev lance sans privilèges pour
    *      itérer sans invite mot de passe (la capture échoue, l'UI marche). */
   if (!fs.existsSync(backendExe)) {
-    dialog.showErrorBox('Snitch', `Backend not found / Backend introuvable :\n${backendExe}`)
+    dialog.showErrorBox('Wiretap', `Backend not found / Backend introuvable :\n${backendExe}`)
     app.quit(); return
   }
 
@@ -665,19 +665,19 @@ function launchBackend() {
 }
 
 function spawnBackendPlain() {
-  /** EN: Spawn the compiled backend with SNITCH_TOKEN + SNITCH_PORT in its
+  /** EN: Spawn the compiled backend with WIRETAP_TOKEN + WIRETAP_PORT in its
    *      environment; windowsHide keeps a console window from flashing;
    *      stdout/stderr stream to the log file for diagnostics.
-   *  FR: Lancer le backend compilé avec SNITCH_TOKEN + SNITCH_PORT dans son
+   *  FR: Lancer le backend compilé avec WIRETAP_TOKEN + WIRETAP_PORT dans son
    *      environnement ; windowsHide évite l'éclair d'une fenêtre console ;
    *      stdout/stderr vont dans le fichier de log pour le diagnostic. */
   fs.mkdirSync(logDir, { recursive: true })
   const logFd = fs.openSync(logFile, 'a')
 
   const env = Object.assign({}, process.env)
-  env.SNITCH_TOKEN = API_TOKEN
-  env.SNITCH_PORT  = String(backendPort)
-  env.SNITCH_USER_DATA = '1'   // EN: per-OS user data dir, not the bundle
+  env.WIRETAP_TOKEN = API_TOKEN
+  env.WIRETAP_PORT  = String(backendPort)
+  env.WIRETAP_USER_DATA = '1'   // EN: per-OS user data dir, not the bundle
                                // FR: dossier de données utilisateur, pas le bundle
   // EN: Prevent the child from being interpreted as an Electron/Node process.
   // FR: Empêcher le processus enfant d'être interprété comme un processus Electron/Node.
@@ -691,13 +691,13 @@ function spawnBackendPlain() {
   })
   backendProc.on('error', err => {
     if (isQuitting) return
-    dialog.showErrorBox('Snitch', `Failed to start backend / Échec du démarrage du backend :\n${err.message}`)
+    dialog.showErrorBox('Wiretap', `Failed to start backend / Échec du démarrage du backend :\n${err.message}`)
     app.quit()
   })
   backendProc.on('exit', (code) => {
     if (isQuitting) return  // EN: normal shutdown — don't alert / FR: arrêt normal — ne pas alerter
     if (mainWindow) {
-      dialog.showErrorBox('Snitch', `Backend stopped (code ${code}) / Backend arrêté (code ${code}).`)
+      dialog.showErrorBox('Wiretap', `Backend stopped (code ${code}) / Backend arrêté (code ${code}).`)
       app.quit()
     }
   })
@@ -716,7 +716,7 @@ function shutdownBackend() {
     try {
       const req = http.request(
         `http://127.0.0.1:${backendPort}/shutdown`,
-        { method: 'POST', headers: { 'X-Snitch-Token': API_TOKEN }, timeout: 3000 },
+        { method: 'POST', headers: { 'X-Wiretap-Token': API_TOKEN }, timeout: 3000 },
         res => res.resume())
       req.on('error', () => {})       // EN: best-effort — app is exiting anyway
       req.on('timeout', () => req.destroy())
@@ -740,7 +740,7 @@ app.whenReady().then(async () => {
     fs.accessSync(app.getPath('userData'), fs.constants.W_OK)
   } catch {
     const dataPath = app.getPath('userData')
-    dialog.showErrorBox('Snitch',
+    dialog.showErrorBox('Wiretap',
       `Cannot write to the data folder (leftover root-owned files from an earlier elevated run).\n` +
       `Impossible d'écrire dans le dossier de données (fichiers restés propriété de root après un lancement élevé).\n\n` +
       `Fix / Réparer :\n  sudo chown -R $USER "${dataPath}"\n  ${'or / ou'} : rm -rf "${dataPath}"`)
@@ -778,11 +778,11 @@ app.whenReady().then(async () => {
     } catch (e) {
       lowerSplash()
       if (!backendElevated) {
-        dialog.showErrorBox('Snitch', `Backend unavailable / Backend indisponible :\n${e.message}`)
+        dialog.showErrorBox('Wiretap', `Backend unavailable / Backend indisponible :\n${e.message}`)
         app.quit(); return
       }
       const choice = await dialog.showMessageBox({
-        type: 'warning', title: 'Snitch',
+        type: 'warning', title: 'Wiretap',
         // EN: Don't guess the cause — a crashing backend looks exactly like a
         //     declined prompt from here. Point to the log that tells which.
         // FR: Ne pas deviner la cause — un backend qui plante ressemble ici
@@ -806,7 +806,7 @@ app.whenReady().then(async () => {
           await waitForBackend()
           booted = true
         } catch (e2) {
-          dialog.showErrorBox('Snitch', `Backend unavailable / Backend indisponible :\n${e2.message}`)
+          dialog.showErrorBox('Wiretap', `Backend unavailable / Backend indisponible :\n${e2.message}`)
           app.quit(); return
         }
       }

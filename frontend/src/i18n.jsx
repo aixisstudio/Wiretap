@@ -1,5 +1,5 @@
 /**
- * Snitch — internationalization.
+ * Wiretap — internationalization.
  *
  * EN: Tiny homemade i18n layer. Dictionaries live in isolated files under
  *     `src/locales/` — one per language — so the community can contribute
@@ -45,7 +45,7 @@ const I18nContext = createContext(null)
  *     zh → zh-CN, sinon le préfixe de langue nu).
  */
 function detectLang() {
-  const saved = localStorage.getItem('snitch_lang')
+  const saved = localStorage.getItem('wiretap_lang')
   if (saved && DICTS[saved]) return saved
   const nav = (navigator.language || 'en')
   if (DICTS[nav]) return nav
@@ -68,7 +68,7 @@ export function I18nProvider({ children }) {
   // FR: Langue persistée — survit aux redémarrages (localStorage, pas juste la RAM).
   const [lang, setLangState] = useState(detectLang)
   const setLang = (l) => {
-    localStorage.setItem('snitch_lang', l)
+    localStorage.setItem('wiretap_lang', l)
     setLangState(l)
   }
   const dict = DICTS[lang] || en

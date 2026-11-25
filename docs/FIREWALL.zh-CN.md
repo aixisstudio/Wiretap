@@ -2,22 +2,22 @@
 
 [English](FIREWALL.md) | [Français](FIREWALL.md) | [Español](FIREWALL.es.md) | [Deutsch](FIREWALL.de.md) | [Русский](FIREWALL.ru.md) | [日本語](FIREWALL.ja.md) | [Português](FIREWALL.pt-BR.md) | **中文**
 
-Snitch 在被动观察之上叠加了威胁狩猎层。**它做什么——以及同样重要的，
+Wiretap 在被动观察之上叠加了威胁狩猎层。**它做什么——以及同样重要的，
 它不做什么：**
 
 ## 出站防火墙编排
 
-Snitch **不**在用户态过滤数据包。规则会被尽力下发到操作系统原生
+Wiretap **不**在用户态过滤数据包。规则会被尽力下发到操作系统原生
 防火墙：
 
 | 系统 | 机制 |
 |---|---|
 | Windows | `netsh advfirewall` 出站阻断规则 |
-| Linux | `iptables -A OUTPUT -j DROP`（lockdown 使用专用 `SNITCH_LOCK` 链） |
+| Linux | `iptables -A OUTPUT -j DROP`（lockdown 使用专用 `WIRETAP_LOCK` 链） |
 | macOS | 生成的 `pf` 锚点，经 `pfctl` 加载 |
 
 规则类型：`ip`、`cidr`、`domain`（应用时解析一次）、`process`、
-`port`。规则持久化到 `snitch.db` 并在启动时重新下发。
+`port`。规则持久化到 `wiretap.db` 并在启动时重新下发。
 
 **如实的限制：**
 
@@ -32,7 +32,7 @@ Snitch **不**在用户态过滤数据包。规则会被尽力下发到操作系
 ## 事件响应
 
 - `POST /processes/kill` / `POST /processes/suspend` —— 按 PID，
-  拒绝 PID ≤ 3 以及 Snitch 自身。适用常规 OS 权限。
+  拒绝 PID ≤ 3 以及 Wiretap 自身。适用常规 OS 权限。
 - `POST /firewall/rules`、`DELETE /firewall/rules/{id}`、
   `POST /firewall/rules/{id}/toggle`、`POST /firewall/lockdown` ——
   与所有端点一样需要认证。
@@ -78,7 +78,7 @@ Snitch **不**在用户态过滤数据包。规则会被尽力下发到操作系
 
 ### v1.2 新功能 / Nouveautés v1.2
 
-- **`sinkhole` 动作** — `domain`/`ip` 规则可重定向到 loopback 而非阻断：域名通过 hosts 文件中带 `# snitch-sinkhole` 标记的块（所有 OS），IP/CIDR 通过 iptables `DNAT`（仅 Linux）。`process`/`port` 的 `sinkhole` 被拒绝；不支持的平台如实返回 `applied=False`。
+- **`sinkhole` 动作** — `domain`/`ip` 规则可重定向到 loopback 而非阻断：域名通过 hosts 文件中带 `# wiretap-sinkhole` 标记的块（所有 OS），IP/CIDR 通过 iptables `DNAT`（仅 Linux）。`process`/`port` 的 `sinkhole` 被拒绝；不支持的平台如实返回 `applied=False`。
 - **域名重解析** — `domain` 规则每约 10 分钟重新解析，按 OS 应用 IP 差值，CDN 轮换不会静默放行域名。
 - **完整性监视**（默认开启，只读，本地） — 联网可执行文件的 SHA-256 基线（`BINARY_CHANGED`）、名称/exe 不匹配（`NAME_MISMATCH`）、仅 Linux `rwxp` 扫描（`MEM_RWX`，已知 JIT 应用为 info 级）。`GET /security/integrity`、`POST /security/integrity/check`。
 - **告警解释** — `GET /security/explain?type=X` 返回手写的双语（EN/FR）解释；确定性、完全离线 — 非模型。UI 中每条告警的「为什么？」按钮显示。
@@ -103,7 +103,7 @@ Snitch **不**在用户态过滤数据包。规则会被尽力下发到操作系
 - **导入屏蔽列表** — `POST /firewall/blocklist`：本地文件（纯本地）或可选 URL（≤4 MiB HTTPS 抓取，响应标记 `remote_fetch`）→ `domain` 规则，去重，上限 500–5000。
 - **PCAP 导出** — `GET /forensics/pcap`（`ip`/`process` 过滤）：~4 MiB 环形缓冲区输出为 Wireshark 可用的 `.pcap`。
 - **远程配对** — `POST /remote/pairing` 持久化 `lan_bind`（下次启动生效）；令牌仍然必需。`GET /remote/pairing` 报告绑定地址与 LAN IP。
-- **无网络沙箱** — `POST /security/sandbox` 以零出站运行二进制（Linux `unshare -n`、macOS `sandbox-exec`；手动版 `contrib/snitch-contain`）。
+- **无网络沙箱** — `POST /security/sandbox` 以零出站运行二进制（Linux `unshare -n`、macOS `sandbox-exec`；手动版 `contrib/wiretap-contain`）。
 - **内置模型** — `slm_mode=embedded` 通过 `llama-cpp-python` 加载用户 `.gguf` — 完全零网络。
 - **原生骨架** — `contrib/wfp-callout/`（C 版 WFP callout＋签名说明）与 `contrib/macos-filter/`（Swift `NEFilterDataProvider`＋entitlement 说明）：研究用脚手架，不随产品分发。
 - **ASN** — 存在 `GeoLite2-ASN.mmdb`/`dbip-asn-lite.mmdb` 时，节点除 `org` 外还带 `asn`。
@@ -115,12 +115,12 @@ Snitch **不**在用户态过滤数据包。规则会被尽力下发到操作系
 - **ICMP 隧道启发式** — 载荷 ≥24 B 的 echo 类型，5 分钟内 ≥3 次 → `ICMP_TUNNEL`。
 - **ML 流异常** — 纯 Python isolation forest（64 棵树、零依赖）对您自己的流摘要打分；<384 流时惰性，0.62 触发 `ML_ANOMALY`。基线偏差，**不是**恶意软件分类器。
 - **Ask-on-connect（Linux，可选）** — `ask_enabled` + root + iptables：新出站流在 NFQUEUE 7 挂起至 `POST /security/ask/verdict` — NFQUEUE 客户端为**纯 Python**（`detection/nfqueue.py`，AF_NETLINK），无需 `python-netfilterqueue`；超时 15 秒，默认拒绝（`ask_failopen=1` 反转）。Windows/macOS 需要 `contrib/` 中的签名 callout/NetworkExtension。
-- **eBPF cgroup 执行（Linux，可选）** — `POST /security/ebpf/isolate {pid}` + `/security/ebpf/block {ip}`：程序挂载到 snitch cgroup — 内核丢弃仅作用于被隔离进程。
+- **eBPF cgroup 执行（Linux，可选）** — `POST /security/ebpf/isolate {pid}` + `/security/ebpf/block {ip}`：程序挂载到 wiretap cgroup — 内核丢弃仅作用于被隔离进程。
 - **空心化检查（Linux）** — `POST /security/hollow {pid}` 对比 `/proc/<pid>/mem` 中文件映射的可执行页与磁盘。
 - **IOC 节点同步（可选）** — `gossip_peers` ≤32 + `gossip_enabled`：每 5 分钟经认证 HTTP(S) 推送 Merkle 证明包 — 无发现机制，非 ZK。
 - **Syslog（可选）** — `syslog_addr`（`主机:端口` UDP 或 `tcp://`）→ RFC 3164 `local4`。
 - **Firejail 隔离** — 优先 `firejail --net=none`，回退 `unshare`。
-- **nftables 后端** — 有 `nft` 时使用专用 `inet snitch` 表替代 iptables。
+- **nftables 后端** — 有 `nft` 时使用专用 `inet wiretap` 表替代 iptables。
 - **可操作告警** — 结构化 `actions`（封锁 IP、终止/挂起、ask 判定）以一键按钮呈现。
 - **自定义规则的 `asn`/`country`** — 本地 geo 数据库，可与 `action=block` 组成地理围栏。
 - **DGA 启发式** — 已解析的 DNS 名与 TLS SNI 按词汇特征评分（熵、

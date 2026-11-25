@@ -1,8 +1,8 @@
-# backend.spec — PyInstaller specification for the Snitch backend.
+# backend.spec — PyInstaller specification for the Wiretap backend.
 #
 # EN: Run from the backend/ directory:
 #       pyinstaller backend.spec --distpath ../dist/backend
-#     Produces a `snitch-backend/` ONEDIR bundle the Electron wrapper spawns
+#     Produces a `wiretap-backend/` ONEDIR bundle the Electron wrapper spawns
 #     as a child process. ONEDIR (not onefile) is deliberate: fewer AV false
 #     positives, faster startup, no temp-dir self-extraction of a
 #     network-sniffing binary.
@@ -12,7 +12,7 @@
 #
 # FR: À lancer depuis le dossier backend/ :
 #       pyinstaller backend.spec --distpath ../dist/backend
-#     Produit un bundle ONEDIR `snitch-backend/` que le conteneur Electron
+#     Produit un bundle ONEDIR `wiretap-backend/` que le conteneur Electron
 #     lance comme processus enfant. ONEDIR (pas onefile) est voulu : moins de
 #     faux positifs antivirus, démarrage plus rapide, pas d'auto-extraction
 #     en temp d'un binaire qui sniffe le réseau.
@@ -99,7 +99,7 @@ exe = EXE(
     [],
     exclude_binaries=True,      # EN: ONEDIR mode — binaries go into COLLECT
                                 # FR: mode ONEDIR — les binaires vont dans COLLECT
-    name='snitch-backend',
+    name='wiretap-backend',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -127,5 +127,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='snitch-backend',
+    name='wiretap-backend',
 )

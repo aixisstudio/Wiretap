@@ -2,7 +2,7 @@
 
 [English](CHANGELOG.md) | [Français](CHANGELOG.md) | [Español](CHANGELOG.es.md) | [Deutsch](CHANGELOG.de.md) | [Русский](CHANGELOG.ru.md) | [日本語](CHANGELOG.ja.md) | [Português](CHANGELOG.pt-BR.md) | [中文](CHANGELOG.zh-CN.md)
 
-All notable changes to Snitch. / Toutes les modifications notables de Snitch.
+All notable changes to Wiretap. / Toutes les modifications notables de Wiretap.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
@@ -60,14 +60,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ### Security / Sécurité
 
-- EN: **Agent↔collector TLS** — `snitch-agent` gains opt-in rustls
-  transport (`SNITCH_TLS=1`, WebPKI roots, `SNITCH_CA` for private CAs);
-  the collector terminates TLS when `SNITCH_TLS_CERT`/`SNITCH_TLS_KEY`
+- EN: **Agent↔collector TLS** — `wiretap-agent` gains opt-in rustls
+  transport (`WIRETAP_TLS=1`, WebPKI roots, `WIRETAP_CA` for private CAs);
+  the collector terminates TLS when `WIRETAP_TLS_CERT`/`WIRETAP_TLS_KEY`
   are set. The `sagt_…` token and flow metadata no longer travel in
   cleartext on hostile links.
-  FR: **TLS agent↔collecteur** — `snitch-agent` gagne un transport rustls
-  opt-in (`SNITCH_TLS=1`, racines WebPKI, `SNITCH_CA` pour CA privée) ;
-  le collecteur termine TLS avec `SNITCH_TLS_CERT`/`SNITCH_TLS_KEY`. Le
+  FR: **TLS agent↔collecteur** — `wiretap-agent` gagne un transport rustls
+  opt-in (`WIRETAP_TLS=1`, racines WebPKI, `WIRETAP_CA` pour CA privée) ;
+  le collecteur termine TLS avec `WIRETAP_TLS_CERT`/`WIRETAP_TLS_KEY`. Le
   jeton `sagt_…` et les métadonnées ne transitent plus en clair.
 - EN: **hosts-file injection closed** — `domain` firewall rules are now
   validated against a strict RFC-1034 hostname regex before any
@@ -77,17 +77,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
   par regex RFC-1034 stricte avant toute écriture sinkhole, et les
   règles `port` exigent un entier 1–65535.
 - EN: **`?token=` restricted to the WebSocket** — REST endpoints only
-  accept the `X-Snitch-Token` header, so the credential can no longer
+  accept the `X-Wiretap-Token` header, so the credential can no longer
   leak into browser history or access logs via API URLs.
   FR: **`?token=` réservé au WebSocket** — les endpoints REST
-  n'acceptent que l'en-tête `X-Snitch-Token`.
+  n'acceptent que l'en-tête `X-Wiretap-Token`.
 - EN: **Per-IP brute-force ban** — 20 failed auth attempts in 5 min →
   HTTP 429 / WS close for 60 s (loopback included).
   FR: **Bannissement anti-force brute par IP** — 20 échecs en 5 min →
   HTTP 429 / fermeture WS pendant 60 s (loopback inclus).
-- EN: `SNITCH_PRINT_TOKEN=0` suppresses the one-time stdout token
+- EN: `WIRETAP_PRINT_TOKEN=0` suppresses the one-time stdout token
   print for hardened deployments (api_token.txt stays readable, 0600).
-  FR: `SNITCH_PRINT_TOKEN=0` supprime l'affichage stdout du jeton.
+  FR: `WIRETAP_PRINT_TOKEN=0` supprime l'affichage stdout du jeton.
 - EN: IP whitelist entries are validated (real addresses only, ≤512);
   port/process filter lists bounded to 512 entries.
   FR: Les entrées whitelist sont validées (vraies adresses, ≤512) ;
@@ -144,15 +144,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
   (éviction du quart le plus ancien, compteur `alerts_dropped()`) et la
   map de suspects mineur à 4 096.
 - EN: media monitor polls every 10 s by default (was 3 s — each Linux
-  tick walks every process's open files); `SNITCH_MEDIA_INTERVAL`
+  tick walks every process's open files); `WIRETAP_MEDIA_INTERVAL`
   (3–300 s) overrides.
   FR: le moniteur média sonde toutes les 10 s par défaut (3 s avant —
   chaque tick Linux parcourt les fichiers ouverts de tous les
-  processus) ; `SNITCH_MEDIA_INTERVAL` (3–300 s) ajuste.
+  processus) ; `WIRETAP_MEDIA_INTERVAL` (3–300 s) ajuste.
 - EN: **GPO installer no longer writes the master token in cleartext**
-  — `-Token` now lands in `%ProgramData%\Snitch\api_token.txt` ACL'd to
-  SYSTEM+Administrators instead of a world-readable `SNITCH_TOKEN=…`
-  line inside `%ProgramFiles%\Snitch\run.cmd`. The launcher also quotes
+  — `-Token` now lands in `%ProgramData%\Wiretap\api_token.txt` ACL'd to
+  SYSTEM+Administrators instead of a world-readable `WIRETAP_TOKEN=…`
+  line inside `%ProgramFiles%\Wiretap\run.cmd`. The launcher also quotes
   `set "VAR=value"` so `&`/spaces in paths cannot inject.
   FR: **L'installeur GPO n'écrit plus le jeton maître en clair** —
   `-Token` atterrit dans `api_token.txt` restreint à
@@ -176,7 +176,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
   fixes ; les pins WFP et la lecture fleet-audit sont bornés.
 
 - EN: **All project surfaces synced to v1.6.3** — README (Rust agent,
-  enrollment, `ti_feeds`, `.rpm`, `snitchd` formula), ROADMAP (v1.5.x/
+  enrollment, `ti_feeds`, `.rpm`, `wiretapd` formula), ROADMAP (v1.5.x/
   v1.6.x shipped rows, fleet scale-out items), wiki (API catalog → 76
   endpoints, new *Fleet & Agent* page, Installation/Roadmap/FAQ/Usage
   refreshed), GitHub Pages (monitor+firewall positioning, fleet/SIEM
@@ -199,13 +199,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
   redessinait l'ancien « œil radar » et écrasait `icon.png` à chaque
   build ; le monogramme commité est désormais la source unique.
 - EN: **Elevated backend no longer bricks the data dir** — files it
-  creates (logs, `snitch.db`, `api_token.txt`) are chowned back to the
-  real user via `SNITCH_OWNER_UID/GID` (on every write and again
+  creates (logs, `wiretap.db`, `api_token.txt`) are chowned back to the
+  real user via `WIRETAP_OWNER_UID/GID` (on every write and again
   recursively at shutdown), instead of leaving root-owned files that
   killed the next unprivileged launch with EACCES.
   FR: **Le backend élevé ne brique plus le dossier de données** — les
   fichiers qu'il crée sont rendus à l'utilisateur réel via
-  `SNITCH_OWNER_UID/GID` (à chaque écriture et récursivement à l'arrêt),
+  `WIRETAP_OWNER_UID/GID` (à chaque écriture et récursivement à l'arrêt),
   au lieu de laisser des fichiers root qui tuaient le lancement suivant.
 - EN: Electron now shows a bilingual error with the repair command when
   `userData` is unwritable (e.g. root-owned leftovers) instead of dying
@@ -230,11 +230,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
   iptables (injection ×2) ; détection webhook par hostname parsé au
   lieu de sous-chaîne d'URL (×3) ; les réponses API ne fuient plus le
   texte d'exception (×2) ; `contents: read` sur `ci-agent.yml`.
-- EN: Homebrew launcher renamed `snitch` → `snitchd` — the bare CLI
-  name belongs to `karol-broda/snitch` (an ss/netstat replacement).
+- EN: Homebrew launcher renamed `wiretap` → `wiretapd` — the bare CLI
+  name belongs to `karol-broda/wiretap` (an ss/netstat replacement).
   Refs #51.
-  FR: Lanceur Homebrew renommé `snitch` → `snitchd` — le nom CLI nu
-  appartient à `karol-broda/snitch`. Refs #51.
+  FR: Lanceur Homebrew renommé `wiretap` → `wiretapd` — le nom CLI nu
+  appartient à `karol-broda/wiretap`. Refs #51.
 - EN: **All 11 dependabot updates merged** — electron 44.9, fastapi,
   react/react-dom 19.3.1, lucide-react, vitest, ruff, and the docker /
   download-artifact / setup-buildx / login GitHub Actions.
@@ -255,13 +255,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 - EN: **Per-agent enrollment** — `POST /ingest/enroll` mints one-shot
   `sagt_…` credentials (only the hash is stored), `GET /ingest/agents`
   lists them, `POST /ingest/revoke` kills one by name. `/ingest/events`
-  accepts `X-Snitch-Agent: sagt_…` where the enrolled name is
+  accepts `X-Wiretap-Agent: sagt_…` where the enrolled name is
   authoritative (a stolen token can't spoof another agent) or the master
-  `X-Snitch-Token` for local deployments.
+  `X-Wiretap-Token` for local deployments.
   FR: **Enrôlement par agent** — `POST /ingest/enroll` mint des crédences
   `sagt_…` one-shot (seul le hash est stocké), `GET /ingest/agents` les
   liste, `POST /ingest/revoke` les révoque par nom. `/ingest/events`
-  accepte `X-Snitch-Agent: sagt_…` (le nom enrôlé fait foi — un jeton
+  accepte `X-Wiretap-Agent: sagt_…` (le nom enrôlé fait foi — un jeton
   volé ne peut pas usurper un autre agent) ou le jeton maître.
 - EN: **Agent process attribution (Linux)** — the Rust agent now maps
   socket inodes to `pid`/`process` via a `/proc/*/fd` walk, lazily
@@ -272,38 +272,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
   Toujours zéro-dépendance ; les builds Windows/macOS compilent et
   reportent `pid: 0` tant que leurs chemins OS ne sont pas livrés.
 - EN: **Scheduled threat feeds** — the `ti_feeds` setting (declarative
-  via `snitch.toml` or `POST /settings`) refreshes each feed on its own
+  via `wiretap.toml` or `POST /settings`) refreshes each feed on its own
   `hours` clock through a background asyncio worker; imports run
   through the same dedupe/caps path as `/firewall/blocklist` and the
   firewall reloads hot. `ti_feeds_state` persists last-fetch times.
   FR: **Flux TI planifiés** — le réglage `ti_feeds` (déclaratif via
-  `snitch.toml` ou `POST /settings`) rafraîchit chaque flux selon son
+  `wiretap.toml` ou `POST /settings`) rafraîchit chaque flux selon son
   horloge `hours` via un worker asyncio ; imports par le même chemin
   dédupe/caps que `/firewall/blocklist`, pare-feu rechargé à chaud.
 - EN: **Agent CI** — `.github/workflows/ci-agent.yml` compiles and
-  unit-tests `snitch-agent` on Linux, macOS and Windows targets on every
+  unit-tests `wiretap-agent` on Linux, macOS and Windows targets on every
   `agent/**` push; 6 unit tests cover hex decoding, table parsing,
   attribution and JSON escaping.
   FR: **CI agent** — `.github/workflows/ci-agent.yml` compile et teste
-  `snitch-agent` sur cibles Linux/macOS/Windows à chaque push
+  `wiretap-agent` sur cibles Linux/macOS/Windows à chaque push
   `agent/**` ; 6 tests unitaires.
 
 ### Fixed / Corrigé
 
 - EN: the agent previously sent `Authorization: Bearer`, which the
-  ingest endpoint never read — it now sends `X-Snitch-Agent` (enrolled
-  `sagt_…`) or `X-Snitch-Token` (master) matching the actual auth path.
+  ingest endpoint never read — it now sends `X-Wiretap-Agent` (enrolled
+  `sagt_…`) or `X-Wiretap-Token` (master) matching the actual auth path.
   FR: l'agent envoyait `Authorization: Bearer`, jamais lu par l'endpoint
-  — il envoie désormais `X-Snitch-Agent` (`sagt_…` enrôlé) ou
-  `X-Snitch-Token` (maître) selon le vrai chemin d'auth.
+  — il envoie désormais `X-Wiretap-Agent` (`sagt_…` enrôlé) ou
+  `X-Wiretap-Token` (maître) selon le vrai chemin d'auth.
 
 ## [1.6.1] — 2026-10-22 — enterprise follow-through / suite entreprise
 
 ### Added / Ajouté
 
-- **Rust agent + ingest API / Agent Rust + API d'ingestion** — `agent/` ships a zero-dependency Rust daemon (~1 MB single binary) that diffs the host socket table (`/proc/net/*`, Linux) and pushes new outbound flows to the new authenticated `POST /ingest/events` (contract `snitch-agent/1`, ≤1000 events/request, per-item validation). Events feed the SAME custom-rule detection surface as local packets and accumulate under `agent-host:…` history keys. Honest scope: sockets only — no payloads/SNI, process attribution is a marked TODO, HTTP transport for LAN trust domains. `deploy/systemd/snitch-agent.service` included. / Daemon Rust zéro-dépendance qui diff la table de sockets et pousse les nouveaux flux vers `POST /ingest/events` (contrat `snitch-agent/1`, borné et validé). Mêmes règles custom que les paquets locaux. Périmètre honnête : sockets seulement.
+- **Rust agent + ingest API / Agent Rust + API d'ingestion** — `agent/` ships a zero-dependency Rust daemon (~1 MB single binary) that diffs the host socket table (`/proc/net/*`, Linux) and pushes new outbound flows to the new authenticated `POST /ingest/events` (contract `wiretap-agent/1`, ≤1000 events/request, per-item validation). Events feed the SAME custom-rule detection surface as local packets and accumulate under `agent-host:…` history keys. Honest scope: sockets only — no payloads/SNI, process attribution is a marked TODO, HTTP transport for LAN trust domains. `deploy/systemd/wiretap-agent.service` included. / Daemon Rust zéro-dépendance qui diff la table de sockets et pousse les nouveaux flux vers `POST /ingest/events` (contrat `wiretap-agent/1`, borné et validé). Mêmes règles custom que les paquets locaux. Périmètre honnête : sockets seulement.
 - **YARA-L export / Export YARA-L** — `GET /alerts/rules/yaral` + `detection/yaral.py`: all custom rules (including Sigma-imported `conds` rules) exported as a YARA-L 2.0 file for Google SecOps/Chronicle, with packet-sensor→UDM field mapping documented inline; untranslatable clauses become `// SKIPPED` comments. Gives a Sigma→YARA-L path for free. / Export unidirectionnel des règles custom en YARA-L 2.0 (mapping UDM documenté, clauses intraduisibles en `// SKIPPED`) — chemin Sigma→YARA-L inclus.
-- **Puppet / Salt / GPO skeletons / Squelettes Puppet / Salt / GPO** — `deploy/puppet/` module + ERB template, `deploy/salt/` state, `deploy/gpo/Install-Snitch.ps1` silent installer (ProgramData config, venv, SYSTEM scheduled task on 127.0.0.1) — all `help wanted` community-maintained. / Module Puppet + template ERB, state Salt, installeur silencieux PowerShell pour GPO/Intune — tous marqués `help wanted`.
+- **Puppet / Salt / GPO skeletons / Squelettes Puppet / Salt / GPO** — `deploy/puppet/` module + ERB template, `deploy/salt/` state, `deploy/gpo/Install-Wiretap.ps1` silent installer (ProgramData config, venv, SYSTEM scheduled task on 127.0.0.1) — all `help wanted` community-maintained. / Module Puppet + template ERB, state Salt, installeur silencieux PowerShell pour GPO/Intune — tous marqués `help wanted`.
 - **Release automation / Automatisation de release** — `.github/workflows/release.yml`: on `v*` tags, builds nfpm `.deb`/`.rpm`, renders + pushes the Homebrew formula to `aixisstudio/homebrew-tap`, submits the winget manifest (winget-releaser) and packs/pushes Chocolatey — all gated on documented secrets (`HOMEBREW_TAP_TOKEN`, `WINGET_TOKEN`, `CHOCO_API_KEY`). Formula/nuspec templates in `packaging/homebrew/` + `packaging/choco/`. / Sur tags `v*` : paquets nfpm, formule Homebrew vers le tap, manifeste winget, push Chocolatey — tout conditionné aux secrets documentés.
 - **Translated INTEGRATIONS docs / Doc INTEGRATIONS traduite** — `docs/INTEGRATIONS.{de,es,ja,pt-BR,ru,zh-CN}.md` generated with a "community translated — PRs welcome" banner. / Variantes traduites avec bandeau « traduction communautaire — PR bienvenues ».
 - **Community on GitHub / Communauté sur GitHub** — no Discord/Matrix to moderate: issues for bugs, Discussions for ideas/questions/feedback, searchable next to the code. `.github/ISSUE_TEMPLATE/config.yml` routes users to Discussions, private security advisories and the integration docs from the issue picker; README carries a Discussions badge. / Pas de Discord/Matrix à modérer : issues pour les bugs, Discussions pour idées/questions/retours — recherchable près du code. `config.yml` oriente vers Discussions, advisories privés et la doc depuis le sélecteur d'issues ; badge Discussions dans le README.
@@ -312,13 +312,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ### Added / Ajouté
 
-- **Security-as-Code config file / Fichier de config Security-as-Code** — `backend/configfile.py` applies `$SNITCH_CONFIG`, else `snitch.toml`/`snitch.json` in the data dir at startup; every declared key overrides the DB so Ansible/Puppet/GPO provision Snitch with one file (`packaging/snitch.toml.example`). / `configfile.py` applique `$SNITCH_CONFIG` ou `snitch.toml`/`.json` du data dir ; chaque clé déclarée écrase la DB — un fichier suffit pour provisionner.
+- **Security-as-Code config file / Fichier de config Security-as-Code** — `backend/configfile.py` applies `$WIRETAP_CONFIG`, else `wiretap.toml`/`wiretap.json` in the data dir at startup; every declared key overrides the DB so Ansible/Puppet/GPO provision Wiretap with one file (`packaging/wiretap.toml.example`). / `configfile.py` applique `$WIRETAP_CONFIG` ou `wiretap.toml`/`.json` du data dir ; chaque clé déclarée écrase la DB — un fichier suffit pour provisionner.
 - **Sigma rule import / Import de règles Sigma** — `POST /alerts/rules/sigma` + `detection/sigma.py`: a bounded, documented subset (field selections, `|contains`/`|startswith`/`|endswith`/`|re`/`|cidr`/`|gt`/`|lt`/`|all`, `1 of`/`all of` conditions) compiled into multi-clause AND custom rules (`conds:`); unmappable selections are reported in `skipped`, never mistranslated. / Sous-ensemble borné et documenté compilé en règles AND multi-clauses ; les sélections non mappables sont rapportées dans `skipped`.
 - **IP threat feeds / Flux TI IP** — `POST /firewall/blocklist` accepts `kind: "ip"` (Blocklist.de, URLhaus/Feodo exports, plain IP-per-line or CSV) imported as `ip` rules; private/reserved/loopback never imported, CIDRs over 4096 addresses rejected. `kind: "domain"` unchanged. / `kind: "ip"` importe les flux IP en règles `ip` ; privées/réservées jamais importées.
-- **Fleet console view / Vue console de flotte** — `GET /remote/fleet` merges every `gossip_peers` node's `/security/audit` (agent count, worst/mean hardening score, per-peer findings) — any Snitch instance can act as the collector; per-peer failures degrade gracefully. / `GET /remote/fleet` fusionne les `/security/audit` des pairs — n'importe quelle instance fait collecteur.
-- **CEF syslog output / Sortie syslog CEF** — `syslog_format: "cef"` wraps forwarded alerts in `CEF:0|Cognition|Snitch|…` (ArcSight/Wazuh/Splunk-ready) over the same UDP/TCP syslog path; `rfc3164` remains the default. / `syslog_format: "cef"` enveloppe les alertes en CEF; `rfc3164` reste le défaut.
+- **Fleet console view / Vue console de flotte** — `GET /remote/fleet` merges every `gossip_peers` node's `/security/audit` (agent count, worst/mean hardening score, per-peer findings) — any Wiretap instance can act as the collector; per-peer failures degrade gracefully. / `GET /remote/fleet` fusionne les `/security/audit` des pairs — n'importe quelle instance fait collecteur.
+- **CEF syslog output / Sortie syslog CEF** — `syslog_format: "cef"` wraps forwarded alerts in `CEF:0|Cognition|Wiretap|…` (ArcSight/Wazuh/Splunk-ready) over the same UDP/TCP syslog path; `rfc3164` remains the default. / `syslog_format: "cef"` enveloppe les alertes en CEF; `rfc3164` reste le défaut.
 - **ECS export / Export ECS** — `GET /forensics/export?format=ecs` emits NDJSON Elastic Common Schema 8.11 (alerts → `event.kind=alert`, process entries carry `file.hash.sha256`), ingestible by Elastic Agent/Logstash/OpenSearch. / NDJSON ECS 8.11 ingérable par Elastic/Logstash/OpenSearch.
-- **Deployment assets / Assets de déploiement** — hardened systemd unit (`deploy/systemd/`), Ansible role + playbook (`deploy/ansible/`), Helm chart for collector/agent modes (`deploy/helm/snitch/`), nfpm config for .deb/.rpm (`packaging/nfpm.yaml`), MkDocs site (`mkdocs.yml`), integration guide `docs/INTEGRATIONS.md` (Wazuh, Splunk, Graylog/Loki, Ansible, Docker/K8s), canonical GitHub labels (`.github/labels.yml`). / Unité systemd durcie, rôle Ansible, chart Helm (collecteur/agent), nfpm .deb/.rpm, site MkDocs, guide d'intégrations, labels GitHub.
+- **Deployment assets / Assets de déploiement** — hardened systemd unit (`deploy/systemd/`), Ansible role + playbook (`deploy/ansible/`), Helm chart for collector/agent modes (`deploy/helm/wiretap/`), nfpm config for .deb/.rpm (`packaging/nfpm.yaml`), MkDocs site (`mkdocs.yml`), integration guide `docs/INTEGRATIONS.md` (Wazuh, Splunk, Graylog/Loki, Ansible, Docker/K8s), canonical GitHub labels (`.github/labels.yml`). / Unité systemd durcie, rôle Ansible, chart Helm (collecteur/agent), nfpm .deb/.rpm, site MkDocs, guide d'intégrations, labels GitHub.
 - **Multi-clause custom rules / Règles multi-clauses** — `customrules` rules may now carry `conds:` (Sigma-style AND over any field set); the single `field/op/value` form is unchanged. / Les règles acceptent `conds:` (AND multi-champs façon Sigma) ; la forme simple est inchangée.
 
 ## [1.5.3] — 2026-10-22
@@ -352,7 +352,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ### Fixed / Corrigé
 
-- **eBPF attach scope / Portée de l'attach eBPF** — the cgroup-skb program attached at the cgroup2 *root*, which would have made every blocked-IP drop host-wide; it now attaches to the dedicated `snitch` cgroup so drops apply only to `isolate_pid()`-moved processes, as documented. / Le programme cgroup-skb s'attachait à la racine cgroup2 — chaque blocage aurait été global ; attach au cgroup `snitch` dédié désormais.
+- **eBPF attach scope / Portée de l'attach eBPF** — the cgroup-skb program attached at the cgroup2 *root*, which would have made every blocked-IP drop host-wide; it now attaches to the dedicated `wiretap` cgroup so drops apply only to `isolate_pid()`-moved processes, as documented. / Le programme cgroup-skb s'attachait à la racine cgroup2 — chaque blocage aurait été global ; attach au cgroup `wiretap` dédié désormais.
 - **iForest split quality / Qualité des splits iForest** — trees now only split on features with variance in the subset (constant columns compressed every score toward 0.5) and draw a fresh subsample per tree — measurably better baseline/outlier contrast. / Les arbres ne splittent que sur les features à variance réelle + sous-échantillon frais par arbre — contraste réel restauré.
 - **Flaky ML test / Test ML flaky** — seeded forest + realistic baseline (stable destination set) make the score assertion deterministic. / Forêt seedée + baseline réaliste rendent l'assertion déterministe.
 
@@ -371,9 +371,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 - **Syslog alerting / Alerting syslog** — `syslog_addr` (`host:port` UDP or `tcp://`) forwards warning/critical alerts as RFC 3164 datagrams (local4 facility, severity-mapped PRI) — the SIEM/Wazuh path, independent of the webhook switch; never breaks detection on failure. / `syslog_addr` relaie les alertes en datagrammes RFC 3164 — chemin SIEM/Wazuh, indépendant du webhook, jamais bloquant.
 - **Geo-aware + actionable custom rules / Règles géo + actionnables** — new `asn`/`country` fields (local .mmdb only), `eq`/`ne`/`contains` ops; `action:"block"` additionally installs a REAL firewall rule on each newly-matched remote IP (deduped per rule+target — the flow-level kill-switch). / Champs `asn`/`country` (mmdb local) ; `action:"block"` installe une vraie règle pare-feu par IP matchée (dédupliquée — kill-switch de flux).
 - **Actionable alerts / Alertes actionnables** — alert details now carry `pid`/`process`; the UI offers one-click **Block IP** (real firewall rule), **Kill**, **Suspend**, and ASK_VERDICT **Allow/Deny** buttons; explanation templates gained remediation actions for all new types. / Les alertes portent `pid`/`process` ; l'UI propose Bloquer IP, Tuer, Suspendre et Autoriser/Refuser ; gabarits d'explication avec actions de remédiation.
-- **nftables backend / Backend nftables** — Linux firewall rules, lockdown, IP-sinkhole DNAT and domain refresh now drive `nft` directly when iptables is absent (dedicated `inet snitch` table, comment-tagged handle cleanup); per-process rules refuse honestly (no PID owner match in nft). / Règles, lockdown, DNAT sinkhole et refresh domaine pilotent `nft` quand iptables est absent ; les règles par processus refusent honnêtement.
+- **nftables backend / Backend nftables** — Linux firewall rules, lockdown, IP-sinkhole DNAT and domain refresh now drive `nft` directly when iptables is absent (dedicated `inet wiretap` table, comment-tagged handle cleanup); per-process rules refuse honestly (no PID owner match in nft). / Règles, lockdown, DNAT sinkhole et refresh domaine pilotent `nft` quand iptables est absent ; les règles par processus refusent honnêtement.
 - **firejail sandbox fallback / Repli firejail** — Linux containment falls back to `firejail --net=none --quiet` when `unshare` is unavailable; `available()` reports which backend it will use. / Repli `firejail --net=none` quand `unshare` est absent ; `available()` rapporte le backend choisi.
-- **Real-OS integration tests / Tests d'intégration OS réels** — new `integration` CI job (per-OS) running `tests/test_integration_os.py` with `SNITCH_OS_INTEGRATION=1`: Linux proves `unshare -n` egress denial, real `iptables` DROP + live connect failure, `tc` clsact/flower, `perf_event_open`; Windows opens the real `fwpuclnt` engine and proves a WFP BLOCK filter with a TCP connect that fails then recovers after key-delete; macOS proves `sandbox-exec` deny-network end-to-end and hosts-file sinkhole apply/remove. Every test cleans up in `finally` and skips honestly when the primitive is unavailable. / Nouveau job CI `integration` par OS exécutant `tests/test_integration_os.py` : `unshare`, `iptables` réels + connexion probée, `tc`, `perf` sous Linux ; moteur WFP + blocage prouvé par connexion TCP sous Windows ; `sandbox-exec` + hosts sous macOS. Nettoyage en `finally`, skip honnête si la primitive manque.
+- **Real-OS integration tests / Tests d'intégration OS réels** — new `integration` CI job (per-OS) running `tests/test_integration_os.py` with `WIRETAP_OS_INTEGRATION=1`: Linux proves `unshare -n` egress denial, real `iptables` DROP + live connect failure, `tc` clsact/flower, `perf_event_open`; Windows opens the real `fwpuclnt` engine and proves a WFP BLOCK filter with a TCP connect that fails then recovers after key-delete; macOS proves `sandbox-exec` deny-network end-to-end and hosts-file sinkhole apply/remove. Every test cleans up in `finally` and skips honestly when the primitive is unavailable. / Nouveau job CI `integration` par OS exécutant `tests/test_integration_os.py` : `unshare`, `iptables` réels + connexion probée, `tc`, `perf` sous Linux ; moteur WFP + blocage prouvé par connexion TCP sous Windows ; `sandbox-exec` + hosts sous macOS. Nettoyage en `finally`, skip honnête si la primitive manque.
 - **WFP filter enums + byte order / Enums WFP + ordre des octets** — real Windows CI caught `FWP_DATA_TYPE` constants off-by-N (`BYTE_ARRAY16`=11, `BYTE_BLOB`=12, composite addr-mask types at 0x100/0x101) and host-order IPv4 encoding in `FWP_V4_ADDR_AND_MASK` (must be network order); filters now actually match traffic on real Windows. / La CI Windows réelle a attrapé des constantes `FWP_DATA_TYPE` décalées et un encodage IPv4 host-order — les filtres matchent maintenant réellement.
 - **perfprobe Windows import / Import perfprobe Windows** — `fcntl` is now imported lazily inside the Linux path instead of top-level (collection crash on Windows). / `fcntl` importé paresseusement dans le chemin Linux (crash de collecte sous Windows).## [1.4.0] — 2026-10-23
 
@@ -381,9 +381,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 - **Forensic PCAP export / Export PCAP forensique** — `GET /forensics/pcap` serializes the bounded raw-frame ring buffer (~4 MiB) into a Wireshark-ready `.pcap` written by a pure-Python `capture/pcapwriter.py`; real libpcap timestamps preserved, optional `ip`/`process` filters. / `GET /forensics/pcap` sérialise l'anneau de trames brutes (~4 Mio) en `.pcap` lisible par Wireshark via `capture/pcapwriter.py` pur Python ; timestamps réels, filtres `ip`/`process` optionnels.
 - **Outbound byte observation / Observation des octets sortants** — Frida deep inspection now also hooks `send`/`WSASend`/`sendto`/`sendmsg` where exports exist, returning bounded head bytes + SHA-256 per flow — an honest byte-observation slice, not full taint analysis. / L'inspection Frida hooke aussi `send`/`WSASend`/`sendto`/`sendmsg` quand présents — tête bornée + SHA-256 par flux : tranche d'observation honnête, pas une analyse de taint complète.
-- **Exact-membership IOC proofs / Preuves d'appartenance exactes IOC** — `format=proof` on `GET /security/iocpack` builds `snitch-ioc-proof/1`: salted SHA-256 leaves + a Merkle commitment root; `POST /security/iocpack/import` verifies membership cryptographically (zero false positives) and detects tampering. Not an interactive ZK protocol — documented as such. / `format=proof` produit `snitch-ioc-proof/1` : feuilles SHA-256 salées + racine d'engagement Merkle ; l'import vérifie l'appartenance cryptographiquement (zéro faux positif) et détecte la falsification. Pas un protocole ZK — documenté ainsi.
-- **Network-denial sandbox / Sandbox sans réseau** — `POST /security/sandbox` detonates a user-chosen executable with **zero egress**: Linux unprivileged `unshare --user --net` or macOS `sandbox-exec` deny-network; bounded runtime + output, honest unsupported-error elsewhere. `contrib/snitch-contain` is the manual twin. / `POST /security/sandbox` exécute un binaire choisi avec zéro égress : `unshare --user --net` non privilégié (Linux) ou `sandbox-exec` deny-network (macOS) ; durée + sortie bornées, erreur honnête ailleurs. `contrib/snitch-contain` est le pendant manuel.
-- **Embedded local model / Modèle local embarqué** — `slm_mode=embedded` loads a user-provided `.gguf` via the optional `llama-cpp-python` package — alert explanations fully in-process, **zero network at all**. Snitch never downloads weights. / `slm_mode=embedded` charge un `.gguf` fourni par l'utilisateur via `llama-cpp-python` optionnel — explications entièrement en processus, zéro réseau. Snitch ne télécharge jamais de poids.
+- **Exact-membership IOC proofs / Preuves d'appartenance exactes IOC** — `format=proof` on `GET /security/iocpack` builds `wiretap-ioc-proof/1`: salted SHA-256 leaves + a Merkle commitment root; `POST /security/iocpack/import` verifies membership cryptographically (zero false positives) and detects tampering. Not an interactive ZK protocol — documented as such. / `format=proof` produit `wiretap-ioc-proof/1` : feuilles SHA-256 salées + racine d'engagement Merkle ; l'import vérifie l'appartenance cryptographiquement (zéro faux positif) et détecte la falsification. Pas un protocole ZK — documenté ainsi.
+- **Network-denial sandbox / Sandbox sans réseau** — `POST /security/sandbox` detonates a user-chosen executable with **zero egress**: Linux unprivileged `unshare --user --net` or macOS `sandbox-exec` deny-network; bounded runtime + output, honest unsupported-error elsewhere. `contrib/wiretap-contain` is the manual twin. / `POST /security/sandbox` exécute un binaire choisi avec zéro égress : `unshare --user --net` non privilégié (Linux) ou `sandbox-exec` deny-network (macOS) ; durée + sortie bornées, erreur honnête ailleurs. `contrib/wiretap-contain` est le pendant manuel.
+- **Embedded local model / Modèle local embarqué** — `slm_mode=embedded` loads a user-provided `.gguf` via the optional `llama-cpp-python` package — alert explanations fully in-process, **zero network at all**. Wiretap never downloads weights. / `slm_mode=embedded` charge un `.gguf` fourni par l'utilisateur via `llama-cpp-python` optionnel — explications entièrement en processus, zéro réseau. Wiretap ne télécharge jamais de poids.
 - **Named firewall profiles / Profils pare-feu nommés** — `POST /firewall/profile` applies `permissive` (clean slate), `balanced` (conservative egress baseline: spam-SMTP + common stratum pool ports) or `strict` (baseline + lockdown) through the ordinary rule machinery, with dedup. / `POST /firewall/profile` applique `permissive` (table rase), `balanced` (base sortante prudente) ou `strict` (base + lockdown) via la machinerie de règles ordinaire, avec dédup.
 - **Custom alert rules / Règles d'alerte personnalisées** — user-defined matchers (`remote_ip`, `host`, `process_name`, `remote_port`, `protocol`, `direction`, `size` × `eq`/`ne`/`contains`/`regex`/`gt`/`lt`/`cidr`) raising `CUSTOM_RULE` alerts; persisted, bounded regex cache, validated at creation, alert-only (never blocks). / Filtres définis par l'utilisateur levant des alertes `CUSTOM_RULE` ; persistés, cache regex borné, validés à la création, alerte seule (jamais de blocage).
 - **Blocklist import / Import de blocklist** — `POST /firewall/blocklist` turns a local hosts/domain file (purely local) or an **opt-in** remote URL (bounded HTTPS fetch, `remote_fetch` flagged in the response) into `domain` rules, deduplicated and capped at 500–5000 entries. / `POST /firewall/blocklist` convertit un fichier local ou une URL opt-in (fetch HTTPS borné, `remote_fetch` signalé) en règles `domain` dédupliquées, plafonnées à 500–5000.
@@ -413,8 +413,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 ### Added / Ajouté
 
 - **Outbound firewall orchestration / Orchestration du pare-feu sortant** — user rules (`ip`, `cidr`, `domain`, `process`, `port`) applied to the OS-native firewall best-effort: `netsh advfirewall` on Windows, `iptables` on Linux, a generated `pf` anchor on macOS. Persisted, re-applied at startup, honest `applied=False` when privileges are missing (matching + `BLOCKED_ATTEMPT` counters still work). / Règles utilisateur (`ip`, `cidr`, `domain`, `process`, `port`) appliquées au pare-feu natif OS au mieux : `netsh` sous Windows, `iptables` sous Linux, ancre `pf` sous macOS. Persistées, réappliquées au démarrage, `applied=False` honnête sans privilèges (matching + compteurs `BLOCKED_ATTEMPT` actifs).
-- **Lockdown / Confinement** — panic switch dropping outbound traffic to public IPs while keeping loopback/LAN alive (Linux `SNITCH_LOCK` chain, `netsh` rules, `pf` anchor). / Interrupteur panique coupant le trafic sortant vers les IP publiques tout en préservant loopback/LAN.
-- **Process actions / Actions processus** — `POST /processes/kill` and `POST /processes/suspend` (by PID, refuses PIDs ≤ 3 and Snitch itself); kill/suspend buttons in the process list. / `POST /processes/kill` et `POST /processes/suspend` (par PID, refuse les PID ≤ 3 et Snitch) ; boutons kill/suspend dans la liste des processus.
+- **Lockdown / Confinement** — panic switch dropping outbound traffic to public IPs while keeping loopback/LAN alive (Linux `WIRETAP_LOCK` chain, `netsh` rules, `pf` anchor). / Interrupteur panique coupant le trafic sortant vers les IP publiques tout en préservant loopback/LAN.
+- **Process actions / Actions processus** — `POST /processes/kill` and `POST /processes/suspend` (by PID, refuses PIDs ≤ 3 and Wiretap itself); kill/suspend buttons in the process list. / `POST /processes/kill` et `POST /processes/suspend` (par PID, refuse les PID ≤ 3 et Wiretap) ; boutons kill/suspend dans la liste des processus.
 - **Threat intelligence (opt-in) / Threat intel (opt-in)** — reputation checks against AbuseIPDB, AlienVault OTX or VirusTotal with your own API key; off by default, one call per newly-seen public IP, bounded LRU cache + dedup, `THREAT_HIT` alerts on suspicious/malicious verdicts. / Vérifs de réputation via AbuseIPDB, AlienVault OTX ou VirusTotal avec votre clé ; désactivé par défaut, un appel par IP publique nouvelle, cache LRU borné + dédup, alertes `THREAT_HIT`.
 - **External webhooks (opt-in) / Webhooks externes (opt-in)** — warning/critical alerts POSTed live to Discord, Slack, Telegram (with chat ID) or any endpoint; off by default. / Alertes warning/critiques POSTées en direct vers Discord, Slack, Telegram ou tout endpoint ; désactivé par défaut.
 - **Detection additions / Ajouts de détection** — `DNS_TUNNEL` (oversized DNS names/labels), `CLEARTEXT` (FTP/Telnet/HTTP/plain-mail egress), `BASELINE_DEVIATION` (per-process learned country profile, persisted). / `DNS_TUNNEL` (noms/labels DNS surdimensionnés), `CLEARTEXT` (sorties FTP/Telnet/HTTP/mail en clair), `BASELINE_DEVIATION` (profil pays appris par processus, persisté).
@@ -422,7 +422,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 - **Forensics export / Export forensique** — `GET /forensics/export?format=json|csv|stix` bundles process tree, executable SHA-256, matching alerts and traffic history; STIX is a minimal 2.1 bundle (indicators + observed-data) for SIEM import. / `GET /forensics/export?format=json|csv|stix` — arbre de processus, SHA-256 de l'exécutable, alertes et historique ; STIX = bundle 2.1 minimal pour SIEM.
 - **Firewall & security UI / UI pare-feu & sécurité** — dedicated panel: lockdown switch, rule create/toggle/delete, per-rule blocked counters, platform-support honesty, audit report, forensics download buttons; per-connection Block action in the sidebar. / Panneau dédié : lockdown, création/bascule/suppression de règles, compteurs bloqués par règle, honnêteté plateforme, rapport d'audit, boutons d'export forensique ; action Bloquer par connexion dans la sidebar.
 - **Five new UI locales / Cinq nouvelles locales** — de, ru, ja, pt-BR, zh-CN (8 total, 280-key parity-checked); dictionaries moved to `frontend/src/locales/*.js` so a new language is a single-file PR. / de, ru, ja, pt-BR, zh-CN (8 au total, parité 280 clés) ; dictionnaires déplacés vers `frontend/src/locales/*.js` — une nouvelle langue = PR d'un fichier.
-- **Sinkhole rule action / Action sinkhole** — `POST /firewall/rules` accepts `action: "sinkhole"`: domains are redirected to loopback via a marked `# snitch-sinkhole` block in the hosts file (all OSes), IPs/CIDRs via iptables `DNAT` in the nat OUTPUT chain (Linux only). `sinkhole` on `process`/`port` is rejected; unsupported platforms report `applied=False` honestly. / `action: "sinkhole"` : les domaines sont redirigés vers loopback via un bloc marqué dans le fichier hosts (tous OS), les IP/CIDR via `DNAT` iptables (Linux). Rejeté pour `process`/`port` ; plateformes non gérées → `applied=False` honnête.
+- **Sinkhole rule action / Action sinkhole** — `POST /firewall/rules` accepts `action: "sinkhole"`: domains are redirected to loopback via a marked `# wiretap-sinkhole` block in the hosts file (all OSes), IPs/CIDRs via iptables `DNAT` in the nat OUTPUT chain (Linux only). `sinkhole` on `process`/`port` is rejected; unsupported platforms report `applied=False` honestly. / `action: "sinkhole"` : les domaines sont redirigés vers loopback via un bloc marqué dans le fichier hosts (tous OS), les IP/CIDR via `DNAT` iptables (Linux). Rejeté pour `process`/`port` ; plateformes non gérées → `applied=False` honnête.
 - **Domain rules re-resolution / Re-résolution des règles domaine** — enabled `domain` rules re-resolve every ~10 min; the resolved-IP delta is applied per-OS so CDN rotation can't silently unblock a name. / Les règles `domain` actives sont re-résolues toutes les ~10 min ; le delta d'IP est appliqué par OS pour que la rotation CDN ne débloque pas un nom en silence.
 - **Process integrity watch / Veille d'intégrité des processus** — on by default (read-only, local): SHA-256 baselines of networked executables (`BINARY_CHANGED`, persisted `integrity_baselines`), name/exe mismatch (`NAME_MISMATCH`), Linux-only `rwxp` maps scan (`MEM_RWX`, info-level for known JIT apps). `GET /security/integrity` reports capabilities; `POST /security/integrity/check` forces a PID re-check; Settings toggle. / Activée par défaut (lecture seule, local) : baselines SHA-256 des exécutables en réseau (`BINARY_CHANGED`, `integrity_baselines` persisté), mismatch nom/exe (`NAME_MISMATCH`), scan `rwxp` Linux (`MEM_RWX`, niveau info pour les apps JIT connues). `GET /security/integrity`, `POST /security/integrity/check`, interrupteur dans Réglages.
 - **Alert explanations / Explications d'alertes** — `GET /security/explain?type=X` returns hand-written bilingual (EN/FR) explanations (meaning, why it matters, next steps) for every alert type; deterministic and offline — not a model. The UI shows them behind a "Why?" button on each alert. / `GET /security/explain?type=X` renvoie des explications bilingues (EN/FR) écrites à la main pour chaque type d'alerte ; déterministes et hors-ligne — pas un modèle. Bouton « Pourquoi ? » sur chaque alerte.
@@ -431,11 +431,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ### Added / Ajouté
 
-- **Auto-update / Mise à jour automatique** — the desktop app checks GitHub Releases at launch and every 6 h via electron-updater (the `latest-*.yml` feeds were already published). Downloads install on restart; tray menu and Settings show live status. Opt-out in Settings or via `SNITCH_NO_UPDATE=1`. / L'app bureau vérifie les releases GitHub au lancement puis toutes les 6 h via electron-updater. Installation au redémarrage ; statut en direct dans le tray et les Réglages. Désactivation dans Réglages ou via `SNITCH_NO_UPDATE=1`.
+- **Auto-update / Mise à jour automatique** — the desktop app checks GitHub Releases at launch and every 6 h via electron-updater (the `latest-*.yml` feeds were already published). Downloads install on restart; tray menu and Settings show live status. Opt-out in Settings or via `WIRETAP_NO_UPDATE=1`. / L'app bureau vérifie les releases GitHub au lancement puis toutes les 6 h via electron-updater. Installation au redémarrage ; statut en direct dans le tray et les Réglages. Désactivation dans Réglages ou via `WIRETAP_NO_UPDATE=1`.
 - **QUIC / HTTP/3 visibility / visibilité QUIC/HTTP3** — UDP/443 flows are labelled `QUIC/HTTP3` instead of being lumped into HTTPS or unknown. The QUIC Initial's SNI is encrypted and is never read — the label is honest about what is observable. / Les flux UDP/443 sont étiquetés `QUIC/HTTP3` au lieu d'être rangés en HTTPS ou inconnu. Le SNI du paquet Initial QUIC est chiffré et jamais lu — l'étiquette reste honnête.
 - **Watchlist** — pin IPs or domain suffixes (`example.com` also matches `api.example.com`); a dedicated `WATCHLIST_HIT` alert fires on first contact, rate-limited per (entry, host). Persisted, managed in Settings. / Épinglez des IP ou suffixes de domaine ; l'alerte dédiée `WATCHLIST_HIT` tire au premier contact, limitée par (entrée, hôte). Persistée, gérée dans Réglages.
 - **Per-process upload alert / Alerte d'envoi par processus** — `UPLOAD_SPIKE` warns when one process exceeds a configurable MB/min ceiling (default 50, 0 = off) — covers exfiltration that the baseline-relative `VOLUME_SPIKE` misses on cold-start processes. / `UPLOAD_SPIKE` alerte quand un processus dépasse un plafond Mo/min réglable (50 par défaut, 0 = off) — couvre l'exfiltration que le `VOLUME_SPIKE` relatif rate sur les processus frais.
-- **Capture interface selector / Sélecteur d'interface de capture** — `GET/POST /capture/interfaces` + a Settings dropdown listing libpcap devices; switching restarts capture instantly. Replaces the `SNITCH_IFACE` env var for desktop users. / `GET/POST /capture/interfaces` + liste déroulante dans Réglages ; le changement redémarre la capture aussitôt. Remplace la variable `SNITCH_IFACE`.
+- **Capture interface selector / Sélecteur d'interface de capture** — `GET/POST /capture/interfaces` + a Settings dropdown listing libpcap devices; switching restarts capture instantly. Replaces the `WIRETAP_IFACE` env var for desktop users. / `GET/POST /capture/interfaces` + liste déroulante dans Réglages ; le changement redémarre la capture aussitôt. Remplace la variable `WIRETAP_IFACE`.
 - **Wi-Fi context / Contexte Wi-Fi** — the toolbar shows the current SSID (or the capture interface when not on Wi-Fi). Best-effort per OS, 60 s cache. / La barre d'outils affiche le SSID courant (ou l'interface hors Wi-Fi). Au mieux par OS, cache 60 s.
 - **Spanish UI / UI espagnole** — full `es` dictionary (194 keys, parity-checked); the language toggle is now EN/FR/ES. / Dictionnaire `es` complet (194 clés, parité vérifiée) ; le sélecteur devient EN/FR/ES.
 - **Snap package / Paquet snap** — electron-builder now emits a strict-confinement `.snap` (with the `network-observe` plug for AF_PACKET capture). Flatpak is deliberately not shipped — the sandbox cannot expose raw packet capture (documented in `docs/PACKAGING.md`). / electron-builder émet un `.snap` en confinement strict (plug `network-observe` pour la capture AF_PACKET). Pas de Flatpak — la sandbox ne peut pas exposer la capture brute (documenté dans `docs/PACKAGING.md`).
@@ -455,16 +455,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ### Fixed / Corrigé
 
-- **AppImage catalog compliance / conformité au catalogue AppImage** — the Linux asset is now named `Snitch-x86_64.AppImage` (proper architecture naming) and electron-builder publishes GitHub update metadata (`latest-linux.yml` + `.zsync`), enabling auto-update through AppImageUpdate-compatible tools. / L'asset Linux est désormais nommé `Snitch-x86_64.AppImage` (nommage d'architecture correct) et electron-builder publie les métadonnées de mise à jour GitHub (`latest-linux.yml` + `.zsync`), permettant l'auto-mise à jour via les outils compatibles AppImageUpdate.
+- **AppImage catalog compliance / conformité au catalogue AppImage** — the Linux asset is now named `Wiretap-x86_64.AppImage` (proper architecture naming) and electron-builder publishes GitHub update metadata (`latest-linux.yml` + `.zsync`), enabling auto-update through AppImageUpdate-compatible tools. / L'asset Linux est désormais nommé `Wiretap-x86_64.AppImage` (nommage d'architecture correct) et electron-builder publie les métadonnées de mise à jour GitHub (`latest-linux.yml` + `.zsync`), permettant l'auto-mise à jour via les outils compatibles AppImageUpdate.
 
 ## [1.0.6] — 2026-10-21
 
 ### Added / Ajouté
 
 - **One download per OS / Un téléchargement par OS** — every tag now ships ready-to-run apps built by CI: / chaque tag publie des apps prêtes à lancer, construites par la CI :
-  - **Windows** — `Snitch Setup <version>.exe` (Electron + NSIS: native window, tray, built-in Npcap check, UAC prompt at backend spawn) and `Snitch-Lite-Setup-<version>-windows-x64.exe` (Inno Setup: backend only, UI opens in the browser). / installeur NSIS Electron (fenêtre native, tray, détection Npcap intégrée, prompt UAC) et variante Inno Lite (backend seul, UI dans le navigateur).
-  - **macOS (Apple Silicon)** — `Snitch-<version>-macos-arm64.zip` + `.dmg` built in CI (previously manual). / zip + dmg construits en CI (auparavant manuels).
-  - **Linux** — `Snitch-<version>.AppImage` + `.deb` — no more Docker requirement for the desktop app. / AppImage + deb — Docker n'est plus obligatoire pour l'app de bureau.
+  - **Windows** — `Wiretap Setup <version>.exe` (Electron + NSIS: native window, tray, built-in Npcap check, UAC prompt at backend spawn) and `Wiretap-Lite-Setup-<version>-windows-x64.exe` (Inno Setup: backend only, UI opens in the browser). / installeur NSIS Electron (fenêtre native, tray, détection Npcap intégrée, prompt UAC) et variante Inno Lite (backend seul, UI dans le navigateur).
+  - **macOS (Apple Silicon)** — `Wiretap-<version>-macos-arm64.zip` + `.dmg` built in CI (previously manual). / zip + dmg construits en CI (auparavant manuels).
+  - **Linux** — `Wiretap-<version>.AppImage` + `.deb` — no more Docker requirement for the desktop app. / AppImage + deb — Docker n'est plus obligatoire pour l'app de bureau.
 - **`--launcher` backend mode / mode backend `--launcher`** — picks a free loopback port, computes the API token and opens the browser; used by the Lite installer shortcut. / port loopback libre + jeton API + ouverture du navigateur ; utilisé par le raccourci de l'installeur Lite.
 
 ### Fixed / Corrigé
@@ -486,7 +486,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 ### Fixed / Corrigé
 
 - Backend crash on `console=False` PyInstaller builds (`sys.stdout`/`sys.stderr` = None) — issue #25. / Crash backend sur les builds PyInstaller `console=False`.
-- Capture interface selection on Windows — Snitch now picks the interface carrying the default route instead of `vEthernet (WSL)`. / Sélection de l'interface de capture sous Windows — Snitch choisit celle qui porte la route par défaut.
+- Capture interface selection on Windows — Wiretap now picks the interface carrying the default route instead of `vEthernet (WSL)`. / Sélection de l'interface de capture sous Windows — Wiretap choisit celle qui porte la route par défaut.
 - `NaNh ago` on alert timestamps with timezone offsets. / Horodatages d'alertes affichant « NaNh ago ».
 - Electron splash no longer hides error dialogs; timeout message lists causes + log folder. / Le splash Electron ne masque plus les dialogues d'erreur.
 - Four leftover English strings translated in the French dictionary (external contribution). / Quatre chaînes anglaises restantes traduites (contribution externe).

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Snitch — HTML shell.
+  Wiretap — HTML shell.
 
   EN: Single entry point for the Vite/React app. The #root div is where React
       mounts; everything else lives in src/.
@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="logo-180.png" />
-    <title>Snitch — Track every hidden flow. / Traquez chaque flux masqué.</title>
+    <title>Wiretap — Track every hidden flow. / Traquez chaque flux masqué.</title>
     <style>
       /* EN: Global reset + dark base theme.
          FR: Reset global + thème sombre de base. */
@@ -83,7 +83,7 @@
          Pas de flash de couleur. */
       (function () {
         var t = null;
-        try { t = localStorage.getItem('snitch_theme'); } catch (e) {}
+        try { t = localStorage.getItem('wiretap_theme'); } catch (e) {}
         if (t !== 'light' && t !== 'dark') {
           t = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches)
             ? 'light' : 'dark';

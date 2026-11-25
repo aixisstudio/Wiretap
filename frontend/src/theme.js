@@ -23,8 +23,8 @@ export function useTheme() {
   const [theme, setTheme] = useState(currentTheme)
   useEffect(() => {
     const onChange = () => setTheme(currentTheme())
-    window.addEventListener('snitch-theme', onChange)
-    return () => window.removeEventListener('snitch-theme', onChange)
+    window.addEventListener('wiretap-theme', onChange)
+    return () => window.removeEventListener('wiretap-theme', onChange)
   }, [])
   return theme
 }

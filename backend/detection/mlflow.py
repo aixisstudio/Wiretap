@@ -1,5 +1,5 @@
 """
-Snitch — ML flow anomaly scoring / scoring ML des flux.
+Wiretap — ML flow anomaly scoring / scoring ML des flux.
 
 EN: Feeds outbound flow summaries through a bounded pure-Python
     IsolationForest (detection/iforest.py) and raises ML_ANOMALY when a

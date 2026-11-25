@@ -2,7 +2,7 @@
 
 [English](CONTRIBUTING.md) | [Français](CONTRIBUTING.md) | [Español](CONTRIBUTING.es.md) | **Deutsch** | [Русский](CONTRIBUTING.ru.md) | [日本語](CONTRIBUTING.ja.md) | [Português](CONTRIBUTING.pt-BR.md) | [中文](CONTRIBUTING.zh-CN.md)
 
-Danke für dein Interesse! Snitch ist ein zweisprachiges Projekt (EN/FR) —
+Danke für dein Interesse! Wiretap ist ein zweisprachiges Projekt (EN/FR) —
 Code-Kommentare und Nutzertexte sollten wo möglich in beiden Sprachen
 vorliegen. Die UI hat 8 Locales in `frontend/src/locales/` — eine neue
 Sprache ist eine von `en.js` kopierte Datei (Schlüsselparität beachten)

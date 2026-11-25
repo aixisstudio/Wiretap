@@ -1,5 +1,5 @@
 /**
- * Snitch — firewall & security panel.
+ * Wiretap — firewall & security panel.
  *
  * EN: Slide-over panel for the outbound-firewall orchestration: a lockdown
  *     panic switch, user rules (IP / domain / process / port) with
@@ -131,7 +131,7 @@ export function FirewallPanel({ onClose, onLockdownChange }) {
     const blob = await res.blob()
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = 'snitch-ioc-pack.json'
+    a.download = 'wiretap-ioc-pack.json'
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -167,7 +167,7 @@ export function FirewallPanel({ onClose, onLockdownChange }) {
     const blob = await res.blob()
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = `snitch-forensics.${format === 'stix' ? 'stix.json' : format}`
+    a.download = `wiretap-forensics.${format === 'stix' ? 'stix.json' : format}`
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -259,7 +259,7 @@ export function FirewallPanel({ onClose, onLockdownChange }) {
     const blob = await res.blob()
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = 'snitch-capture.pcap'
+    a.download = 'wiretap-capture.pcap'
     a.click()
     URL.revokeObjectURL(a.href)
   }

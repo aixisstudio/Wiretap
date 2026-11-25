@@ -2,7 +2,7 @@
 
 [English](CHANGELOG.md) | [Français](CHANGELOG.md) | [Español](CHANGELOG.es.md) | [Deutsch](CHANGELOG.de.md) | [Русский](CHANGELOG.ru.md) | [日本語](CHANGELOG.ja.md) | [Português](CHANGELOG.pt-BR.md) | **中文**
 
-Snitch 的所有重要变更。
+Wiretap 的所有重要变更。
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/)。
 
@@ -15,21 +15,21 @@ Snitch 的所有重要变更。
 - **高熵检测** — 明文套接字上接近随机的载荷头部（≥4.7 比特/字节）→ `HIGH_ENTROPY`（隐蔽加密/隐写迹象）。
 - **Isolation Forest（纯 Python）** — `detection/iforest.py` + `mlflow.py` 用 6 个特征为出站流打分；score ≥0.62 触发 `ML_ANOMALY`，学习不足 384 流时保持惰性。
 - **Ask-on-connect（Linux NFQUEUE，可选）** — `ask_enabled` 将新出站流挂入队列 7 直到 `POST /security/ask/verdict` — 真实判定权，超时默认丢弃。
-- **eBPF 出站执行** — `detection/ebpf_enforce.py` + `POST /security/ebpf/isolate|block` — 仅对 snitch cgroup 内进程进行内核级丢弃。
+- **eBPF 出站执行** — `detection/ebpf_enforce.py` + `POST /security/ebpf/isolate|block` — 仅对 wiretap cgroup 内进程进行内核级丢弃。
 - **空心化证据** — `POST /security/hollow` 对比 RAM 中可执行页与磁盘文件（Linux，`/proc`）。
 - **IOC 节点同步** — `gossip_peers` + `gossip_enabled`：每 5 分钟向显式列出的节点推送加盐 Merkle 包 — 仅哈希承诺，无发现机制。
 - **Syslog** — `syslog_addr`（UDP 或 `tcp://`）以 RFC 3164 转发警告/严重告警 — SIEM/Wazuh 路径。
 - **地理规则 + 自动封锁** — 自定义规则支持 `asn`/`country`（本地 mmdb）与 `action:"block"`，为每个匹配 IP 安装真实防火墙规则。
 - **可操作告警 + 设置界面** — 每条告警提供封锁 IP / 终止 / 挂起 / 允许-拒绝；设置中新增控件（syslog、ask、节点）。
-- **nftables 后端 + firejail** — 无 iptables 时使用 `nft`（专用 `inet snitch` 表）；`firejail --net=none` 作为沙箱回退。
+- **nftables 后端 + firejail** — 无 iptables 时使用 `nft`（专用 `inet wiretap` 表）；`firejail --net=none` 作为沙箱回退。
 
 ## [Unreleased]
 
 ### 新增
 
 - **出站防火墙编排** — 用户规则（`ip`、`cidr`、`domain`、`process`、`port`）以 best-effort 方式应用到 OS 原生防火墙：Windows 用 `netsh advfirewall`，Linux 用 `iptables`，macOS 生成 `pf` 锚点。规则持久化、启动时重新应用，无权限时如实返回 `applied=False`（匹配与 `BLOCKED_ATTEMPT` 计数仍然工作）。
-- **Lockdown** —— 一键切断指向公网 IP 的出站流量，同时保留 loopback/LAN（Linux 的 `SNITCH_LOCK` 链、`netsh` 规则、`pf` 锚点）。
-- **进程操作** —— `POST /processes/kill` 与 `POST /processes/suspend`（按 PID，拒绝 PID ≤ 3 及 Snitch 自身）；进程列表内提供 kill/suspend 按钮。
+- **Lockdown** —— 一键切断指向公网 IP 的出站流量，同时保留 loopback/LAN（Linux 的 `WIRETAP_LOCK` 链、`netsh` 规则、`pf` 锚点）。
+- **进程操作** —— `POST /processes/kill` 与 `POST /processes/suspend`（按 PID，拒绝 PID ≤ 3 及 Wiretap 自身）；进程列表内提供 kill/suspend 按钮。
 - **威胁情报（opt-in）** —— 使用你自己的 API key 对 AbuseIPDB、AlienVault OTX 或 VirusTotal 做信誉核查；默认关闭，每个新出现的公网 IP 仅调用一次，有界 LRU 缓存 + 去重，可疑/恶意判定触发 `THREAT_HIT` 告警。
 - **外部 Webhook（opt-in）** —— warning/critical 告警实时 POST 到 Discord、Slack、Telegram（带 chat ID）或任意端点；默认关闭。
 - **新增检测** —— `DNS_TUNNEL`（超长 DNS 名/标签）、`CLEARTEXT`（FTP/Telnet/HTTP/明文邮件出站）、`BASELINE_DEVIATION`（按进程学习的国家画像，持久化）。
@@ -42,11 +42,11 @@ Snitch 的所有重要变更。
 
 ### 新增
 
-- **自动更新** —— 桌面应用启动时及每 6 小时通过 electron-updater 检查 GitHub Releases（`latest-*.yml` feed 早已发布）。下载在重启时安装；托盘与设置实时显示状态。可在设置中或通过 `SNITCH_NO_UPDATE=1` 关闭。
+- **自动更新** —— 桌面应用启动时及每 6 小时通过 electron-updater 检查 GitHub Releases（`latest-*.yml` feed 早已发布）。下载在重启时安装；托盘与设置实时显示状态。可在设置中或通过 `WIRETAP_NO_UPDATE=1` 关闭。
 - **QUIC / HTTP/3 可见性** —— UDP/443 流量标记为 `QUIC/HTTP3`，不再归入 HTTPS 或未知。QUIC Initial 的 SNI 已加密且从不读取——标签如实反映可观测内容。
 - **Watchlist** —— 可固定 IP 或域名后缀（`example.com` 同样匹配 `api.example.com`）；专用 `WATCHLIST_HIT` 告警在首次接触时触发，按（条目，主机）限流。持久化，在设置中管理。
 - **按进程上传告警** —— 当进程超过可配置的 MB/分钟上限（默认 50，0 = 关闭）时 `UPLOAD_SPIKE` 告警——覆盖基线相对 `VOLUME_SPIKE` 在新进程上漏掉的外传行为。
-- **抓包接口选择器** —— `GET/POST /capture/interfaces` + 设置页列出 libpcap 设备的下拉框；切换即时重启抓包。替代桌面用户的 `SNITCH_IFACE` 环境变量。
+- **抓包接口选择器** —— `GET/POST /capture/interfaces` + 设置页列出 libpcap 设备的下拉框；切换即时重启抓包。替代桌面用户的 `WIRETAP_IFACE` 环境变量。
 - **Wi-Fi 上下文** —— 工具栏显示当前 SSID（非 Wi-Fi 时显示抓包接口）。按 OS best-effort，缓存 60 秒。
 - **西班牙语 UI** —— 完整 `es` 词典（194 键，奇偶校验通过）；语言切换变为 EN/FR/ES。
 - **Snap 包** —— electron-builder 现输出 strict confinement 的 `.snap`（带 `network-observe` 插口用于 AF_PACKET 抓包）。Flatpak 有意不提供——沙箱无法暴露原始抓包（见 `docs/PACKAGING.md`）。
@@ -66,16 +66,16 @@ Snitch 的所有重要变更。
 
 ### 修复
 
-- **AppImage 目录合规** —— Linux 资产更名为 `Snitch-x86_64.AppImage`（正确的架构命名），electron-builder 发布 GitHub 更新元数据（`latest-linux.yml` + `.zsync`），使兼容 AppImageUpdate 的工具可以自动更新。
+- **AppImage 目录合规** —— Linux 资产更名为 `Wiretap-x86_64.AppImage`（正确的架构命名），electron-builder 发布 GitHub 更新元数据（`latest-linux.yml` + `.zsync`），使兼容 AppImageUpdate 的工具可以自动更新。
 
 ## [1.0.6] — 2026-10-21
 
 ### 新增
 
 - **每个 OS 一个下载** —— 每个 tag 发布 CI 构建的即用应用：
-  - **Windows** —— `Snitch Setup <version>.exe`（Electron + NSIS：原生窗口、托盘、内置 Npcap 检测、后端启动时 UAC 提示）与 `Snitch-Lite-Setup-<version>-windows-x64.exe`（Inno Setup：仅后端，UI 在浏览器打开）。
-  - **macOS (Apple Silicon)** —— CI 构建 `Snitch-<version>-macos-arm64.zip` + `.dmg`（此前为手工）。
-  - **Linux** —— `Snitch-<version>.AppImage` + `.deb` —— 桌面应用不再需要 Docker。
+  - **Windows** —— `Wiretap Setup <version>.exe`（Electron + NSIS：原生窗口、托盘、内置 Npcap 检测、后端启动时 UAC 提示）与 `Wiretap-Lite-Setup-<version>-windows-x64.exe`（Inno Setup：仅后端，UI 在浏览器打开）。
+  - **macOS (Apple Silicon)** —— CI 构建 `Wiretap-<version>-macos-arm64.zip` + `.dmg`（此前为手工）。
+  - **Linux** —— `Wiretap-<version>.AppImage` + `.deb` —— 桌面应用不再需要 Docker。
 - **`--launcher` 后端模式** —— 选取空闲 loopback 端口、计算 API token 并打开浏览器；供 Lite 安装包快捷方式使用。
 
 ### 修复
@@ -97,7 +97,7 @@ Snitch 的所有重要变更。
 ### 修复
 
 - `console=False` PyInstaller 构建的后端崩溃（`sys.stdout`/`sys.stderr` = None）——issue #25。
-- Windows 抓包接口选择——Snitch 现在选择默认路由所在接口，而非 `vEthernet (WSL)`。
+- Windows 抓包接口选择——Wiretap 现在选择默认路由所在接口，而非 `vEthernet (WSL)`。
 - 带时区偏移的告警时间显示 `NaNh ago`。
 - Electron 启动画面不再遮挡错误对话框；超时信息列出原因 + 日志目录。
 - 法语词典中残留的四条英文字符串已翻译（外部贡献）。

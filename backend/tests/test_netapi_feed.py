@@ -46,7 +46,7 @@ def test_api_firewall_presets_lists_netapi():
     """EN: GET /firewall/presets exposes the preset.
     FR: GET /firewall/presets expose le préréglage."""
     client = TestClient(app)
-    resp = client.get("/firewall/presets", headers={"X-Snitch-Token": API_TOKEN})
+    resp = client.get("/firewall/presets", headers={"X-Wiretap-Token": API_TOKEN})
     assert resp.status_code == 200
     preset = resp.json()["presets"]["netapi_compromised"]
     assert preset["kind"] == "ip"
@@ -68,7 +68,7 @@ def test_api_firewall_blocklist_netapi_preset_resolution(monkeypatch):
     client = TestClient(app)
     resp = client.post(
         "/firewall/blocklist",
-        headers={"X-Snitch-Token": API_TOKEN},
+        headers={"X-Wiretap-Token": API_TOKEN},
         json={"preset": "netapi_compromised", "action": "block", "max_entries": 100},
     )
     assert resp.status_code == 200

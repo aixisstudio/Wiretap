@@ -1,5 +1,5 @@
 """
-Snitch — interactive ask-on-first-connect (Linux NFQUEUE) / demande
+Wiretap — interactive ask-on-first-connect (Linux NFQUEUE) / demande
 interactive à la première connexion (NFQUEUE Linux).
 
 EN: The honest user-mode slice of "ask before letting a new outbound flow
@@ -231,7 +231,7 @@ class AskMode:
         self._rule_installed = True
         self._running = True
         self._thread = threading.Thread(target=self._run, daemon=True,
-                                        name="snitch-askmode")
+                                        name="wiretap-askmode")
         self._thread.start()
         return True, ""
 
@@ -368,7 +368,7 @@ class AskMode:
                           "timeout_s": int(self._timeout)})
             threading.Thread(target=self._waiter, args=(key, ev),
                              daemon=True,
-                             name="snitch-ask-waiter").start()
+                             name="wiretap-ask-waiter").start()
         except Exception:                          # noqa: BLE001
             try:
                 self._nfq.verdict(pid, True)       # EN: never wedge host

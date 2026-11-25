@@ -4,7 +4,7 @@
 
 ## 现状
 
-Snitch 的 Windows 和 macOS 构建**均未签名**。这是诚实且刻意的决定：
+Wiretap 的 Windows 和 macOS 构建**均未签名**。这是诚实且刻意的决定：
 我们不会发布使签名失去意义的自签名证书，也不会在为开源项目存在
 合法免费途径时购买证书。
 
@@ -17,10 +17,10 @@ Authenticode 签名**。获批项目获得 `release-signing` 策略，产生公�
 ### 配置（一次性，仅维护者）
 
 1. 在 <https://signpath.org/apply> 申请——表单需要姓名、邮箱、项目名、
-   仓库 URL 和描述。人工审核（数天）。Snitch 满足全部公开条件：
+   仓库 URL 和描述。人工审核（数天）。Wiretap 满足全部公开条件：
    AGPL-3.0（OSI 批准，无双许可）、源码完全公开、活跃维护、已在
    GitHub Releases 发布、有文档。**申请已提交——等待审核。**
-2. 创建 SignPath 组织、一个**项目**（slug，如 `Snitch`），关联可信
+2. 创建 SignPath 组织、一个**项目**（slug，如 `Wiretap`），关联可信
    构建系统 *GitHub.com*，并在本仓库安装 SignPath GitHub App（来源
    验证所必需）。
 3. 创建仅限 tag 构建的 **release-signing 策略**，artifact 配置覆盖
@@ -39,7 +39,7 @@ Apple 要求付费的 **Developer Program** 会员（$99/年）才能获得
 Developer ID 证书 + 公证。没有合法的免费替代方案。在此之前：
 
 - `.zip`/`.dmg` 保持未签名——首次启动需**右键 → 打开**，或
-  `xattr -d com.apple.quarantine Snitch.app`
+  `xattr -d com.apple.quarantine Wiretap.app`
 - 每个 release 的 SHA256 校验和可验证完整性
 - 公开的 CI 构建日志提供来源证明（可复现流水线）
 

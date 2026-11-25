@@ -13,7 +13,7 @@ do repositório. Não abra issues públicas para problemas de segurança.
 A API expõe todo o seu grafo de tráfego — é protegida por design:
 
 - **Autenticação por token** em todo endpoint REST e no WebSocket
-  (`X-Snitch-Token` ou `?token=`). Gerado por execução no Electron,
+  (`X-Wiretap-Token` ou `?token=`). Gerado por execução no Electron,
   persistido com permissões 0600 nos demais modos.
 - **Bind em loopback** (`127.0.0.1`) por padrão em todos os modos.
 - **Allowlist de Origin** no handshake WebSocket (hosts loopback + `null`)

@@ -2,7 +2,7 @@
 
 [English](threat-model.md) | [Français](threat-model.md) | [Español](threat-model.es.md) | [Deutsch](threat-model.de.md) | [Русский](threat-model.ru.md) | [日本語](threat-model.ja.md) | **Português** | [中文](threat-model.zh-CN.md)
 
-## O que é o Snitch
+## O que é o Wiretap
 
 Um visualizador de tráfego de rede local-first. Captura pacotes no host,
 atribui a processos, enriquece **offline** (geolocalização `.mmdb` local,
@@ -14,13 +14,13 @@ mapas DNS/SNI locais) e renderiza numa UI web servida pelo mesmo processo.
 - Seus metadados de tráfego (IPs de destino, portas, volumes, processos).
 - O token de API (por execução no Electron, por instalação em CLI/Docker).
 - A base SQLite local (`traffic`, `alerts_log`, históricos, configurações).
-- A integridade da própria máquina (um Snitch comprometido poderia mentir).
+- A integridade da própria máquina (um Wiretap comprometido poderia mentir).
 
 ## Fronteiras de confiança
 
 | Fronteira | Ameaça | Mitigação |
 |---|---|---|
-| Navegador/cliente remoto → REST | Um atacante na LAN ou página maliciosa lê/controla sua visão do tráfego | Token exigido em **todo** endpoint (`Authorization: Bearer`). Bind `127.0.0.1` por padrão. Em Docker, `0.0.0.0` exige `SNITCH_TOKEN` explícito. |
+| Navegador/cliente remoto → REST | Um atacante na LAN ou página maliciosa lê/controla sua visão do tráfego | Token exigido em **todo** endpoint (`Authorization: Bearer`). Bind `127.0.0.1` por padrão. Em Docker, `0.0.0.0` exige `WIRETAP_TOKEN` explícito. |
 | Página web → `/ws` | Sequestro de WebSocket cross-site (CSWSH) | Token **e** allowlist de `Origin` (loopback + origem `null` do Electron). |
 | Host → terceiros | Vazamento de privacidade | Zero chamadas externas por padrão. Download GeoIP, threat intel, webhooks e atualizações são **opt-in** documentados em PRIVACY.md. |
 | Driver de captura → parser | Frames malformados derrubam o processo | O parser limita cada offset; pacotes malformados retornam `None`, nunca lançam exceção no loop de captura. |

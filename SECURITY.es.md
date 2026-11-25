@@ -14,7 +14,7 @@ problemas de seguridad.
 La API expone todo tu grafo de tráfico — está protegida por diseño:
 
 - **Autenticación por token** en cada endpoint REST y en el WebSocket
-  (`X-Snitch-Token` o `?token=`). Generado por lanzamiento bajo Electron,
+  (`X-Wiretap-Token` o `?token=`). Generado por lanzamiento bajo Electron,
   persistido con permisos 0600 en los demás modos.
 - **Bind en loopback** (`127.0.0.1`) por defecto en todos los modos.
 - **Allowlist de Origin** en el handshake WebSocket (hosts loopback +

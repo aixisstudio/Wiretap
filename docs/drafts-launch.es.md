@@ -7,20 +7,20 @@
 
 ## meneame.net + foros
 
-**Título:** `Snitch — cortafuegos de aplicación open source: ve y bloquea cada conexión saliente por proceso`
+**Título:** `Wiretap — cortafuegos de aplicación open source: ve y bloquea cada conexión saliente por proceso`
 
 Texto completo: sección 12 de `drafts-launch.md`.
 
 ## Post social (es)
 
 ```
-Snitch — cortafuegos de aplicación open source 🛡️
+Wiretap — cortafuegos de aplicación open source 🛡️
 
 Ve cada conexión saliente por proceso y bloquéala con un clic
 (eBPF / NFQUEUE / nftables / WFP). Reglas Sigma, inteligencia de
 amenazas offline, detección DGA/túneles ICMP. 100% local,
 cero telemetría, sin cuenta. Interfaz en español.
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 #opensource #ciberseguridad #privacidad
 ```

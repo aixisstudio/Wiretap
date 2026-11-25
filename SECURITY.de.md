@@ -15,7 +15,7 @@ Die API legt deinen kompletten Verkehrsgraph offen — sie ist by design
 geschützt:
 
 - **Token-Authentifizierung** auf jedem REST-Endpoint und dem WebSocket
-  (`X-Snitch-Token` oder `?token=`). Unter Electron pro Start generiert,
+  (`X-Wiretap-Token` oder `?token=`). Unter Electron pro Start generiert,
   sonst mit 0600 persistiert.
 - **Loopback-Bind** (`127.0.0.1`) standardmäßig in allen Modi.
 - **Origin-Allowlist** beim WebSocket-Handshake (Loopback-Hosts + `null`),

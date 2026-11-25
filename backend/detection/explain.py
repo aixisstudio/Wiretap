@@ -37,8 +37,8 @@ EXPLANATIONS: dict[str, dict] = {
 "NEW_HOST": _e(
     "First contact with a remote host",
     "Premier contact avec un hôte distant",
-    "Snitch saw traffic to an IP it had never observed since the session started.",
-    "Snitch a vu du trafic vers une IP jamais observée depuis le début de la session.",
+    "Wiretap saw traffic to an IP it had never observed since the session started.",
+    "Wiretap a vu du trafic vers une IP jamais observée depuis le début de la session.",
     "Mostly informational — every new server you legitimately visit triggers it. "
     "It becomes meaningful when paired with other alerts or an unexpected process.",
     "Surtout informatif — tout nouveau serveur légitime la déclenche. Elle prend "
@@ -53,8 +53,8 @@ EXPLANATIONS: dict[str, dict] = {
 "NEW_LAN_DEVICE": _e(
     "New device joined the LAN",
     "Nouvel appareil sur le LAN",
-    "A MAC/IP pair appeared in the ARP table that Snitch had not seen.",
-    "Un couple MAC/IP est apparu dans la table ARP, inconnu de Snitch.",
+    "A MAC/IP pair appeared in the ARP table that Wiretap had not seen.",
+    "Un couple MAC/IP est apparu dans la table ARP, inconnu de Wiretap.",
     "Phones, TVs and guests legitimately join networks — but on a network you "
     "control, an unknown device deserves one look.",
     "Téléphones, TV et invités rejoignent légitimement le réseau — mais sur un "
@@ -255,9 +255,9 @@ EXPLANATIONS: dict[str, dict] = {
     "Process changed its network habits",
     "Le processus a changé d'habitudes réseau",
     "A known process contacted a country or pattern outside its learned "
-    "profile — Snitch's per-app baseline flags the drift.",
+    "profile — Wiretap's per-app baseline flags the drift.",
     "Un processus connu a contacté un pays ou un motif hors de son profil "
-    "appris — la baseline par app de Snitch signale la dérive.",
+    "appris — la baseline par app de Wiretap signale la dérive.",
     "Updates change destinations legitimately — but a chat app suddenly "
     "reaching an unusual country deserves a look.",
     "Les mises à jour changent légitimement de destination — mais une app de "
@@ -642,10 +642,10 @@ EXPLANATIONS: dict[str, dict] = {
     "New flow awaiting your verdict",
     "Nouveau flux en attente de verdict",
     "Ask-on-first-connect is enabled: the kernel handed this packet to "
-    "Snitch instead of letting it through. It is genuinely suspended "
+    "Wiretap instead of letting it through. It is genuinely suspended "
     "until you answer — this is real verdict power, not a notification.",
     "Le mode ask-on-first-connect est actif : le noyau a remis ce paquet "
-    "à Snitch au lieu de le laisser passer. Il est réellement suspendu "
+    "à Wiretap au lieu de le laisser passer. Il est réellement suspendu "
     "jusqu'à votre réponse — vrai pouvoir de verdict, pas une notif.",
     "Only the FIRST packet of each flow waits — decide once and the rest "
     "of the connection rides your decision for the session. Unanswered "
@@ -710,8 +710,8 @@ EXPLANATIONS: dict[str, dict] = {
 "C2_SUSPECT": _e(
     "Suspicious C2 TLS fingerprint match",
     "Correspondance d'empreinte TLS C2 suspecte",
-    "Snitch observed an outbound TLS ClientHello matching a known Command and Control (C2) framework profile (JA3 / JA4).",
-    "Snitch a observé un ClientHello TLS sortant correspondant au profil d'un framework de Command & Control (C2) connu (JA3 / JA4).",
+    "Wiretap observed an outbound TLS ClientHello matching a known Command and Control (C2) framework profile (JA3 / JA4).",
+    "Wiretap a observé un ClientHello TLS sortant correspondant au profil d'un framework de Command & Control (C2) connu (JA3 / JA4).",
     "Adversary simulation frameworks and remote access trojans (Cobalt Strike, Sliver, Havoc, Metasploit) exhibit characteristic TLS handshake signatures. While legitimate applications occasionally share cipher suites, matches warrant immediate investigation.",
     "Les frameworks d'adversaire et chevaux de Troie d'accès distant (Cobalt Strike, Sliver, Havoc, Metasploit) présentent des signatures de négociation TLS caractéristiques. Bien que des applications légitimes puissent partager certaines suites de chiffrement, une concordance exige une analyse immédiate.",
     ["Inspect the originating process, parent process, and command line",

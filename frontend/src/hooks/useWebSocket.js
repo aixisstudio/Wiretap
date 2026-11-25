@@ -1,5 +1,5 @@
 /**
- * Snitch — WebSocket hook.
+ * Wiretap — WebSocket hook.
  *
  * EN: Single source of truth for realtime state. Maintains the node/edge/LAN
  *     device maps, the recent-packet list, alerts, capture status and the
@@ -34,7 +34,7 @@ import { apiBase, authHeaders, wsUrlWithToken, wsBase } from '../api'
 function notifyAlert(alert) {
   if (alert.severity === 'info' || !document.hidden) return
   if (typeof Notification === 'undefined') return
-  const fire = () => new Notification(`Snitch — ${alert.type}`, {
+  const fire = () => new Notification(`Wiretap — ${alert.type}`, {
     body: alert.message || '', tag: alert.id, silent: false,
   })
   if (Notification.permission === 'granted') fire()

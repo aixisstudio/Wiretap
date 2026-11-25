@@ -1,5 +1,5 @@
 /**
- * Snitch — dicionário da UI em português (Brasil).
+ * Wiretap — dicionário da UI em português (Brasil).
  *
  * EN: Isolated locale file — one per language, so community contributors can
  *     add translations via a simple pull request (see CONTRIBUTING.md).
@@ -33,7 +33,7 @@ export default {
   legend_dns: 'DNS',
 
   // Cabeçalho da barra lateral + estatísticas
-  app_name: 'SNITCH',
+  app_name: 'WIRETAP',
   tagline: 'Rastreie cada fluxo oculto.',
   footer_credit: 'Desenvolvido por aiXis',
   stat_lan: 'Dispositivos LAN',
@@ -79,7 +79,7 @@ export default {
 
   // Nomes de nós + dicas
   node_local: 'Este dispositivo',
-  hint_local: 'Esta é ESTA máquina — a que roda o Snitch. Tudo que ela envia ou recebe irradia do centro do grafo.',
+  hint_local: 'Esta é ESTA máquina — a que roda o Wiretap. Tudo que ela envia ou recebe irradia do centro do grafo.',
   unidentified: 'não identificado',
   devtype_router: 'Roteador',
   devtype_phone: 'Celular',
@@ -157,7 +157,7 @@ export default {
   capture_stopping: 'Parando…',
   capture_starting: 'Iniciando…',
   capture_error_title: 'Falha na captura — nenhum tráfego será exibido',
-  capture_error_hint: 'Reinicie o Snitch com privilégios de captura (admin no Windows — Npcap obrigatório, sudo no macOS/Linux) ou pressione Iniciar para tentar de novo.',
+  capture_error_hint: 'Reinicie o Wiretap com privilégios de captura (admin no Windows — Npcap obrigatório, sudo no macOS/Linux) ou pressione Iniciar para tentar de novo.',
 
   // Filtro de portas
   port_filter: 'Portas',
@@ -228,7 +228,7 @@ export default {
   update_available: v => `Atualização disponível: v${v} — baixando`,
   update_downloading: p => `Baixando atualização… ${p}%`,
   update_ready: v => `v${v} baixada — reinicie para instalar`,
-  update_none: 'Snitch está atualizado',
+  update_none: 'Wiretap está atualizado',
   update_error: 'Falha na verificação de atualização',
   update_idle: 'Nenhuma verificação ainda',
   update_restart: 'Reiniciar e instalar',
@@ -247,7 +247,7 @@ export default {
   diag_hint: 'Logs e informações do sistema para relatórios de bug',
   diag_open_logs: 'Logs',
   diag_export: 'Exportar',
-  settings_note: 'Todas as configurações são armazenadas localmente. O Snitch nunca envia dados a terceiros sem o seu opt-in explícito.',
+  settings_note: 'Todas as configurações são armazenadas localmente. O Wiretap nunca envia dados a terceiros sem o seu opt-in explícito.',
   nav_apps: 'Apps',
   ignore_alert: 'Ignorar este tipo de alerta/host',
 
@@ -261,10 +261,10 @@ export default {
   apps_history_60m: 'Última hora (bytes/min)',
   alertmsg_NEW_HOSTS: n => `${n} novo${n > 1 ? 's' : ''} host${n > 1 ? 's' : ''} contatado${n > 1 ? 's' : ''}`,
   settings_autolaunch: 'Iniciar ao fazer login',
-  settings_autolaunch_hint: 'Iniciar o Snitch automaticamente ao entrar',
+  settings_autolaunch_hint: 'Iniciar o Wiretap automaticamente ao entrar',
 
   // Onboarding
-  onboard_title: 'Bem-vindo ao Snitch',
+  onboard_title: 'Bem-vindo ao Wiretap',
   onboard_sub: 'Visualizador de tráfego de rede em tempo real — privado por design.',
   onboard_priv_title: 'Tudo fica nesta máquina',
   onboard_priv_body: 'Metadados de tráfego, alertas e histórico são armazenados em um banco SQLite local. Sem conta, sem nuvem, sem telemetria.',
@@ -395,7 +395,7 @@ export default {
   bl_src_file: 'Arquivo',
   bl_src_url: 'URL',
   bl_import: 'Importar',
-  bl_url_confirm: 'Baixar esta URL faz o Snitch emitir uma requisição de SAÍDA — uma das poucas que ele pode enviar. Continuar?',
+  bl_url_confirm: 'Baixar esta URL faz o Wiretap emitir uma requisição de SAÍDA — uma das poucas que ele pode enviar. Continuar?',
   bl_result: (a, s) => `${a} regras adicionadas · ${s} já existentes`,
   bl_truncated: 'lista truncada no limite',
   bl_remote: 'busca remota realizada',
@@ -456,7 +456,7 @@ export default {
   ask_unavailable: 'Modo ask indisponível neste sistema',
   ask_not_running: 'Modo ask ativado mas não iniciado — verifique os logs do backend',
   gs_title: 'Sincronização IOC entre pares',
-  gs_hint: 'Envia pacotes Merkle com sal a instâncias Snitch pareadas explicitamente a cada 5 min — só compromissos hash, nunca indicadores brutos.',
+  gs_hint: 'Envia pacotes Merkle com sal a instâncias Wiretap pareadas explicitamente a cada 5 min — só compromissos hash, nunca indicadores brutos.',
   gs_peers_ph: 'host:porta, separados por vírgula',
   gs_privacy: 'Compartilhamento opt-in — os pacotes só saem para os pares listados aqui.',
   ks_title: 'Kill-switch de volume',

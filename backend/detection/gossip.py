@@ -1,14 +1,14 @@
 """
-Snitch — peer IOC sharing (decentralized-lite) / partage d'IOC entre
+Wiretap — peer IOC sharing (decentralized-lite) / partage d'IOC entre
 pairs (décentralisé allégé).
 
 EN: The honest, shippable version of "fleet gossip": instead of a real
     epidemic protocol (libp2p, membership, NAT traversal — heavy and
-    attack-prone), Snitch instances EXPLICITLY paired by the operator
+    attack-prone), Wiretap instances EXPLICITLY paired by the operator
     exchange their privacy-preserving IOC packs directly over HTTP:
 
       * peers are opt-in and explicit — a list of `http(s)://host:port`
-        Snitch backends plus the shared bearer token; ZERO auto-discovery,
+        Wiretap backends plus the shared bearer token; ZERO auto-discovery,
         nothing ever leaves for an unlisted address
       * transport = the peer's own authenticated API: our `format=proof`
         pack is POSTed to its /security/iocpack/import — no new wire
@@ -26,7 +26,7 @@ EN: The honest, shippable version of "fleet gossip": instead of a real
     anonymous gossip mesh stays a research item.
 
 FR: Version honnête et livrable du « gossip de flotte » : au lieu d'un
-    vrai protocole épidémique (lourd et exposé), les instances Snitch
+    vrai protocole épidémique (lourd et exposé), les instances Wiretap
     explicitement appairées par l'opérateur échangent leurs packs IOC
     préservant la vie privée en HTTP direct — pairs opt-in uniquement,
     transport = l'API authentifiée du pair (notre pack `format=proof`
@@ -82,7 +82,7 @@ class PeerSync:
         return list(self._peers)
 
     def push_pack(self, pack: dict) -> dict:
-        """EN: POST one IOC pack (snitch-ioc-proof/1 dict) to every peer's
+        """EN: POST one IOC pack (wiretap-ioc-proof/1 dict) to every peer's
         import endpoint. Returns per-peer results; never raises.
         FR: POST un pack IOC vers l'endpoint import de chaque pair.
         Renvoie les résultats par pair ; ne lève jamais."""

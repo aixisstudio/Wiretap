@@ -8,4 +8,4 @@ labels: enhancement
 
 **Das Feature** :
 
-**Auswirkung auf Privatsphäre** : (jeder ausgehende Aufruf in Snitch ist Opt-in — braucht dieses Feature einen neuen?)
+**Auswirkung auf Privatsphäre** : (jeder ausgehende Aufruf in Wiretap ist Opt-in — braucht dieses Feature einen neuen?)

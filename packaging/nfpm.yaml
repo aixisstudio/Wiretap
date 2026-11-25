@@ -1,36 +1,36 @@
-# Snitch — nfpm packaging (one file → .deb AND .rpm AND .apk)
+# Wiretap — nfpm packaging (one file → .deb AND .rpm AND .apk)
 # EN: Build:  nfpm package -f packaging/nfpm.yaml -p deb
 #             nfpm package -f packaging/nfpm.yaml -p rpm
-#     Requires a prepared staging tree: backend/ + venv under /opt/snitch.
+#     Requires a prepared staging tree: backend/ + venv under /opt/wiretap.
 #     Chocolatey/winget/brew formulas live in their own upstream repos —
 #     see docs/INTEGRATIONS.md for the submission steps.
 # FR: Build : nfpm package -f packaging/nfpm.yaml -p deb|rpm.
-#     Exige un arbre staging : backend/ + venv sous /opt/snitch. Les
+#     Exige un arbre staging : backend/ + venv sous /opt/wiretap. Les
 #     formulas choco/winget/brew vivent dans leurs dépôts upstream.
-name: snitch
+name: wiretap
 arch: amd64
 platform: linux
 version: "1.6.4"
 release: 1
 section: net
 priority: optional
-maintainer: "Snitch contributors <noreply@aixisstudio.github.io>"
+maintainer: "Wiretap contributors <noreply@aixisstudio.github.io>"
 description: |
   Local-first network observability and outbound firewall —
   packet capture via libpcap, per-process traffic graph, alerting,
   custom rules, Sigma import, CEF/ECS/syslog SIEM output.
   Observabilité réseau local-first et pare-feu sortant.
-vendor: Snitch
-homepage: https://github.com/aixisstudio/Snitch
+vendor: Wiretap
+homepage: https://github.com/aixisstudio/Wiretap
 license: AGPL-3.0-or-later
 contents:
-  - src: staging/opt/snitch/backend
-    dst: /opt/snitch/backend
-  - src: deploy/systemd/snitch.service
-    dst: /usr/lib/systemd/system/snitch.service
+  - src: staging/opt/wiretap/backend
+    dst: /opt/wiretap/backend
+  - src: deploy/systemd/wiretap.service
+    dst: /usr/lib/systemd/system/wiretap.service
     type: config|noreplace
-  - src: packaging/snitch.toml.example
-    dst: /etc/snitch/snitch.toml
+  - src: packaging/wiretap.toml.example
+    dst: /etc/wiretap/wiretap.toml
     type: config|noreplace
 overrides:
   rpm:

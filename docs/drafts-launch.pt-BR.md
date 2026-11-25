@@ -7,20 +7,20 @@
 
 ## TabNews
 
-**Título:** `Snitch — firewall de aplicação open source: veja e bloqueie cada conexão de saída por processo`
+**Título:** `Wiretap — firewall de aplicação open source: veja e bloqueie cada conexão de saída por processo`
 
 Texto completo: seção 10 de `drafts-launch.md`.
 
 ## Post social (pt-BR)
 
 ```
-Snitch — firewall de aplicação open source 🛡️
+Wiretap — firewall de aplicação open source 🛡️
 
 Veja cada conexão de saída por processo e bloqueie com um clique
 (eBPF / NFQUEUE / nftables / WFP). Regras Sigma, threat intel
 offline, detecção de DGA/túneis ICMP/beaconing.
 100% local, zero telemetria, sem conta. Interface em pt-BR.
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 #opensource #segurança #privacidade
 ```

@@ -1,5 +1,5 @@
 /**
- * Snitch — search & category filter bar.
+ * Wiretap — search & category filter bar.
  *
  * EN: Text search (matches label/IP/country/org/hostname) plus a row of
  *     category chips. Controlled component: state lives in App, this just

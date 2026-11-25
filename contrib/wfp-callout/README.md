@@ -1,4 +1,4 @@
-# Snitch WFP kernel callout — skeleton
+# Wiretap WFP kernel callout — skeleton
 
 [English](#english) · [Français](#français)
 
@@ -18,14 +18,14 @@ filters cannot give.
 **This is scaffolding, not a production driver.** It compiles against
 the WDK and registers/unregisters a callout correctly, but:
 
-- It does **not** ship in Snitch releases. Snitch's Windows enforcement
+- It does **not** ship in Wiretap releases. Wiretap's Windows enforcement
   today is the user-mode WFP filter layer — no driver required.
 - A real callout driver must be **signed**: test-signed for your own
   machine (`bcdedit /set testsigning on` + a self-signed cert), or
   attestation/EV-signed for distribution. Unsigned drivers do not load
   on retail Windows.
 - The classify callback here only permits traffic — deciding *what* to
-  block is policy, and policy belongs in user mode where Snitch rules
+  block is policy, and policy belongs in user mode where Wiretap rules
   already live.
 
 ### Authoritative references (read before writing callout code)
@@ -36,7 +36,7 @@ the WDK and registers/unregisters a callout correctly, but:
 - `JaredWright/WFPStarterKit` — a minimal ~100-line callout that is
   much easier to learn from than the full sample
 - `docs.microsoft.com` WFP architecture docs: callouts, layers
-  (`FWPS_LAYER_ALE_AUTH_CONNECT_V4` is the layer Snitch cares about —
+  (`FWPS_LAYER_ALE_AUTH_CONNECT_V4` is the layer Wiretap cares about —
   outbound connect authorization), filter conditions
 
 ### Build (for research only)
@@ -67,7 +67,7 @@ garanties qu'un filtre user-mode ne donne pas.
 **C'est un échafaudage, pas un pilote de production.** Il compile avec
 le WDK et enregistre/désenregistre un callout correctement, mais :
 
-- Il n'est **pas** livré dans les releases Snitch. L'application des
+- Il n'est **pas** livré dans les releases Wiretap. L'application des
   règles Windows aujourd'hui = la couche de filtres WFP user-mode — sans
   pilote.
 - Un vrai pilote callout exige une **signature** : test-signing sur sa
@@ -76,14 +76,14 @@ le WDK et enregistre/désenregistre un callout correctement, mais :
   retail refuse les pilotes non signés.
 - Le callback ici ne fait qu'autoriser — décider *quoi* bloquer est de
   la politique, et la politique appartient au user-mode où vivent déjà
-  les règles Snitch.
+  les règles Wiretap.
 
 ### Références autorisées (à lire avant d'écrire un callout)
 
 - `Windows-driver-samples` de Microsoft → `network/trans/inspect`
 - `JaredWright/WFPStarterKit` — callout minimal ~100 lignes
 - Documentation WFP Microsoft : callouts, couches
-  (`FWPS_LAYER_ALE_AUTH_CONNECT_V4` est celle qui intéresse Snitch —
+  (`FWPS_LAYER_ALE_AUTH_CONNECT_V4` est celle qui intéresse Wiretap —
   autorisation de connexion sortante)
 
 ### Build (recherche uniquement)

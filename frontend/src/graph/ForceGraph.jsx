@@ -1,5 +1,5 @@
 /**
- * Snitch — D3 force-directed graph view.
+ * Wiretap — D3 force-directed graph view.
  *
  * EN: The main visualization. Every remote host and LAN device is a node,
  *     every connection an edge anchored on the central "local" node.

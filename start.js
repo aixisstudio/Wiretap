@@ -1,4 +1,4 @@
-// EN: Snitch start — launches backend/cli.py which picks the port given via
+// EN: Wiretap start — launches backend/cli.py which picks the port given via
 //     --port, prints the full token URL on one line
 //     ("http://127.0.0.1:<port>/?token=<hex>"), then serves API + built UI.
 //
@@ -10,7 +10,7 @@
 //     On Windows there is no sudo — run Pinokio as Administrator (Npcap
 //     required) for capture; the UI still works without it.
 //
-// FR: Démarrage de Snitch — lance backend/cli.py qui prend le port via
+// FR: Démarrage de Wiretap — lance backend/cli.py qui prend le port via
 //     --port, affiche l'URL complète avec jeton sur une ligne
 //     (« http://127.0.0.1:<port>/?token=<hex> »), puis sert API + UI buildée.
 //

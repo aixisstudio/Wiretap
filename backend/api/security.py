@@ -1,13 +1,13 @@
 """
-Snitch — API security layer.
+Wiretap — API security layer.
 
 EN: Three complementary protections:
       1. Bearer-style token. Generated at startup (or taken from the
-         SNITCH_TOKEN env var, which is how the Electron wrapper injects
+         WIRETAP_TOKEN env var, which is how the Electron wrapper injects
          it), persisted to <data>/api_token.txt (0600) and printed once to
          stdout so Docker/dev users can pass ?token=… in the browser
-         (disable that print with SNITCH_PRINT_TOKEN=0). REST endpoints
-         require the X-Snitch-Token header; ?token= is honoured on the
+         (disable that print with WIRETAP_PRINT_TOKEN=0). REST endpoints
+         require the X-Wiretap-Token header; ?token= is honoured on the
          WebSocket handshake only.
       2. CORS allowlist — no more `*`. Only the Vite dev server, the
          backend's own origin and `null` (file:// pages under Electron).
@@ -16,11 +16,11 @@ EN: Three complementary protections:
 
 FR: Trois protections complémentaires :
       1. Jeton d'authentification. Généré au démarrage (ou pris de la variable
-         SNITCH_TOKEN, ce que fait le conteneur Electron), persisté dans
+         WIRETAP_TOKEN, ce que fait le conteneur Electron), persisté dans
          <data>/api_token.txt (0600) et affiché une fois sur stdout pour que
          les utilisateurs Docker/dev passent ?token=… dans le navigateur
-         (désactivable via SNITCH_PRINT_TOKEN=0). Les endpoints REST exigent
-         l'en-tête X-Snitch-Token ; ?token= n'est honoré qu'au handshake
+         (désactivable via WIRETAP_PRINT_TOKEN=0). Les endpoints REST exigent
+         l'en-tête X-Wiretap-Token ; ?token= n'est honoré qu'au handshake
          WebSocket.
       2. Liste blanche CORS — plus de `*`. Seulement le serveur de dev Vite,
          l'origine du backend lui-même et `null` (pages file:// sous Electron).
@@ -38,7 +38,7 @@ from fastapi import HTTPException, Request, WebSocket, status
 
 from paths import data_dir, chown_to_user
 
-logger = logging.getLogger("snitch.api.security")
+logger = logging.getLogger("wiretap.api.security")
 
 # EN: Origins allowed to reach the API. `null` covers file:// pages (Electron
 #     renderer) — browsers send Origin: null for local files.
@@ -101,19 +101,19 @@ ALLOWED_ORIGINS_LIST = ["null"]
 def _load_or_create_token() -> str:
     """
     EN: Token resolution order:
-          1. SNITCH_TOKEN env var   — set by the Electron wrapper
+          1. WIRETAP_TOKEN env var   — set by the Electron wrapper
           2. existing api_token.txt — survives backend restarts so an open
              UI doesn't get logged out
           3. freshly generated 48-hex secret
         The token file is created with 0600 permissions where supported.
     FR: Ordre de résolution du jeton :
-          1. variable SNITCH_TOKEN  — posée par le conteneur Electron
+          1. variable WIRETAP_TOKEN  — posée par le conteneur Electron
           2. api_token.txt existant — survit aux redémarrages du backend pour
              ne pas déconnecter une UI déjà ouverte
           3. secret hexadécimal de 48 caractères fraîchement généré
         Le fichier est créé en 0600 quand le système le permet.
     """
-    token = os.environ.get("SNITCH_TOKEN", "").strip()
+    token = os.environ.get("WIRETAP_TOKEN", "").strip()
     if token:
         return token
 
@@ -141,14 +141,14 @@ def _load_or_create_token() -> str:
         logger.warning("Could not persist API token to %s: %s", token_file, exc)
 
     # EN: Printed once so Docker/browser users can complete the ?token= URL.
-    #     Hardened deployments can suppress it with SNITCH_PRINT_TOKEN=0 —
+    #     Hardened deployments can suppress it with WIRETAP_PRINT_TOKEN=0 —
     #     the token remains readable from api_token.txt (0600).
     # FR: Affiché une fois pour que les utilisateurs Docker/navigateur
     #     complètent l'URL ?token=. Les déploiements durcis peuvent le
-    #     supprimer via SNITCH_PRINT_TOKEN=0 — le jeton reste lisible dans
+    #     supprimer via WIRETAP_PRINT_TOKEN=0 — le jeton reste lisible dans
     #     api_token.txt (0600).
-    if os.environ.get("SNITCH_PRINT_TOKEN", "1") != "0":
-        print(f"[snitch] API token: {token}", flush=True)
+    if os.environ.get("WIRETAP_PRINT_TOKEN", "1") != "0":
+        print(f"[wiretap] API token: {token}", flush=True)
     return token
 
 
@@ -165,13 +165,13 @@ def get_token() -> str:
 
 # ── Brute-force guard / Garde anti-force brute ───────────────────────────────
 # EN: The 48-hex token is not realistically brute-forceable, but when the
-#     API is bound to a LAN address (opt-in SNITCH_BIND) failed attempts
+#     API is bound to a LAN address (opt-in WIRETAP_BIND) failed attempts
 #     are cheap to spray. Track failures per client IP: after
 #     _AUTH_MAX_FAILS within _AUTH_WINDOW_S the source is rejected with
 #     429/4401 for _AUTH_BAN_S. Loopback keeps the same rules — a rogue
 #     local process should not get unlimited guesses either.
 # FR: Le jeton hex de 48 caractères n'est pas réalistement brute-forçable,
-#     mais quand l'API écoute sur une adresse LAN (SNITCH_BIND opt-in) les
+#     mais quand l'API écoute sur une adresse LAN (WIRETAP_BIND opt-in) les
 #     tentatives ratées ne coûtent rien. Suivre les échecs par IP cliente :
 #     après _AUTH_MAX_FAILS dans _AUTH_WINDOW_S la source est rejetée en
 #     429/4401 pendant _AUTH_BAN_S. Loopback suit les mêmes règles — un
@@ -228,15 +228,15 @@ def _record_failure(ip: str) -> None:
 
 def _extract_token(request: Request) -> str | None:
     """
-    EN: `X-Snitch-Token` header ONLY. The `?token=` query param is honoured
+    EN: `X-Wiretap-Token` header ONLY. The `?token=` query param is honoured
         on the WebSocket handshake (browser API can't set headers) but not
         on REST — URLs end up in browser history and access logs.
-    FR: En-tête `X-Snitch-Token` UNIQUEMENT. Le paramètre `?token=` est
+    FR: En-tête `X-Wiretap-Token` UNIQUEMENT. Le paramètre `?token=` est
         honoré au handshake WebSocket (l'API navigateur ne peut pas poser
         d'en-têtes) mais pas sur REST — les URLs finissent dans l'historique
         navigateur et les access logs.
     """
-    return request.headers.get("x-snitch-token")
+    return request.headers.get("x-wiretap-token")
 
 
 def require_token(request: Request) -> None:
@@ -274,7 +274,7 @@ async def ws_authorized(websocket: WebSocket) -> bool:
     if not origin_allowed(websocket.headers.get("origin")):
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return False
-    token = websocket.query_params.get("token") or websocket.headers.get("x-snitch-token")
+    token = websocket.query_params.get("token") or websocket.headers.get("x-wiretap-token")
     if not token or not secrets.compare_digest(token, API_TOKEN):
         _record_failure(ip)
         await websocket.close(code=4401)

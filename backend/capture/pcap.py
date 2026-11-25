@@ -1,5 +1,5 @@
 """
-Snitch — ctypes binding to libpcap / wpcap.
+Wiretap — ctypes binding to libpcap / wpcap.
 
 EN: Minimal, dependency-free binding to the system packet-capture library:
       - Windows : wpcap.dll, shipped by Npcap (user-installed — NOT bundled;
@@ -36,7 +36,7 @@ import sys
 from dataclasses import dataclass
 from typing import Optional
 
-logger = logging.getLogger("snitch.capture.pcap")
+logger = logging.getLogger("wiretap.capture.pcap")
 
 
 class PcapError(Exception):

@@ -1,4 +1,4 @@
-# Snitch — Growth-кампания к GitHub Trending & 10K ⭐
+# Wiretap — Growth-кампания к GitHub Trending & 10K ⭐
 
 [English](growth-campaign.md) | [Français](growth-campaign.md) | [Español](growth-campaign.es.md) | [Deutsch](growth-campaign.de.md) | **Русский** | [日本語](growth-campaign.ja.md) | [Português](growth-campaign.pt-BR.md) | [中文](growth-campaign.zh-CN.md)
 
@@ -37,7 +37,7 @@
 
 - Каждый релиз = повод постить (v1.x → новая волна каждые 2-3 недели)
 - Changelog → кросспост dev.to/Medium
-- Ежемесячный пост « State of Snitch » с реальными метриками
+- Ежемесячный пост « State of Wiretap » с реальными метриками
 
 ## Слой 4 — Длинный хвост
 

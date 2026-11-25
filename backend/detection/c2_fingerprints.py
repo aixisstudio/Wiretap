@@ -17,7 +17,7 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-logger = logging.getLogger("snitch.detection.c2_fingerprints")
+logger = logging.getLogger("wiretap.detection.c2_fingerprints")
 
 _JA3_MAP: dict[str, dict[str, Any]] = {}
 _JA4_MAP: dict[str, dict[str, Any]] = {}

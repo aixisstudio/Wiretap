@@ -1,27 +1,27 @@
-# Snitch — 企业集成
+# Wiretap — 企业集成
 
 *Community translated — PRs welcome for refinement / 社区翻译 — 欢迎提交改进 PR。*
 
-**中文：** 将 Snitch 接入 SOC 技术栈的分步指南 — Wazuh、Splunk、
+**中文：** 将 Wiretap 接入 SOC 技术栈的分步指南 — Wazuh、Splunk、
 Graylog/Loki、Ansible、Docker/Kubernetes — 全部免费且自托管，
-符合 Snitch 的本地优先原则。Snitch 自身不发送任何遥测数据；
+符合 Wiretap 的本地优先原则。Wiretap 自身不发送任何遥测数据；
 唯一的出站连接就是您在此处配置的连接。
 
 ---
 
 ## 1. SIEM 输出
 
-Snitch 为告警转发提供三种原生格式：
+Wiretap 为告警转发提供三种原生格式：
 
 | 设置 | 取值 | 效果 |
 |---|---|---|
 | `syslog_addr` | `host:514` 或 `tcp://host:514` | 启用 syslog 转发（默认 UDP，`tcp://` 前缀使用 TCP） |
 | `syslog_format` | `rfc3164` *（默认）* | 经典 BSD syslog — 任何采集器均可读取 |
-| | `cef` | `CEF:0|Snitch|…` — ArcSight/Wazuh/Splunk 自动解析 `src`、`dst`、`dpt`、`cs1`（进程） |
+| | `cef` | `CEF:0|Wiretap|…` — ArcSight/Wazuh/Splunk 自动解析 `src`、`dst`、`dpt`、`cs1`（进程） |
 | `webhook_url` + `webhook_enabled` | URL | 通用 JSON `POST`（自动识别 Discord/Slack/Telegram 负载） |
 | `GET /forensics/export?format=…` | `json`、`csv`、`stix`、`ecs` | 一次性取证包 — `ecs` 输出 Elastic Common Schema NDJSON |
 
-在 UI（设置 → 安全）或 `snitch.toml` 中配置：
+在 UI（设置 → 安全）或 `wiretap.toml` 中配置：
 
 ```toml
 syslog_addr = "siem.example.com:514"
@@ -41,14 +41,14 @@ syslog_format = "cef"
    </remote>
    ```
 
-2. 将每个 Snitch 代理指向它 — Ansible：
+2. 将每个 Wiretap 代理指向它 — Ansible：
 
    ```yaml
-   snitch_syslog_addr: "wazuh.example.com:514"
-   snitch_syslog_format: "cef"
+   wiretap_syslog_addr: "wazuh.example.com:514"
+   wiretap_syslog_format: "cef"
    ```
 
-3. Wazuh 的 CEF 解码器会接收 `CEF:0|Snitch|…` 消息；`severity`
+3. Wazuh 的 CEF 解码器会接收 `CEF:0|Wiretap|…` 消息；`severity`
    映射到 syslog PRI（critical→2、warning→4、info→6）。
 
 ## 3. Splunk
@@ -68,8 +68,8 @@ syslog_format = "cef"
 
 ## 5. 声明式配置（Security-as-Code）
 
-后端启动时应用**一个文件** — `$SNITCH_CONFIG`，否则为数据目录中的
-`snitch.toml`/`snitch.json`。声明的每个键都会覆盖 UI/DB 值 ——
+后端启动时应用**一个文件** — `$WIRETAP_CONFIG`，否则为数据目录中的
+`wiretap.toml`/`wiretap.json`。声明的每个键都会覆盖 UI/DB 值 ——
 该文件是整个集群的单一事实来源：
 
 ```toml
@@ -81,7 +81,7 @@ gossip_peers = ["sec-01:8000"]
 ports = [80, 443]
 ```
 
-完整词汇见 `packaging/snitch.toml.example`。
+完整词汇见 `packaging/wiretap.toml.example`。
 
 ## 6. Ansible / Puppet / Salt / GPO
 
@@ -91,14 +91,14 @@ ports = [80, 443]
   ansible-playbook -i inventory deploy/ansible/site.yml
   ```
 
-  安装 `/opt/snitch`、venv、`/etc/snitch/snitch.toml` 和加固的
-  systemd 单元，然后启用 `snitch.service`。
+  安装 `/opt/wiretap`、venv、`/etc/wiretap/wiretap.toml` 和加固的
+  systemd 单元，然后启用 `wiretap.service`。
 
 - **Puppet / SaltStack** — `deploy/puppet/` 与 `deploy/salt/` 中的
   社区骨架（`help wanted` 标签）：同样三个原语 —— 部署 backend
-  目录树、渲染 `snitch.toml`、管理 `snitch.service`。
+  目录树、渲染 `wiretap.toml`、管理 `wiretap.service`。
 
-- **Windows GPO** — `deploy/gpo/Install-Snitch.ps1` 执行静默安装
+- **Windows GPO** — `deploy/gpo/Install-Wiretap.ps1` 执行静默安装
   （ProgramData 配置、venv、127.0.0.1 上的 SYSTEM 计划任务）。
   Windows 上的 ask-on-connect 还需要已签名的 WFP callout —
   见 `docs/SIGNING.md`。
@@ -107,13 +107,13 @@ ports = [80, 443]
 
 - **单主机**：`docker compose up` — `network_mode: host` +
   `cap_add: NET_RAW/NET_ADMIN` 已在 `docker-compose.yml` 中配置。
-- **集群控制台**：`deploy/helm/snitch` — `mode: collector` 运行
+- **集群控制台**：`deploy/helm/wiretap` — `mode: collector` 运行
   ClusterIP Deployment，将所有已配置代理的审计合并到
   `GET /remote/fleet`；`mode: agent` 渲染带 `NET_RAW`/`NET_ADMIN`
   的 host-network DaemonSet。
 
   ```bash
-  helm install snitch ./deploy/helm/snitch \
+  helm install wiretap ./deploy/helm/wiretap \
       --set token=$(openssl rand -hex 32) \
       --set config.gossip_peers='["agent-1:8000","agent-2:8000"]'
   ```
@@ -122,7 +122,7 @@ ports = [80, 443]
 
 `POST /alerts/rules/sigma` 接受 Sigma 检测 YAML，将支持的子集
 （字段→值选择、`|contains`/`|startswith`/`|endswith`/`|re`/`|cidr`/
-`|gt`/`|lt`/`|all`、`1 of`/`all of` 条件）编译为 Snitch 自定义规则 ——
+`|gt`/`|lt`/`|all`、`1 of`/`all of` 条件）编译为 Wiretap 自定义规则 ——
 仅告警，超出子集的内容会在 `skipped` 中返回原因。字段映射到
 *数据包*传感器实际可见的内容（`DestinationIp→remote_ip`、
 `Image→process_name`、`Domain→host` 等）。
@@ -131,7 +131,7 @@ ports = [80, 443]
 将所有规则（包括导入的 Sigma 规则）导出为 `.yar` 文件 ——
 Sigma→YARA-L 路径就此打通。
 
-## 9. 远程代理（snitch-agent/1）
+## 9. 远程代理（wiretap-agent/1）
 
 `agent/` 包含一个轻量 Rust 守护进程（零依赖，单个 ~1MB 二进制），
 监视主机 socket 表（`/proc/net/*`）并将新的出站流推送到
@@ -159,4 +159,4 @@ Opt-in API 提供商（AbuseIPDB / OTX / VirusTotal）仍可通过
 
 GUI 是可选的：后端即全部产品。直接运行（`uvicorn api.main:app`）、
 用附带的 systemd 单元或在容器中 —— 以上所有功能无需前端即可工作。
-`SNITCH_DEMO=1` 继续为培训和 CTF 提供免 root 的合成流量。
+`WIRETAP_DEMO=1` 继续为培训和 CTF 提供免 root 的合成流量。

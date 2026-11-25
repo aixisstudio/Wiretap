@@ -1,5 +1,5 @@
 """
-Snitch — microphone / camera usage monitor.
+Wiretap — microphone / camera usage monitor.
 
 EN: Polls the OS to find which processes currently hold the microphone or
     the camera. Powers the MEDIA_EXFIL anomaly rule: an unknown process using
@@ -32,7 +32,7 @@ from typing import Callable
 
 import psutil
 
-logger = logging.getLogger("snitch.capture.media")
+logger = logging.getLogger("wiretap.capture.media")
 
 
 @dataclass

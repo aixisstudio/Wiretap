@@ -1,5 +1,5 @@
 /**
- * Snitch — privacy score engine.
+ * Wiretap — privacy score engine.
  *
  * EN: Computes a 0–100 score from the live node map and alert history.
  *     Starts at 100 and subtracts penalties: trackers contacted, share of

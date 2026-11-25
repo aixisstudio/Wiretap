@@ -1,4 +1,4 @@
-# Snitch — Growth-Kampagne Richtung GitHub Trending & 10K ⭐
+# Wiretap — Growth-Kampagne Richtung GitHub Trending & 10K ⭐
 
 [English](growth-campaign.md) | [Français](growth-campaign.md) | [Español](growth-campaign.es.md) | **Deutsch** | [Русский](growth-campaign.ru.md) | [日本語](growth-campaign.ja.md) | [Português](growth-campaign.pt-BR.md) | [中文](growth-campaign.zh-CN.md)
 
@@ -37,7 +37,7 @@ Fertige Drafts in `docs/drafts-launch.md` (und `drafts-launch.de.md`).
 
 - Jedes Release = Anlass zu posten (v1.x → neue Welle alle 2-3 Wochen)
 - Changelog → Cross-Post dev.to/Medium
-- Monatlicher « State of Snitch »-Post mit echten Metriken
+- Monatlicher « State of Wiretap »-Post mit echten Metriken
 
 ## Schicht 4 — Long Tail
 

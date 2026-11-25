@@ -1,5 +1,5 @@
 /**
- * Snitch — privacy score widget.
+ * Wiretap — privacy score widget.
  *
  * EN: Renders the 0–100 score as an SVG donut plus the top contributing
  *     factors. `factors` entries carry an i18n `key` + `args` so the labels

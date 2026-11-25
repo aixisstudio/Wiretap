@@ -1,23 +1,23 @@
 """
-Snitch backend entry point.
+Wiretap backend entry point.
 
 EN: Single entry point — used both in development (`python run_backend.py`)
-    and by PyInstaller for the standalone `snitch-backend` binary that
+    and by PyInstaller for the standalone `wiretap-backend` binary that
     Electron spawns. `app` is imported as an object (not a string) so
     PyInstaller traces the full import chain.
 
     Binds to 127.0.0.1 by default in ALL modes — the API holds sensitive
     traffic data and must never be network-exposed without an explicit
-    SNITCH_BIND override (token auth is always enforced regardless).
+    WIRETAP_BIND override (token auth is always enforced regardless).
 
 FR: Point d'entrée unique — utilisé en développement (`python run_backend.py`)
-    et par PyInstaller pour le binaire autonome `snitch-backend` que lance
+    et par PyInstaller pour le binaire autonome `wiretap-backend` que lance
     Electron. `app` est importé comme objet (pas une chaîne) pour que
     PyInstaller suive toute la chaîne d'imports.
 
     Écoute sur 127.0.0.1 par défaut dans TOUS les modes — l'API contient des
     données de trafic sensibles et ne doit jamais être exposée au réseau sans
-    override explicite de SNITCH_BIND (le jeton reste de toute façon exigé).
+    override explicite de WIRETAP_BIND (le jeton reste de toute façon exigé).
 """
 
 import logging
@@ -98,29 +98,29 @@ if __name__ == '__main__':
         raise SystemExit(0)
 
     # EN: Loopback-only by default everywhere — Electron AND Docker/dev.
-    #     Set SNITCH_BIND=0.0.0.0 to expose (token auth still applies).
+    #     Set WIRETAP_BIND=0.0.0.0 to expose (token auth still applies).
     #     The persisted `lan_bind` setting (written by POST /remote/pairing)
     #     is honoured at the lowest precedence — env and argv always win.
     # FR: Loopback uniquement par défaut partout — Electron ET Docker/dev.
-    #     Poser SNITCH_BIND=0.0.0.0 pour exposer (le jeton reste exigé).
+    #     Poser WIRETAP_BIND=0.0.0.0 pour exposer (le jeton reste exigé).
     #     Le réglage persisté `lan_bind` (écrit par POST /remote/pairing)
     #     est honoré en dernière priorité — env et argv gagnent toujours.
     import storage.db as _db
     _lan_bind = _db.get_setting("lan_bind", "") or ""
-    # EN: Optional TLS termination — set SNITCH_TLS_CERT + SNITCH_TLS_KEY to
-    #     PEM paths (e.g. for remote collectors receiving snitch-agent posts
-    #     over SNITCH_TLS=1). Off by default: loopback serving needs no TLS.
-    # FR: Terminaison TLS optionnelle — poser SNITCH_TLS_CERT +
-    #     SNITCH_TLS_KEY vers des PEM (ex. collecteur distant recevant des
-    #     posts snitch-agent en SNITCH_TLS=1). Off par défaut : loopback n'en
+    # EN: Optional TLS termination — set WIRETAP_TLS_CERT + WIRETAP_TLS_KEY to
+    #     PEM paths (e.g. for remote collectors receiving wiretap-agent posts
+    #     over WIRETAP_TLS=1). Off by default: loopback serving needs no TLS.
+    # FR: Terminaison TLS optionnelle — poser WIRETAP_TLS_CERT +
+    #     WIRETAP_TLS_KEY vers des PEM (ex. collecteur distant recevant des
+    #     posts wiretap-agent en WIRETAP_TLS=1). Off par défaut : loopback n'en
     #     a pas besoin.
-    _tls_cert = os.environ.get('SNITCH_TLS_CERT') or None
-    _tls_key = os.environ.get('SNITCH_TLS_KEY') or None
+    _tls_cert = os.environ.get('WIRETAP_TLS_CERT') or None
+    _tls_key = os.environ.get('WIRETAP_TLS_KEY') or None
     uvicorn.run(
         app,
-        host=(os.environ.get('SNITCH_BIND') or argv_bind
+        host=(os.environ.get('WIRETAP_BIND') or argv_bind
               or _lan_bind or '127.0.0.1'),
-        port=int(os.environ.get('SNITCH_PORT') or argv_port or '8000'),
+        port=int(os.environ.get('WIRETAP_PORT') or argv_port or '8000'),
         log_level='warning',
         ssl_certfile=_tls_cert,
         ssl_keyfile=_tls_key,

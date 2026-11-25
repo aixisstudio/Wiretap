@@ -1,5 +1,5 @@
 """
-Snitch — real-OS integration tests / tests d'intégration OS réels.
+Wiretap — real-OS integration tests / tests d'intégration OS réels.
 
 EN: These tests exercise the ACTUAL OS primitives the production code
     drives — no mocks for the platform layer:
@@ -9,14 +9,14 @@ EN: These tests exercise the ACTUAL OS primitives the production code
       * Windows : `fwpuclnt.dll` WFP engine open, real BLOCK filter at the
                   ALE connect layer verified with a live TCP connect.
       * macOS   : `sandbox-exec` seatbelt egress denial end-to-end.
-    They run only when SNITCH_OS_INTEGRATION=1 (the CI `integration` job)
+    They run only when WIRETAP_OS_INTEGRATION=1 (the CI `integration` job)
     because they mutate host firewall state / spawn namespaces. Every test
     cleans up in `finally` and skips honestly when the environment can't
     provide the primitive (no egress, userns disabled, no admin).
 
 FR: Ces tests exercent les VRAIES primitives OS que le code de production
     pilote — aucun mock sur la couche plateforme. Ils ne tournent que si
-    SNITCH_OS_INTEGRATION=1 (job CI `integration`) car ils modifient l'état
+    WIRETAP_OS_INTEGRATION=1 (job CI `integration`) car ils modifient l'état
     du pare-feu hôte. Chaque test nettoie dans `finally` et skip honnêtement
     quand l'environnement ne fournit pas la primitive.
 """
@@ -35,11 +35,11 @@ import textwrap
 import pytest
 
 SYSTEM = platform.system().lower()
-ENABLED = os.environ.get("SNITCH_OS_INTEGRATION") == "1"
+ENABLED = os.environ.get("WIRETAP_OS_INTEGRATION") == "1"
 
 pytestmark = [
     pytest.mark.skipif(not ENABLED,
-                       reason="needs SNITCH_OS_INTEGRATION=1 (CI job)"),
+                       reason="needs WIRETAP_OS_INTEGRATION=1 (CI job)"),
 ]
 
 # EN: Public reachability probe target for end-to-end block checks.
@@ -82,7 +82,7 @@ def _run(cmd: list[str], timeout: int = 15) -> subprocess.CompletedProcess:
 
 def _sudo(cmd: list[str]) -> list[str]:
     """EN: Prefix with non-interactive sudo — CI runners have passwordless
-    sudo; production normally runs Snitch with capture privileges anyway.
+    sudo; production normally runs Wiretap with capture privileges anyway.
     FR: Préfixe sudo non interactif — sudo sans mot de passe en CI."""
     return ["sudo", "-n", *cmd]
 
@@ -143,14 +143,14 @@ class TestLinuxReal:
             check = _run(_sudo([
                 "iptables", "-w", "-C", "OUTPUT", "-d", "203.0.113.9",
                 "-j", "DROP", "-m", "comment", "--comment",
-                f"snitch-{rule['id']}"]))
+                f"wiretap-{rule['id']}"]))
             assert check.returncode == 0, check.stderr[:300]
         finally:
             fm.remove_rule(rule["id"])
         gone = _run(_sudo([
             "iptables", "-w", "-C", "OUTPUT", "-d", "203.0.113.9",
             "-j", "DROP", "-m", "comment", "--comment",
-            f"snitch-{rule['id']}"]))
+            f"wiretap-{rule['id']}"]))
         assert gone.returncode != 0, "DROP rule still present"
 
     def test_iptables_block_really_drops(self):
@@ -163,10 +163,10 @@ class TestLinuxReal:
             pytest.skip("runner has no direct egress to 1.1.1.1:443")
         add = _sudo(["iptables", "-w", "-I", "OUTPUT", "-d", _PROBE_IP,
                      "-j", "DROP", "-m", "comment", "--comment",
-                     "snitch-itest"])
+                     "wiretap-itest"])
         delete = _sudo(["iptables", "-w", "-D", "OUTPUT", "-d", _PROBE_IP,
                         "-j", "DROP", "-m", "comment", "--comment",
-                        "snitch-itest"])
+                        "wiretap-itest"])
         res = _run(add)
         if res.returncode != 0:
             pytest.skip(f"cannot insert iptables rule: {res.stderr[:200]}")
@@ -322,7 +322,7 @@ class TestMacosReal:
         try:
             assert rule["applied"], rule["error"]
             body = fake_hosts.read_text()
-            assert f"# snitch-sinkhole {rule['id']} begin" in body
+            assert f"# wiretap-sinkhole {rule['id']} begin" in body
             assert "127.0.0.1 itest-sinkhole.example" in body
         finally:
             fm.remove_rule(rule["id"])
@@ -338,26 +338,26 @@ class TestLinuxV15Real:
     nfqueue, bcc/cgroup. Sondes d'abord, skip honnête sinon."""
 
     def test_nftables_table_lifecycle(self):
-        """EN: If `nft` exists, a dedicated `inet snitch` table can be
+        """EN: If `nft` exists, a dedicated `inet wiretap` table can be
         created and destroyed for real — the path _nft_apply() uses.
-        FR: Si `nft` existe, une table `inet snitch` dédiée se crée et se
+        FR: Si `nft` existe, une table `inet wiretap` dédiée se crée et se
         détruit réellement — le chemin utilisé par _nft_apply()."""
         import shutil
         if not shutil.which("nft"):
             pytest.skip("nft binary missing")
-        probe = _sudo(["nft", "list", "table", "inet", "snitch_itest"])
+        probe = _sudo(["nft", "list", "table", "inet", "wiretap_itest"])
         _run(probe)                                              # may exist
-        _run(_sudo(["nft", "delete", "table", "inet", "snitch_itest"]))
+        _run(_sudo(["nft", "delete", "table", "inet", "wiretap_itest"]))
         try:
-            res = _run(_sudo(["nft", "add", "table", "inet", "snitch_itest"]))
+            res = _run(_sudo(["nft", "add", "table", "inet", "wiretap_itest"]))
             assert res.returncode == 0, res.stderr[:200]
-            res = _run(_sudo(["nft", "add", "chain", "inet", "snitch_itest",
+            res = _run(_sudo(["nft", "add", "chain", "inet", "wiretap_itest",
                               "output", "{", "type", "filter", "hook",
                               "output", "priority", "0", ";", "}"]))
             assert res.returncode == 0, res.stderr[:200]
         finally:
-            _run(_sudo(["nft", "delete", "table", "inet", "snitch_itest"]))
-        res = _run(_sudo(["nft", "list", "table", "inet", "snitch_itest"]))
+            _run(_sudo(["nft", "delete", "table", "inet", "wiretap_itest"]))
+        res = _run(_sudo(["nft", "list", "table", "inet", "wiretap_itest"]))
         assert res.returncode != 0                            # really gone
 
     def test_firejail_net_none_denies_egress(self, tmp_path):

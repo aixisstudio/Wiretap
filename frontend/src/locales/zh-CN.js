@@ -1,5 +1,5 @@
 /**
- * Snitch — 简体中文界面词典。
+ * Wiretap — 简体中文界面词典。
  *
  * EN: Isolated locale file — one per language, so community contributors can
  *     add translations via a simple pull request (see CONTRIBUTING.md).
@@ -33,7 +33,7 @@ export default {
   legend_dns: 'DNS',
 
   // 侧栏标题 + 统计
-  app_name: 'SNITCH',
+  app_name: 'WIRETAP',
   tagline: '追踪每一个隐藏的流量。',
   footer_credit: '由 aiXis 开发',
   stat_lan: '局域网设备',
@@ -79,7 +79,7 @@ export default {
 
   // 节点名称 + 提示
   node_local: '本设备',
-  hint_local: '这就是本机 — 运行 Snitch 的机器。它收发的一切都从图的中心辐射出去。',
+  hint_local: '这就是本机 — 运行 Wiretap 的机器。它收发的一切都从图的中心辐射出去。',
   unidentified: '未识别',
   devtype_router: '路由器',
   devtype_phone: '手机',
@@ -157,7 +157,7 @@ export default {
   capture_stopping: '停止中…',
   capture_starting: '启动中…',
   capture_error_title: '抓包失败 — 将不会显示任何流量',
-  capture_error_hint: '请以抓包权限重启 Snitch（Windows 需管理员权限并安装 Npcap，macOS/Linux 需 sudo），或点击“开始”重试。',
+  capture_error_hint: '请以抓包权限重启 Wiretap（Windows 需管理员权限并安装 Npcap，macOS/Linux 需 sudo），或点击“开始”重试。',
 
   // 端口过滤
   port_filter: '端口',
@@ -228,7 +228,7 @@ export default {
   update_available: v => `有可用更新：v${v} — 正在下载`,
   update_downloading: p => `正在下载更新… ${p}%`,
   update_ready: v => `v${v} 已下载 — 重启以安装`,
-  update_none: 'Snitch 已是最新',
+  update_none: 'Wiretap 已是最新',
   update_error: '更新检查失败',
   update_idle: '尚未检查',
   update_restart: '重启并安装',
@@ -247,7 +247,7 @@ export default {
   diag_hint: '用于错误报告的日志和系统信息',
   diag_open_logs: '日志',
   diag_export: '导出',
-  settings_note: '所有设置均存储在本地。未经您明确启用，Snitch 从不向第三方发送数据。',
+  settings_note: '所有设置均存储在本地。未经您明确启用，Wiretap 从不向第三方发送数据。',
   nav_apps: '应用',
   ignore_alert: '忽略此类警报/主机',
 
@@ -261,10 +261,10 @@ export default {
   apps_history_60m: '最近一小时（字节/分钟）',
   alertmsg_NEW_HOSTS: n => `联系了 ${n} 个新主机`,
   settings_autolaunch: '登录时启动',
-  settings_autolaunch_hint: '登录时自动启动 Snitch',
+  settings_autolaunch_hint: '登录时自动启动 Wiretap',
 
   // 新手引导
-  onboard_title: '欢迎使用 Snitch',
+  onboard_title: '欢迎使用 Wiretap',
   onboard_sub: '实时网络流量可视化工具 — 隐私设计。',
   onboard_priv_title: '一切留在本机',
   onboard_priv_body: '流量元数据、警报和历史存储在本地 SQLite 数据库。无账号、无云端、无遥测。',
@@ -395,7 +395,7 @@ export default {
   bl_src_file: '文件',
   bl_src_url: 'URL',
   bl_import: '导入',
-  bl_url_confirm: '获取此 URL 会让 Snitch 发出出站请求 — 这是极少数例外之一。继续？',
+  bl_url_confirm: '获取此 URL 会让 Wiretap 发出出站请求 — 这是极少数例外之一。继续？',
   bl_result: (a, s) => `已添加 ${a} 条规则 · ${s} 条已存在`,
   bl_truncated: '列表已按上限截断',
   bl_remote: '已执行远程获取',
@@ -456,7 +456,7 @@ export default {
   ask_unavailable: '此系统不支持询问模式',
   ask_not_running: '询问模式已启用但未运行 — 请查看后端日志',
   gs_title: 'IOC 节点同步',
-  gs_hint: '每 5 分钟向显式配对的 Snitch 实例推送加盐 Merkle 证明包 — 仅哈希承诺，绝不发送原始指标。',
+  gs_hint: '每 5 分钟向显式配对的 Wiretap 实例推送加盐 Merkle 证明包 — 仅哈希承诺，绝不发送原始指标。',
   gs_peers_ph: '主机:端口，逗号分隔',
   gs_privacy: '可选的集群共享 — 数据包只发送给此处列出的节点。',
   ks_title: '流量终止开关',

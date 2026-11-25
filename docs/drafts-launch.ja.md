@@ -15,14 +15,14 @@
 ## 日本語 SNS 投稿（当日用）
 
 ```
-オープンソースのアプリケーションファイアウォール「Snitch」🛡️
+オープンソースのアプリケーションファイアウォール「Wiretap」🛡️
 
 すべてのアウトバウンド接続をプロセス単位で可視化し、
 ワンクリックでブロック（eBPF / NFQUEUE / nftables / WFP）。
 Sigmaルール、オフライン脅威インテリ、DGA/ICMPトンネル検知。
 100%ローカル・テレメトリなし・UIは日本語対応。
 
-https://github.com/aixisstudio/Snitch
+https://github.com/aixisstudio/Wiretap
 #OSS #セキュリティ
 ```
 

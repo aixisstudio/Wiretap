@@ -1,6 +1,6 @@
 """
 EN: Windows Filtering Platform — USER-MODE backend (no driver, no kernel
-    callout). Snitch talks to `fwpuclnt.dll` through ctypes and installs
+    callout). Wiretap talks to `fwpuclnt.dll` through ctypes and installs
     ordinary WFP *filters* at the ALE_AUTH_CONNECT layers — exactly what
     `netsh advfirewall` does under the hood, but with per-application
     precision (ALE_APP_ID), per-rule GUID keys and atomic deletes.
@@ -19,7 +19,7 @@ EN: Windows Filtering Platform — USER-MODE backend (no driver, no kernel
     reported as honest applied=False by the caller.
 
 FR: Windows Filtering Platform — backend USER-MODE (sans driver ni callout
-    noyau). Snitch dialogue avec `fwpuclnt.dll` via ctypes et installe des
+    noyau). Wiretap dialogue avec `fwpuclnt.dll` via ctypes et installe des
     filtres WFP ordinaires sur les couches ALE_AUTH_CONNECT — exactement ce
     que fait `netsh advfirewall` en dessous, mais avec une précision par
     application (ALE_APP_ID), des clés GUID par règle et des suppressions
@@ -62,7 +62,7 @@ FWP_V6_ADDR_MASK         = 257
 FWP_MATCH_EQUAL          = 0
 FWP_ACTION_BLOCK         = 0x00001001  # EN: BLOCK | FLAG_TERMINATING / FR: BLOCK | TERMINATING
 FWP_E_FILTER_NOT_FOUND   = 0x80320004
-_NAME_PREFIX             = "SnitchRule-"
+_NAME_PREFIX             = "WiretapRule-"
 
 
 def _guid(text: str):
@@ -78,7 +78,7 @@ def _rule_key(rid: str, tag: str = ""):
     FR: GUID de filtre déterministe par (règle, cible) — la suppression par
     clé n'exige pas de handle stocké et survit aux redémarrages."""
     return _GUID.from_buffer_copy(
-        uuid.uuid5(uuid.NAMESPACE_URL, f"snitch-wfp:{rid}:{tag}").bytes_le)
+        uuid.uuid5(uuid.NAMESPACE_URL, f"wiretap-wfp:{rid}:{tag}").bytes_le)
 
 
 # ── ctypes structures — layouts match the SDK on Win64 exactly ──────────────
@@ -161,11 +161,11 @@ class _BYTE_ARRAY16(ctypes.Structure):
 
 class WfpBackend:
     """EN: Minimal WFP user-mode client — open engine, add block filters with
-    deterministic GUID keys, delete by key, purge stale Snitch filters by
+    deterministic GUID keys, delete by key, purge stale Wiretap filters by
     enumerating names. Everything is best-effort and never raises.
     FR: Client WFP user-mode minimal — ouvre le moteur, ajoute des filtres
     de blocage à clés GUID déterministes, supprime par clé, purge les
-    filtres Snitch périmés en énumérant les noms. Au mieux, ne lève jamais."""
+    filtres Wiretap périmés en énumérant les noms. Au mieux, ne lève jamais."""
 
     def __init__(self):
         self._dll = None
@@ -187,9 +187,9 @@ class WfpBackend:
 
     def open(self) -> tuple[bool, str]:
         """EN: Load fwpuclnt + open a non-dynamic session (filters persist —
-        Snitch deletes them explicitly by key). Returns (ok, error).
+        Wiretap deletes them explicitly by key). Returns (ok, error).
         FR: Charge fwpuclnt + ouvre une session non dynamique (les filtres
-        persistent — Snitch les supprime explicitement par clé)."""
+        persistent — Wiretap les supprime explicitement par clé)."""
         if self._engine.value:
             return True, ""
         if not self.available():
@@ -199,8 +199,8 @@ class WfpBackend:
         except OSError as e:
             return False, f"fwpuclnt unavailable: {e}"
         sess = _SESSION()
-        sess.displayData.name = "Snitch"
-        sess.displayData.description = "Snitch outbound filters"
+        sess.displayData.name = "Wiretap"
+        sess.displayData.description = "Wiretap outbound filters"
         sess.flags = 0                 # EN: persistent / FR: persistante
         sess.processId = os.getpid()
         engine = ctypes.c_void_p()
@@ -240,7 +240,7 @@ class WfpBackend:
                 f = _FILTER()
                 f.filterKey = _rule_key(rid, tag)
                 f.displayData.name = _NAME_PREFIX + rid
-                f.displayData.description = "Snitch outbound block"
+                f.displayData.description = "Wiretap outbound block"
                 f.layerKey = _guid(layer_s)
                 f.subLayerKey = _guid(_SUBLAYER_UNIVERSAL)
                 weight = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)
@@ -382,9 +382,9 @@ class WfpBackend:
         return blob
 
     def _purge_stale(self) -> None:
-        """EN: Remove leftover SnitchRule-* filters from previous runs —
+        """EN: Remove leftover WiretapRule-* filters from previous runs —
         enumerates the engine and deletes by key on name-prefix match.
-        FR: Retire les filtres SnitchRule-* restés d'exécutions passées —
+        FR: Retire les filtres WiretapRule-* restés d'exécutions passées —
         énumère le moteur et supprime par clé sur préfixe de nom."""
         enum_h = ctypes.c_void_p()
         rc = self._dll.FwpmFilterCreateEnumHandle0(

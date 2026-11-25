@@ -1,5 +1,5 @@
 """
-Snitch — DGA / suspicious-domain heuristics (pure Python, local-only) /
+Wiretap — DGA / suspicious-domain heuristics (pure Python, local-only) /
 heuristiques anti-DGA (pur Python, local).
 
 EN: Domain-generation-algorithm detection without any external lookup —

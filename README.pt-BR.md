@@ -1,37 +1,37 @@
 <div align="center">
 
-# Snitch
+# Wiretap
 
 **Rastreie cada conexão escondida.**
 
 [English](README.md#english) | [Français](README.md#français) | [Español](README.es.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [日本語](README.ja.md) | **Português** | [中文](README.zh-CN.md)
 
-⭐ **Se o Snitch te ajuda, uma estrela significa muito!** ⭐
+⭐ **Se o Wiretap te ajuda, uma estrela significa muito!** ⭐
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-blue.svg)]()
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)]()
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20(Docker)-blue.svg)]()
-[![GitHub release](https://img.shields.io/github/v/release/aixisstudio/Snitch?include_prereleases&label=release)](https://github.com/aixisstudio/Snitch/releases/latest)
-[![GitHub stars](https://img.shields.io/github/stars/aixisstudio/Snitch?style=flat-square&logo=github)](https://github.com/aixisstudio/Snitch/stargazers)
+[![GitHub release](https://img.shields.io/github/v/release/aixisstudio/Wiretap?include_prereleases&label=release)](https://github.com/aixisstudio/Wiretap/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/aixisstudio/Wiretap?style=flat-square&logo=github)](https://github.com/aixisstudio/Wiretap/stargazers)
 
-<!-- PT-BR: Captura ao vivo do modo demo (SNITCH_DEMO=1) — apenas tráfego sintético. -->
-![Snitch live graph — LAN perimeter, geolocated hosts, alerts](docs/assets/demo.gif)
+<!-- PT-BR: Captura ao vivo do modo demo (WIRETAP_DEMO=1) — apenas tráfego sintético. -->
+![Wiretap live graph — LAN perimeter, geolocated hosts, alerts](docs/assets/demo.gif)
 
 </div>
 
 ---
 
-**Snitch** é um visualizador de tráfego de rede em tempo real.
+**Wiretap** é um visualizador de tráfego de rede em tempo real.
 Veja cada conexão que seu computador faz — com quem fala, onde está e qual aplicativo é o responsável.
 
 Toda a interface está disponível em **English, Français, Español, Deutsch, Русский, 日本語, Português (BR) e 简体中文**: use o seletor de idioma na barra de ferramentas.
 
-### Por que Snitch?
+### Por que Wiretap?
 
-- **vs Little Snitch / Lulu** — mesma ideia (visibilidade por app + regras de bloqueio de saída), mas o Snitch é multiplataforma, gratuito e open-source. O bloqueio é orquestrado pelo firewall nativo do SO (`netsh` / `iptables` / `pf`) — o Snitch nunca filtra em user-space.
-- **vs GlassWire** — Snitch é gratuito, open-source (AGPL), sem conta e **zero chamadas externas** sem opt-in; até a geolocalização é offline.
-- **vs Wireshark** — Snitch dá uma visão geral ao vivo que qualquer um lê, em vez de dissecação bruta de pacotes.
+- **vs Little Snitch / Lulu** — mesma ideia (visibilidade por app + regras de bloqueio de saída), mas o Wiretap é multiplataforma, gratuito e open-source. O bloqueio é orquestrado pelo firewall nativo do SO (`netsh` / `iptables` / `pf`) — o Wiretap nunca filtra em user-space.
+- **vs GlassWire** — Wiretap é gratuito, open-source (AGPL), sem conta e **zero chamadas externas** sem opt-in; até a geolocalização é offline.
+- **vs Wireshark** — Wiretap dá uma visão geral ao vivo que qualquer um lê, em vez de dissecação bruta de pacotes.
 - **vs monitores na nuvem** — tudo roda em `127.0.0.1` atrás de um token; seus dados de tráfego nunca saem da máquina.
 
 ### Funcionalidades
@@ -60,7 +60,7 @@ Toda a interface está disponível em **English, Français, Español, Deutsch, �
 | Monitor de banda | Sparkline de MB/s ao vivo |
 | UI em 8 idiomas | EN · FR · ES · DE · RU · JA · PT-BR · ZH-CN — troca em um clique, locales em `frontend/src/locales/` |
 | Tema claro / escuro | Segue a preferência do SO, alternância manual persistida |
-| Atualização automática | O app desktop consulta o GitHub Releases (desativável em Configurações; `SNITCH_NO_UPDATE=1`) |
+| Atualização automática | O app desktop consulta o GitHub Releases (desativável em Configurações; `WIRETAP_NO_UPDATE=1`) |
 | QUIC / HTTP/3 | Fluxos UDP/443 rotulados honestamente — o SNI do QUIC é criptografado e nunca lido |
 | Watchlist | Fixe IPs/domínios — alerta dedicado no primeiro contato |
 | Alerta de pico de upload | Teto de MB/min por processo com limiar ajustável |
@@ -72,15 +72,15 @@ Toda a interface está disponível em **English, Français, Español, Deutsch, �
 
 | Plataforma | Pacote |
 |---|---|
-| **macOS (Apple Silicon)** | `brew install --cask aixisstudio/tap/snitch` — ou **Snitch.app** zip/dmg da [última release](https://github.com/aixisstudio/Snitch/releases/latest) |
-| **Linux** | **Snitch AppImage / .deb / .rpm / .snap** da [última release](https://github.com/aixisstudio/Snitch/releases/latest) — ou `sudo docker compose up --build`, veja [Docker (Linux)](#docker-linux) |
-| **Headless (qualquer SO)** | `brew install aixisstudio/tap/snitch` → daemon `snitchd` (servidores/VMs, sem GUI) |
-| **Windows** | **Snitch Setup** `.exe` — instalador NSIS de um clique (app nativo, prompt UAC ao abrir, verificação de Npcap embutida) da [última release](https://github.com/aixisstudio/Snitch/releases/latest). Alternativa lite: `Snitch-Lite-Setup` (backend + UI no navegador). Requer [Npcap](https://npcap.com/) |
-| **Todas (1 clique)** | [Pinokio](https://pinokio.co/apps/github-com-aixisstudio-snitch) — instala dependências, sobe o backend, abre a UI |
+| **macOS (Apple Silicon)** | `brew install --cask aixisstudio/tap/wiretap` — ou **Wiretap.app** zip/dmg da [última release](https://github.com/aixisstudio/Wiretap/releases/latest) |
+| **Linux** | **Wiretap AppImage / .deb / .rpm / .snap** da [última release](https://github.com/aixisstudio/Wiretap/releases/latest) — ou `sudo docker compose up --build`, veja [Docker (Linux)](#docker-linux) |
+| **Headless (qualquer SO)** | `brew install aixisstudio/tap/wiretap` → daemon `wiretapd` (servidores/VMs, sem GUI) |
+| **Windows** | **Wiretap Setup** `.exe` — instalador NSIS de um clique (app nativo, prompt UAC ao abrir, verificação de Npcap embutida) da [última release](https://github.com/aixisstudio/Wiretap/releases/latest). Alternativa lite: `Wiretap-Lite-Setup` (backend + UI no navegador). Requer [Npcap](https://npcap.com/) |
+| **Todas (1 clique)** | [Pinokio](https://pinokio.co/apps/github-com-aixisstudio-wiretap) — instala dependências, sobe o backend, abre a UI |
 
-Ou pegue a última release: **[github.com/aixisstudio/Snitch/releases](https://github.com/aixisstudio/Snitch/releases)**
+Ou pegue a última release: **[github.com/aixisstudio/Wiretap/releases](https://github.com/aixisstudio/Wiretap/releases)**
 
-> **Primeira execução no macOS** — o Snitch é assinado ad-hoc, não notarizado (sem Apple Developer ID pago). O `brew install --cask` remove a quarentena para você. Para o zip manual: clique direito → **Abrir**, ou `xattr -dr com.apple.quarantine /Applications/Snitch.app`. Na primeira execução o Snitch pede sua senha de admin **uma vez** — a captura de pacotes exige, como tcpdump/Wireshark; a UI permanece sem privilégios.
+> **Primeira execução no macOS** — o Wiretap é assinado ad-hoc, não notarizado (sem Apple Developer ID pago). O `brew install --cask` remove a quarentena para você. Para o zip manual: clique direito → **Abrir**, ou `xattr -dr com.apple.quarantine /Applications/Wiretap.app`. Na primeira execução o Wiretap pede sua senha de admin **uma vez** — a captura de pacotes exige, como tcpdump/Wireshark; a UI permanece sem privilégios.
 >
 > **Assinatura de código Windows** — os builds Windows serão assinados com Authenticode graças a um certificado open source gratuito da [SignPath Foundation](https://signpath.org) via [SignPath.io](https://signpath.io) (pedido enviado, aguardando aprovação). Até o primeiro build assinado, o SmartScreen pode avisar — clique **Mais informações → Executar mesmo assim**.
 
@@ -97,10 +97,10 @@ Ou pegue a última release: **[github.com/aixisstudio/Snitch/releases](https://g
 ### Segurança e privacidade
 
 - **Token de API** — todo endpoint REST e o WebSocket exigem token. O Electron o gera por execução; em Docker/navegador é impresso uma vez nos logs e guardado em `data/api_token.txt`. Abra a UI em `http://localhost:8000/?token=<TOKEN>`.
-- **Só loopback por padrão** — a API escuta em `127.0.0.1` em todos os modos. Use `SNITCH_BIND=0.0.0.0` apenas para acesso LAN explícito (o token continua obrigatório).
+- **Só loopback por padrão** — a API escuta em `127.0.0.1` em todos os modos. Use `WIRETAP_BIND=0.0.0.0` apenas para acesso LAN explícito (o token continua obrigatório).
 - **Allowlist CORS/Origin de WebSocket** — apenas `localhost:5173`, a origem do próprio backend e páginas `file://` do Electron podem conectar.
 - **Geolocalização 100 % offline** — *nenhuma* consulta online. DB-IP Lite ([CC BY 4.0](https://db-ip.com/db/lite.php)) é extraída para `<data_dir>/geo/`; você pode soltar `.mmdb` MaxMind mais novas ou baixar DB-IP Lite em Configurações (consentimento explícito; as demais chamadas opt-in — threat intel, webhooks, atualizações — estão em [PRIVACY.md](PRIVACY.md)).
-- **Todos os dados ficam locais** — `snitch.db` (janela deslizante de 24 h, `retention_hours`) e `data/logs/snitch.log` nunca saem da máquina. Sem telemetria. Toda chamada externa é opt-in.
+- **Todos os dados ficam locais** — `wiretap.db` (janela deslizante de 24 h, `retention_hours`) e `data/logs/wiretap.log` nunca saem da máquina. Sem telemetria. Toda chamada externa é opt-in.
 - **Configurações persistem** — filtros de porta, processos excluídos, whitelist de IP, regras de firewall, idioma e retenção são guardados em SQLite e restaurados no reinício.
 - **Regras de firewall best-effort** — o backend pilota o firewall do SO (`netsh advfirewall`, `iptables`, âncoras `pf`); sem privilégios a regra é mantida e avaliada para *visibilidade* (alertas BLOCKED_ATTEMPT), marcada «não aplicada» em vez de fingir aplicação. O lockdown mantém loopback + LAN para a UI continuar acessível.
 - **Threat intel e webhooks opt-in** — desligados por padrão; ativar um provedor ou webhook adiciona chamadas externas, documentadas em [PRIVACY.md](PRIVACY.md).
@@ -112,14 +112,14 @@ Ou pegue a última release: **[github.com/aixisstudio/Snitch/releases](https://g
 
 ### Docker (Linux)
 
-O deploy em Docker é para usuários Linux que querem rodar o Snitch sem instalar mais nada.
+O deploy em Docker é para usuários Linux que querem rodar o Wiretap sem instalar mais nada.
 A captura funciona via `network_mode: host` — o contêiner vê o tráfego real do host.
 
 **Imagem pronta** — sem clone nem build:
 
 ```bash
 sudo docker run --network host --cap-add NET_ADMIN --cap-add NET_RAW \
-  -v snitch-data:/app/data ghcr.io/aixisstudio/snitch
+  -v wiretap-data:/app/data ghcr.io/aixisstudio/wiretap
 ```
 
 > **Nota:** o Docker Desktop no Mac/Windows roda numa VM e não consegue capturar o tráfego do host. Use o app Electron nessas plataformas.
@@ -133,7 +133,7 @@ Limitações do Docker: atribuição de processo restrita aos processos do cont�
 
 Requisitos: Python 3.11+, Node.js 18+, [Npcap](https://npcap.com/) (só Windows), terminal com privilégios para o backend.
 
-> **Modo demo** — `SNITCH_DEMO=1` alimenta tráfego sintético pelo pipeline real: sem root, sem libpcap, sem pacotes reais. Ideal para capturas de tela e testes.
+> **Modo demo** — `WIRETAP_DEMO=1` alimenta tráfego sintético pelo pipeline real: sem root, sem libpcap, sem pacotes reais. Ideal para capturas de tela e testes.
 
 ```bash
 cd backend && pip install -r requirements.txt && python run_backend.py
@@ -151,7 +151,7 @@ cd frontend && npm test
 ### Estrutura do projeto
 
 ```
-snitch/
+wiretap/
 ├── backend/       FastAPI + captura libpcap (ctypes, parser próprio)
 ├── frontend/      UI React + D3.js (8 idiomas)
 ├── electron/      Empacotador Electron (main, splash, preload)
@@ -163,12 +163,12 @@ snitch/
 
 ### Enterprise e frota
 
-O Snitch também roda headless para implantações SOC — tudo por arquivos e grátis:
+O Wiretap também roda headless para implantações SOC — tudo por arquivos e grátis:
 
-- **Security-as-Code** — um `snitch.toml` (ou `$SNITCH_CONFIG`) sobrescreve todas as configurações; provisione frotas com Ansible (`deploy/ansible/`), Puppet, Salt ou GPO.
+- **Security-as-Code** — um `wiretap.toml` (ou `$WIRETAP_CONFIG`) sobrescreve todas as configurações; provisione frotas com Ansible (`deploy/ansible/`), Puppet, Salt ou GPO.
 - **Agente Rust** — um daemon sem dependências (`agent/`) envia sockets a `POST /ingest/events` com atribuição `/proc`→PID no Linux; `POST /ingest/enroll` emite tokens `sagt_…` de uso único (hasheados, revogáveis).
 - **Nativo em SIEM** — syslog CEF ou RFC 3164, webhooks genéricos e `GET /forensics/export?format=ecs` (NDJSON Elastic Common Schema) alimentam Wazuh, Splunk, Graylog, Loki e Elastic. Importação Sigma (`POST /alerts/rules/sigma`), exportação YARA-L (`GET /alerts/rules/yaral`).
-- **Visão da frota** — `GET /remote/fleet` funde as auditorias de todos os pares; um chart Helm (`deploy/helm/snitch`) roda o coletor no cluster.
+- **Visão da frota** — `GET /remote/fleet` funde as auditorias de todos os pares; um chart Helm (`deploy/helm/wiretap`) roda o coletor no cluster.
 - **Feeds de TI gratuitos** — `POST /firewall/blocklist` importa listas de domínios (StevenBlack) e IPs (Blocklist.de, URLhaus/Feodo); `ti_feeds` agenda atualizações automáticas.
 
 Receitas passo a passo em [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md).
@@ -179,4 +179,4 @@ AGPL v3 — veja [LICENSE](LICENSE). Livre para usar, estudar e modificar; obras
 
 ## Histórico de estrelas
 
-[![Star History Chart](https://api.star-history.com/svg?repos=aixisstudio/Snitch&type=Date)](https://star-history.com/#aixisstudio/Snitch&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=aixisstudio/Wiretap&type=Date)](https://star-history.com/#aixisstudio/Wiretap&Date)

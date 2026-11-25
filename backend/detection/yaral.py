@@ -1,11 +1,11 @@
 """
-Snitch — YARA-L 2.0 export / export YARA-L 2.0.
+Wiretap — YARA-L 2.0 export / export YARA-L 2.0.
 
-EN: Translates Snitch custom rules (single-condition or `conds:` AND
+EN: Translates Wiretap custom rules (single-condition or `conds:` AND
     rules, including Sigma-imported ones) into a YARA-L 2.0 file for
-    Google SecOps/Chronicle UDM pipelines. Snitch stays the runtime —
+    Google SecOps/Chronicle UDM pipelines. Wiretap stays the runtime —
     this is a one-way EXPORT, giving a Sigma→YARA-L path for free
-    (Sigma YAML → snitch rules → YARA-L text).
+    (Sigma YAML → wiretap rules → YARA-L text).
 
     Field mapping (packet-sensor → UDM, honest approximations):
 
@@ -13,7 +13,7 @@ EN: Translates Snitch custom rules (single-condition or `conds:` AND
       remote_port  → target.port          (eq/ne/gt/lt)
       host         → network.tls.client.server_name OR'd with
                      network.dns.questions.name — SNI and DNS are both
-                     "host" in Snitch; emitted as a ( … or … ) clause
+                     "host" in Wiretap; emitted as a ( … or … ) clause
       process_name → principal.process.file.full_path (contains → regex)
       protocol     → network.ip_protocol  (tcp/udp uppercased)
       direction    → network.direction    (OUTBOUND/INBOUND)
@@ -26,7 +26,7 @@ EN: Translates Snitch custom rules (single-condition or `conds:` AND
     Ops outside a field's row are dropped with a `// SKIPPED` comment —
     never mistranslated, same honesty contract as the Sigma importer.
 
-FR: Traduit les règles custom Snitch (simples ou `conds:` AND, y
+FR: Traduit les règles custom Wiretap (simples ou `conds:` AND, y
     compris les règles importées Sigma) en fichier YARA-L 2.0 pour
     pipelines UDM Google SecOps/Chronicle. Export unidirectionnel —
     donne un chemin Sigma→YARA-L gratuitement. Les ops hors ligne sont
@@ -37,8 +37,8 @@ from __future__ import annotations
 
 import re
 
-_HEADER = """// Snitch — auto-generated YARA-L 2.0 rules
-// Source: Snitch custom rules (single + Sigma-imported conds rules)
+_HEADER = """// Wiretap — auto-generated YARA-L 2.0 rules
+// Source: Wiretap custom rules (single + Sigma-imported conds rules)
 // Regenerate: GET /alerts/rules/yaral — do NOT edit by hand.
 // Field mapping is packet-sensor → UDM; see detection/yaral.py.
 
@@ -134,9 +134,9 @@ def export(rules: list[dict]) -> str:
         body = " and\n    ".join(clauses)
         note = ("\n    // skipped: " + "; ".join(skipped)) if skipped else ""
         out.append(
-            f'rule snitch_{rid} {{\n'
+            f'rule wiretap_{rid} {{\n'
             f'  meta:\n'
-            f'    author = "Snitch"\n'
+            f'    author = "Wiretap"\n'
             f'    description = "{_esc(name)}"\n'
             f'    severity = "{sev}"\n'
             f'  events:\n'

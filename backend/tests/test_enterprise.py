@@ -15,8 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 def test_configfile_toml(tmp_path, monkeypatch):
     import configfile
-    monkeypatch.delenv("SNITCH_CONFIG", raising=False)
-    (tmp_path / "snitch.toml").write_text(
+    monkeypatch.delenv("WIRETAP_CONFIG", raising=False)
+    (tmp_path / "wiretap.toml").write_text(
         'syslog_addr = "siem:514"\nkill_switch_enabled = true\nports = [80, 443]\n')
     cfg = configfile.load(tmp_path)
     assert cfg["syslog_addr"] == "siem:514" and cfg["ports"] == [80, 443]
@@ -26,22 +26,22 @@ def test_configfile_env_wins(tmp_path, monkeypatch):
     import configfile
     env_file = tmp_path / "elsewhere.toml"
     env_file.write_text('ask_enabled = true\n')
-    monkeypatch.setenv("SNITCH_CONFIG", str(env_file))
+    monkeypatch.setenv("WIRETAP_CONFIG", str(env_file))
     cfg = configfile.load(tmp_path)              # no local file → env only
     assert cfg == {"ask_enabled": True}
 
 
 def test_configfile_invalid_is_empty(tmp_path, monkeypatch):
     import configfile
-    monkeypatch.delenv("SNITCH_CONFIG", raising=False)
-    (tmp_path / "snitch.toml").write_text('this is = = broken [[[\n')
+    monkeypatch.delenv("WIRETAP_CONFIG", raising=False)
+    (tmp_path / "wiretap.toml").write_text('this is = = broken [[[\n')
     assert configfile.load(tmp_path) == {}       # EN: never crashes / FR: ne plante jamais
 
 
 def test_configfile_apply_overrides(tmp_path, monkeypatch):
     import configfile
-    monkeypatch.delenv("SNITCH_CONFIG", raising=False)
-    (tmp_path / "snitch.toml").write_text('kill_switch_enabled = true\n')
+    monkeypatch.delenv("WIRETAP_CONFIG", raising=False)
+    (tmp_path / "wiretap.toml").write_text('kill_switch_enabled = true\n')
     store = {"kill_switch_enabled": False}
     n = configfile.apply(tmp_path, lambda k, v: store.__setitem__(k, v))
     assert n == 1 and store["kill_switch_enabled"] is True
@@ -277,7 +277,7 @@ def test_to_cef_escapes_and_maps():
                    "message": "a|b=c\\d", "timestamp": "2024-01-01T00:00:00Z",
                    "details": {"ip": "1.2.3.4", "process": "evil",
                                "pid": 42}}, "1.5.3")
-    assert line.startswith("CEF:0|Cognition|Snitch|1.5.3|CUSTOM_RULE|")
+    assert line.startswith("CEF:0|Cognition|Wiretap|1.5.3|CUSTOM_RULE|")
     assert "|8|" in line                       # EN: critical→cef 8 / FR: critical→cef 8
     assert "dst=1.2.3.4" in line and "sproc=evil" in line
     assert "\\\\" in line or "\\|" in line or "\\=" in line   # EN: escaped / FR: échappé
@@ -296,7 +296,7 @@ def test_yaral_single_rule():
     out = yaral.export([{"id": "r1", "name": "bad c2", "severity": "critical",
                          "field": "remote_ip", "op": "cidr",
                          "value": "10.0.0.0/8"}])
-    assert "rule snitch_r1" in out
+    assert "rule wiretap_r1" in out
     assert 'net.ip_in_range_cidr($e.target.ip, "10.0.0.0/8")' in out
     assert 'severity = "CRITICAL"' in out
 
@@ -320,7 +320,7 @@ def test_yaral_unmappable_skipped_honestly():
                          "field": "direction", "op": "contains",
                          "value": "y"}])
     assert "// SKIPPED rule 'nope'" in out
-    assert "rule snitch_x {" not in out
+    assert "rule wiretap_x {" not in out
 
 
 def test_yaral_numeric_fields_unquoted():
@@ -341,8 +341,8 @@ def test_ingest_events_endpoint():
     from api.security import API_TOKEN
     c = TestClient(app)
     r = c.post("/ingest/events",
-               headers={"X-Snitch-Token": API_TOKEN},
-               json={"agent": "snitch-agent/1", "host": "a1",
+               headers={"X-Wiretap-Token": API_TOKEN},
+               json={"agent": "wiretap-agent/1", "host": "a1",
                      "events": [{"src_ip": "10.0.0.5", "dst_ip": "93.184.216.34",
                                  "src_port": 51000, "dst_port": 443,
                                  "proto": "tcp", "direction": "out"}]})
@@ -368,7 +368,7 @@ def test_ingest_events_bounded_and_validated():
     from api.security import API_TOKEN
     c = TestClient(app)
     r = c.post("/ingest/events",
-               headers={"X-Snitch-Token": API_TOKEN},
+               headers={"X-Wiretap-Token": API_TOKEN},
                json={"agent": "x", "host": "h",
                      "events": [{"dst_ip": ""},        # EN: dropped / FR: rejeté
                                 "not-a-dict",          # EN: dropped / FR: rejeté
@@ -380,10 +380,10 @@ def test_ingest_events_bounded_and_validated():
 
 def test_ingest_enroll_and_agent_token():
     # EN: Master enrolls an agent → returns a one-shot sagt_ token; the
-    #     agent then ingests with X-Snitch-Agent and its enrolled name is
+    #     agent then ingests with X-Wiretap-Agent and its enrolled name is
     #     authoritative. Revoking removes the token hash → 401 again.
     # FR: Le maître enrôle un agent → jeton sagt_ one-shot ; l'agent ingère
-    #     ensuite avec X-Snitch-Agent et son nom enrôlé fait foi. La
+    #     ensuite avec X-Wiretap-Agent et son nom enrôlé fait foi. La
     #     révocation supprime le hash → 401.
     import pytest
     pytest.importorskip("httpx")
@@ -391,7 +391,7 @@ def test_ingest_enroll_and_agent_token():
     from api.main import app
     from api.security import API_TOKEN
     c = TestClient(app)
-    auth = {"X-Snitch-Token": API_TOKEN}
+    auth = {"X-Wiretap-Token": API_TOKEN}
 
     # EN: enroll requires the master token / FR: enrôlement = jeton maître
     assert c.post("/ingest/enroll", json={"name": "edge-1"}).status_code in (401, 403)
@@ -405,8 +405,8 @@ def test_ingest_enroll_and_agent_token():
                   json={"name": "edge-1"}).status_code == 409
 
     # EN: agent token ingests, master-free / FR: le jeton agent ingère sans maître
-    r = c.post("/ingest/events", headers={"X-Snitch-Agent": tok},
-               json={"agent": "snitch-agent/1", "host": "spoofed",
+    r = c.post("/ingest/events", headers={"X-Wiretap-Agent": tok},
+               json={"agent": "wiretap-agent/1", "host": "spoofed",
                      "events": [{"dst_ip": "8.8.8.8", "dst_port": 443,
                                  "proto": "tcp"}]})
     # EN: enrolled name is authoritative, not the body's claimed host
@@ -416,7 +416,7 @@ def test_ingest_enroll_and_agent_token():
     # EN: list + revoke / FR: liste + révocation
     assert "edge-1" in c.get("/ingest/agents", headers=auth).json()["agents"]
     c.post("/ingest/revoke", headers=auth, json={"name": "edge-1"})
-    r = c.post("/ingest/events", headers={"X-Snitch-Agent": tok},
+    r = c.post("/ingest/events", headers={"X-Wiretap-Agent": tok},
                json={"events": []})
     assert r.status_code in (401, 403)
 
@@ -446,11 +446,11 @@ def test_ingest_events_cmdline_enrichment_and_remote_port():
 
     custom_rules.add("catch mcp", "cmdline", "contains", "mcp-agent")
     c = TestClient(app)
-    auth = {"X-Snitch-Token": API_TOKEN}
+    auth = {"X-Wiretap-Token": API_TOKEN}
 
     # Outbound event with cmdline and parent_name
     r = c.post("/ingest/events", headers=auth, json={
-        "agent": "snitch-agent/1", "host": "test-host",
+        "agent": "wiretap-agent/1", "host": "test-host",
         "events": [{
             "src_ip": "10.0.0.5", "dst_ip": "93.184.216.34",
             "src_port": 52000, "dst_port": 443, "proto": "tcp",

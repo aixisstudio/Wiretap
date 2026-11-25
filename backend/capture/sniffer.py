@@ -1,5 +1,5 @@
 """
-Snitch — packet sniffer (libpcap edition).
+Wiretap — packet sniffer (libpcap edition).
 
 EN: Captures IPv4 AND IPv6 frames through a ctypes libpcap binding
     (capture/pcap.py) and decodes them with our own parser
@@ -42,7 +42,7 @@ from .procinfo import ProcEnricher
 from capture.pcap import PcapError, PcapSession, is_available, list_devices
 from capture.parser import parse_frame
 
-logger = logging.getLogger("snitch.capture.sniffer")
+logger = logging.getLogger("wiretap.capture.sniffer")
 
 # EN: libpcap presence check — capture disabled but the API still runs.
 # FR: Vérification de présence de libpcap — capture désactivée mais l'API tourne.
@@ -212,11 +212,11 @@ class ConnectionTable:
 class PacketSniffer:
     """
     EN: libpcap-backed capture with an optional BPF port filter and an
-        interface selector (SNITCH_IFACE env or constructor arg; default =
+        interface selector (WIRETAP_IFACE env or constructor arg; default =
         first non-loopback device). The user callback fires once per packet
         from the capture thread.
     FR: Capture adossée à libpcap avec filtre de ports BPF optionnel et
-        sélecteur d'interface (env SNITCH_IFACE ou argument ; défaut = premier
+        sélecteur d'interface (env WIRETAP_IFACE ou argument ; défaut = premier
         périphérique non-loopback). Le callback utilisateur est appelé une fois
         par paquet depuis le thread de capture.
     """
@@ -225,7 +225,7 @@ class PacketSniffer:
                  ports: list[int] | None = None, iface: str | None = None):
         self.callback = callback
         self.ports = ports or []
-        self.iface = iface or os.environ.get("SNITCH_IFACE") or self._default_iface()
+        self.iface = iface or os.environ.get("WIRETAP_IFACE") or self._default_iface()
         self.local_ips = get_local_ips()
         self._session: Optional[PcapSession] = None
         self._conn_table = ConnectionTable()

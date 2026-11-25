@@ -1,5 +1,5 @@
 /**
- * Snitch — privacy score tests (Vitest).
+ * Wiretap — privacy score tests (Vitest).
  *
  * EN: Exercises computePrivacyScore's main branches: baseline, tracker
  *     penalties, beacon/critical penalties, grade/color/label mapping and

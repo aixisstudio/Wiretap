@@ -1,5 +1,5 @@
 """
-Snitch — capture interface selection tests (no libpcap, no real traffic).
+Wiretap — capture interface selection tests (no libpcap, no real traffic).
 
 EN: Covers sockaddr decoding of libpcap device addresses and the default
     interface choice: the device owning the default-route IP must win over

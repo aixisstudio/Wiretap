@@ -18,27 +18,27 @@
 
 ## Fiche d'identité (pour harmoniser toutes les plateformes)
 
-- **Nom :** Snitch
+- **Nom :** Wiretap
 - **Tagline EN :** Open-source application firewall — see and block every connection, 100% local
-- **Repo :** https://github.com/aixisstudio/Snitch
-- **Site :** https://aixisstudio.github.io/Snitch/
+- **Repo :** https://github.com/aixisstudio/Wiretap
+- **Site :** https://aixisstudio.github.io/Wiretap/
 - **Licence :** AGPL-3.0-or-later
 - **Plateformes :** Windows, macOS, Linux (+ Docker, agent Rust headless)
 - **Langues UI :** EN, FR, ES, DE, RU, JA, PT-BR, ZH-CN
 - **Arguments clés :** blocage par processus (eBPF / NFQUEUE / nftables /
   Windows WFP), règles Sigma, threat intel offline, détection DGA / tunnel
-  ICMP / beaconing, zéro télémétrie, API loopback+token, `SNITCH_DEMO=1`,
+  ICMP / beaconing, zéro télémétrie, API loopback+token, `WIRETAP_DEMO=1`,
   exports SIEM (ECS/CEF/JSON/Syslog), déploiement Ansible/Helm/GPO.
 
 ---
 
 ## 1. Show HN — news.ycombinator.com/submit
 
-**URL :** `https://github.com/aixisstudio/Snitch`
+**URL :** `https://github.com/aixisstudio/Wiretap`
 
 ### Titre — option A (recommandé)
 
-`Show HN: Snitch – open-source app firewall, Sigma rules and one-click blocking`
+`Show HN: Wiretap – open-source app firewall, Sigma rules and one-click blocking`
 
 (80/80 caractères)
 
@@ -49,7 +49,7 @@
 ### Premier commentaire auteur — dans les 60 s après soumission
 
 ```
-Author here. Snitch started as a passive network map and grew into a
+Author here. Wiretap started as a passive network map and grew into a
 full application firewall: it attributes every outbound connection to
 its process and can now *block* it in one click.
 
@@ -66,8 +66,8 @@ Stack details for the curious:
   a per-launch token, zero telemetry, no account, AGPL-3.0.
 - Server side: lightweight Rust agent, REST/WebSocket API, ECS/CEF/
   JSON/Syslog export for SIEM, Docker/Helm/Ansible/GPO deployment,
-  declarative snitch.toml.
-- SNITCH_DEMO=1 feeds synthetic traffic through the real pipeline —
+  declarative wiretap.toml.
+- WIRETAP_DEMO=1 feeds synthetic traffic through the real pipeline —
   try it without root.
 
 UI is in 8 languages (EN FR ES DE RU JA PT-BR ZH-CN). Happy to
@@ -88,7 +88,7 @@ Scapy for license reasons.
 
 ### r/netsec (le plus technique — en premier)
 
-**Title:** `Snitch — open-source app firewall: per-process outbound monitoring + one-click blocking (Sigma, eBPF/WFP)`
+**Title:** `Wiretap — open-source app firewall: per-process outbound monitoring + one-click blocking (Sigma, eBPF/WFP)`
 
 ```
 Passive pcap → per-process attribution → one-click blocking.
@@ -101,19 +101,19 @@ Passive pcap → per-process attribution → one-click blocking.
   DGA domains, ICMP tunnels, beaconing
 - Offline GeoIP, loopback-only API + token, zero telemetry
 - Server mode: Rust agent, ECS/CEF/JSON/Syslog export,
-  Docker/Helm/Ansible/GPO, declarative snitch.toml
+  Docker/Helm/Ansible/GPO, declarative wiretap.toml
 - Windows/macOS/Linux, AGPL-3.0, UI in 8 languages
 
-github.com/aixisstudio/Snitch — SNITCH_DEMO=1 runs synthetic
+github.com/aixisstudio/Wiretap — WIRETAP_DEMO=1 runs synthetic
 traffic through the real pipeline, no root needed.
 ```
 
 ### r/opensource
 
-**Title:** `Snitch — open-source Little Snitch alternative that also blocks (AGPL, Windows/macOS/Linux)`
+**Title:** `Wiretap — open-source Little Snitch alternative that also blocks (AGPL, Windows/macOS/Linux)`
 
 ```
-Little Snitch is macOS-only and paid. Snitch is the same idea,
+Little Snitch is macOS-only and paid. Wiretap is the same idea,
 open-source (AGPL-3.0) and cross-platform — and it blocks too.
 
 - See every outbound connection per process in real time
@@ -125,30 +125,30 @@ open-source (AGPL-3.0) and cross-platform — and it blocks too.
   (ECS/CEF/JSON/Syslog), headless/CLI mode
 - UI in 8 languages
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 ```
 
 ### r/selfhosted — **vendredi uniquement** (règle « New Project Friday »)
 
-**Title:** `Snitch — self-hosted application firewall & network observer (Docker, Rust agent, SIEM export, AGPL)`
+**Title:** `Wiretap — self-hosted application firewall & network observer (Docker, Rust agent, SIEM export, AGPL)`
 
 ```
 Runs headless on servers too: a lightweight Rust agent streams
 per-process outbound connection data to a central console.
 ECS/CEF/JSON/Syslog output for your SIEM, Docker image, Helm
-chart, Ansible role, declarative snitch.toml config.
+chart, Ansible role, declarative wiretap.toml config.
 
 On desktop it's a one-click app firewall: block any process's
 outbound connections via eBPF/NFQUEUE/nftables/WFP. Sigma rules,
 offline threat intel, DGA/ICMP-tunnel/beaconing detection.
 Zero telemetry, loopback-only API, no account.
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 ```
 
 ### r/sysadmin
 
-**Title:** `Open-source per-process outbound firewall with Sigma rules + fleet agent — Snitch`
+**Title:** `Open-source per-process outbound firewall with Sigma rules + fleet agent — Wiretap`
 
 ```
 Per-process outbound visibility and blocking for fleets:
@@ -158,12 +158,12 @@ Ansible/Puppet/Salt/GPO or Helm. Kill-switch and IOC gossip
 supported. Desktop app for Windows/macOS/Linux too.
 AGPL-3.0, zero telemetry, loopback-only API.
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 ```
 
 ### r/privacytoolsIO
 
-**Title:** `Snitch — 100% local application firewall, no account, no telemetry (open source)`
+**Title:** `Wiretap — 100% local application firewall, no account, no telemetry (open source)`
 
 ### r/SideProject / r/macapps — adapter le texte r/opensource
 
@@ -175,7 +175,7 @@ github.com/aixisstudio/Snitch
 
 ## 3. Lobste.rs (invitation requise — demander à un membre ou sur le canal #lobsters IRC)
 
-**Titre :** `Snitch: open-source application firewall with Sigma rules and eBPF/WFP blocking`
+**Titre :** `Wiretap: open-source application firewall with Sigma rules and eBPF/WFP blocking`
 
 **Tags :** `security` `networking` `rust` `python`
 
@@ -189,14 +189,14 @@ pour raison de licence (GPL-2.0-only) : Lobsters adore ce détail.
 ### Mastodon (infosec.exchange, fosstodon.org, hachyderm.io)
 
 ```
-Snitch — open-source application firewall 🛡️
+Wiretap — open-source application firewall 🛡️
 
 See every outbound connection per process. Block in one click
 (eBPF / NFQUEUE / nftables / WFP). Sigma rules, offline threat
 intel, DGA + ICMP-tunnel detection. 100% local, zero telemetry,
 no account. 8 languages.
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 #opensource #infosec #privacy #cybersecurity #foss
 ```
 
@@ -217,9 +217,9 @@ github.com/aixisstudio/Snitch
 ### LinuxFr — dépêche (syntaxe wiki Markdown, longue)
 
 ````
-# Snitch : pare-feu applicatif libre — voir et bloquer chaque connexion
+# Wiretap : pare-feu applicatif libre — voir et bloquer chaque connexion
 
-Snitch est un pare-feu applicatif libre (AGPL-3.0) pour Windows,
+Wiretap est un pare-feu applicatif libre (AGPL-3.0) pour Windows,
 macOS et Linux. Il attribue chaque connexion sortante à son processus
 en temps réel et permet de la bloquer en un clic — via eBPF, NFQUEUE,
 nftables ou WFP sous Windows.
@@ -235,19 +235,19 @@ nftables ou WFP sous Windows.
   127.0.0.1 avec jeton, zéro télémétrie, aucun compte
 - Mode serveur : agent Rust léger, API REST/WebSocket,
   exports ECS/CEF/JSON/Syslog, Docker/Helm/Ansible/GPO,
-  configuration déclarative `snitch.toml`
-- `SNITCH_DEMO=1` injecte du trafic synthétique dans le vrai
+  configuration déclarative `wiretap.toml`
+- `WIRETAP_DEMO=1` injecte du trafic synthétique dans le vrai
   pipeline — testable sans root
 
 ## Pour aller plus loin
 
-Dépôt : https://github.com/aixisstudio/Snitch
-Site : https://aixisstudio.github.io/Snitch/
+Dépôt : https://github.com/aixisstudio/Wiretap
+Site : https://aixisstudio.github.io/Wiretap/
 ````
 
 ### Journal du hacker (journalduhacker.net — Lobsters francophone)
 
-**Titre :** `Snitch : pare-feu applicatif libre — visualiser et bloquer chaque connexion sortante (AGPL)`
+**Titre :** `Wiretap : pare-feu applicatif libre — visualiser et bloquer chaque connexion sortante (AGPL)`
 **Tags :** sécurité, réseau, open-source
 **Texte :** résumé de la dépêche ci-dessus (2 paragraphes).
 
@@ -261,12 +261,12 @@ Adapter la dépêche, ajouter : « projet solo, retours bienvenus ».
 
 ### Habr — article complet (markdown)
 
-**Заголовок:** `Snitch: опенсорсный межсетевой экран уровня приложений — видим и блокируем каждое исходящее соединение`
+**Заголовок:** `Wiretap: опенсорсный межсетевой экран уровня приложений — видим и блокируем каждое исходящее соединение`
 
 **Теги:** информационная безопасность, open source, сетевые технологии, python, ebpf
 
 ```markdown
-Snitch — межсетевой экран уровня приложений с открытым исходным
+Wiretap — межсетевой экран уровня приложений с открытым исходным
 кодом (AGPL-3.0) для Windows, macOS и Linux. Он показывает каждое
 исходящее соединение в разрезе процессов и позволяет заблокировать
 его одним кликом.
@@ -283,13 +283,13 @@ Snitch — межсетевой экран уровня приложений с 
   токеном, ноль телеметрии, без аккаунта
 - Серверный режим: лёгкий Rust-агент, REST/WebSocket API,
   экспорт в SIEM (ECS/CEF/JSON/Syslog), Docker/Helm/Ansible/GPO
-- SNITCH_DEMO=1 — синтетический трафик через реальный pipeline,
+- WIRETAP_DEMO=1 — синтетический трафик через реальный pipeline,
   root не нужен
 
 Интерфейс на 8 языках, включая русский.
 
-Репозиторий: https://github.com/aixisstudio/Snitch
-Сайт: https://aixisstudio.github.io/Snitch/
+Репозиторий: https://github.com/aixisstudio/Wiretap
+Сайт: https://aixisstudio.github.io/Wiretap/
 ```
 
 ### Pikabu — пост (тег «IT», «Open Source»)
@@ -305,10 +305,10 @@ Snitch — межсетевой экран уровня приложений с 
 
 ### V2EX — nœud « 程序员 » ou « 分享创造 »
 
-**标题:** `开源应用防火墙 Snitch：按进程实时查看并一键拦截所有出站连接`
+**标题:** `开源应用防火墙 Wiretap：按进程实时查看并一键拦截所有出站连接`
 
 ```
-大家好，我做了一个开源应用防火墙 Snitch（AGPL-3.0），
+大家好，我做了一个开源应用防火墙 Wiretap（AGPL-3.0），
 Windows / macOS / Linux 全平台支持，界面含简体中文。
 
 - 实时显示每个进程的出站连接（目标主机、国家、ASN、进程名）
@@ -320,10 +320,10 @@ Windows / macOS / Linux 全平台支持，界面含简体中文。
   API 仅监听 127.0.0.1 并带令牌，零遥测，无需注册
 - 服务端：轻量 Rust agent、REST/WebSocket API、
   SIEM 输出（ECS/CEF/JSON/Syslog）、Docker/Helm/Ansible/GPO
-- SNITCH_DEMO=1 无需 root 即可体验
+- WIRETAP_DEMO=1 无需 root 即可体验
 
-GitHub：https://github.com/aixisstudio/Snitch
-官网：https://aixisstudio.github.io/Snitch/
+GitHub：https://github.com/aixisstudio/Wiretap
+官网：https://aixisstudio.github.io/Wiretap/
 
 欢迎试用、提 issue，觉得有用求个 star 🙏
 ```
@@ -352,11 +352,11 @@ GitHub：https://github.com/aixisstudio/Snitch
 
 ### OKKY — 게시판 « Tech » ou « 자유게시판 »
 
-**제목:** `오픈소스 애플리케이션 방화벽 Snitch — 프로세스별 아웃바운드 연결을 실시간으로 보고 한 클릭에 차단`
+**제목:** `오픈소스 애플리케이션 방화벽 Wiretap — 프로세스별 아웃바운드 연결을 실시간으로 보고 한 클릭에 차단`
 
 ```
 Windows / macOS / Linux를 지원하는 오픈소스 애플리케이션
-방화벽 Snitch(AGPL-3.0)를 만들었습니다. 한국어는 없지만
+방화벽 Wiretap(AGPL-3.0)를 만들었습니다. 한국어는 없지만
 영어/일본어/중국어 등 8개 언어 UI를 지원합니다.
 
 - 프로세스별 아웃바운드 연결 실시간 표시
@@ -368,7 +368,7 @@ Windows / macOS / Linux를 지원하는 오픈소스 애플리케이션
 - 서버용 경량 Rust 에이전트, SIEM 내보내기
   (ECS/CEF/JSON/Syslog), Docker/Helm/Ansible/GPO
 
-GitHub: https://github.com/aixisstudio/Snitch
+GitHub: https://github.com/aixisstudio/Wiretap
 ```
 
 ### Velog / Tistory — article technique (architecture libpcap→blocage)
@@ -377,7 +377,7 @@ GitHub: https://github.com/aixisstudio/Snitch
 
 ## 10. PT-BR — TabNews
 
-**Título:** `Snitch — firewall de aplicação open source: veja e bloqueie cada conexão de saída por processo`
+**Título:** `Wiretap — firewall de aplicação open source: veja e bloqueie cada conexão de saída por processo`
 
 ```
 Fiz um firewall de aplicação open source (AGPL-3.0) para
@@ -393,18 +393,18 @@ via eBPF, NFQUEUE, nftables ou WFP no Windows.
   (ECS/CEF/JSON/Syslog), Docker/Helm/Ansible/GPO
 - Interface em 8 idiomas, incluindo português (pt-BR)
 
-GitHub: https://github.com/aixisstudio/Snitch
-SNITCH_DEMO=1 para testar sem root.
+GitHub: https://github.com/aixisstudio/Wiretap
+WIRETAP_DEMO=1 para testar sem root.
 ```
 
 ---
 
 ## 11. DE — Heise / Golem forums + angle Datenschutz
 
-**Titre (Heise Forum / Golem Kommentar):** `Snitch — quelloffene Anwendungs-Firewall: jede ausgehende Verbindung pro Prozess sehen und blockieren`
+**Titre (Heise Forum / Golem Kommentar):** `Wiretap — quelloffene Anwendungs-Firewall: jede ausgehende Verbindung pro Prozess sehen und blockieren`
 
 ```
-Snitch ist eine Open-Source-Anwendungsfirewall (AGPL-3.0) für
+Wiretap ist eine Open-Source-Anwendungsfirewall (AGPL-3.0) für
 Windows, macOS und Linux: jede ausgehende Verbindung wird dem
 Prozess zugeordnet und kann per Klick blockiert werden —
 eBPF, NFQUEUE, nftables bzw. Windows WFP.
@@ -417,7 +417,7 @@ eBPF, NFQUEUE, nftables bzw. Windows WFP.
   (ECS/CEF/JSON/Syslog), Docker/Helm/Ansible/GPO
 - UI in 8 Sprachen, Deutsch inklusive
 
-GitHub: https://github.com/aixisstudio/Snitch
+GitHub: https://github.com/aixisstudio/Wiretap
 ```
 
 Angle éditorial : **Datenschutz** — un outil de vie privée qui ne
@@ -427,7 +427,7 @@ fait lui-même *aucun* appel réseau non consenti.
 
 ## 12. ES — meneame.net + foros
 
-**Título:** `Snitch — cortafuegos de aplicación open source: ve y bloquea cada conexión saliente por proceso`
+**Título:** `Wiretap — cortafuegos de aplicación open source: ve y bloquea cada conexión saliente por proceso`
 
 ```
 Firewall de aplicación open source (AGPL-3.0) para Windows,
@@ -438,7 +438,7 @@ offline, detección de dominios DGA, túneles ICMP y beaconing.
 100% local: GeoIP offline, API solo en 127.0.0.1 con token,
 cero telemetría. Interfaz en 8 idiomas, español incluido.
 
-GitHub: https://github.com/aixisstudio/Snitch
+GitHub: https://github.com/aixisstudio/Wiretap
 ```
 
 ---
@@ -446,12 +446,12 @@ GitHub: https://github.com/aixisstudio/Snitch
 ## 13. NL — Tweakers.net (forum « Software Algemeen »)
 
 ```
-Snitch — open-source applicatie-firewall (AGPL): ziet elke
+Wiretap — open-source applicatie-firewall (AGPL): ziet elke
 uitgaande verbinding per proces en blokkeert met één klik
 (eBPF / NFQUEUE / nftables / WFP). Sigma-regels, offline
 threat-intel, DGA/ICMP-tunnel/beaconing-detectie. Volledig
 lokaal, geen telemetrie, geen account. 8 talen.
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 ```
 
 ---
@@ -459,13 +459,13 @@ github.com/aixisstudio/Snitch
 ## 14. PL — Wykop.pl (tag `#programowanie` `#opensource`)
 
 ```
-Snitch — otwartoźródłowa zapora aplikacyjna (AGPL-3.0) na
+Wiretap — otwartoźródłowa zapora aplikacyjna (AGPL-3.0) na
 Windows/macOS/Linux: pokazuje każde wychodzące połączenie
 per proces i blokuje je jednym kliknięciem (eBPF / NFQUEUE /
 nftables / WFP). Reguły zgodne z Sigma, offline threat-intel,
 detekcja DGA/tuneli ICMP/beaconingu. W 100% lokalnie —
 zero telemetrii, bez konta. 8 języków.
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 ```
 
 ---
@@ -475,16 +475,16 @@ github.com/aixisstudio/Snitch
 ### X (thread, 2 tweets)
 
 ```
-1/ Snitch is now a full open-source application firewall.
+1/ Wiretap is now a full open-source application firewall.
 
 See every outbound connection per process — and BLOCK it in one
 click (eBPF / NFQUEUE / nftables / WFP). Sigma rules, offline
 threat intel, DGA/ICMP-tunnel/beaconing detection.
 
 100% local. Zero telemetry. 8 languages. AGPL.
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 
-2/ Try it without root: SNITCH_DEMO=1 feeds synthetic traffic
+2/ Try it without root: WIRETAP_DEMO=1 feeds synthetic traffic
 through the real pipeline. Server mode: lightweight Rust agent,
 SIEM export (ECS/CEF/JSON/Syslog), Helm/Ansible/GPO deploy.
 Show HN today — link below.
@@ -500,16 +500,16 @@ Show HN today — link below.
 If you're on Windows or Linux, Little Snitch doesn't exist —
 closest options:
 
-• Snitch (open source, AGPL): sees every outbound connection
+• Wiretap (open source, AGPL): sees every outbound connection
   per process AND blocks it in one click (eBPF/NFQUEUE/
   nftables/WFP). Sigma rules, offline threat intel, 100% local.
-  github.com/aixisstudio/Snitch
+  github.com/aixisstudio/Wiretap
 
 • For Linux ask-permission blocking: OpenSnitch
 • For Windows: Portmaster or GlassWire (freemium)
 • For deep packet inspection: Wireshark
 
-Snitch is the closest free cross-platform equivalent —
+Wiretap is the closest free cross-platform equivalent —
 monitoring and blocking in one.
 ```
 

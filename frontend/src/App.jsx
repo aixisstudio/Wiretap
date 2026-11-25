@@ -1,5 +1,5 @@
 /**
- * Snitch — root application component.
+ * Wiretap — root application component.
  *
  * EN: Owns the top-level layout (sidebar | main view | timeline) and the
  *     toolbar (language toggle, view switch, export, filters, capture
@@ -46,7 +46,7 @@ export default function App() {
   // FR: Explications de premier lancement — affichées une fois, drapeau
   //     persisté en localStorage.
   const [showOnboarding, setShowOnboarding] = useState(
-    () => !localStorage.getItem('snitch_onboarded'))
+    () => !localStorage.getItem('wiretap_onboarded'))
   const [filter, setFilter] = useState({ text: '', category: 'all' })
   const { lang, setLang } = useT()
 
@@ -302,22 +302,22 @@ function ExportButton({ nodes, edges, lanDevices, alerts }) {
       nodes: [...Object.values(nodes), ...Object.values(lanDevices)],
       edges: Object.values(edges),
     }
-    downloadFile(JSON.stringify(data, null, 2), `snitch-graph-${stamp()}.json`)
+    downloadFile(JSON.stringify(data, null, 2), `wiretap-graph-${stamp()}.json`)
   }
 
   function exportGraphCSV() {
     const allNodes = [...Object.values(nodes), ...Object.values(lanDevices)]
     const cols = ['id', 'label', 'ip', 'category', 'country', 'city', 'org', 'bytes', 'packets']
-    downloadFile(toCSV(allNodes, cols), `snitch-graph-${stamp()}.csv`)
+    downloadFile(toCSV(allNodes, cols), `wiretap-graph-${stamp()}.csv`)
   }
 
   function exportAlertsJSON() {
-    downloadFile(JSON.stringify(alerts, null, 2), `snitch-alerts-${stamp()}.json`)
+    downloadFile(JSON.stringify(alerts, null, 2), `wiretap-alerts-${stamp()}.json`)
   }
 
   function exportAlertsCSV() {
     const cols = ['id', 'type', 'severity', 'message', 'node_id', 'timestamp']
-    downloadFile(toCSV(alerts, cols), `snitch-alerts-${stamp()}.csv`)
+    downloadFile(toCSV(alerts, cols), `wiretap-alerts-${stamp()}.csv`)
   }
 
   const items = [
@@ -748,11 +748,11 @@ function ThemeToggle() {
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
     document.documentElement.dataset.theme = next
-    try { localStorage.setItem('snitch_theme', next) } catch (e) { /* ignore */ }
+    try { localStorage.setItem('wiretap_theme', next) } catch (e) { /* ignore */ }
     setTheme(next)
     // EN: Let WebGL/canvas consumers re-resolve their palettes.
     // FR: Laisser les consommateurs WebGL/canvas re-résoudre leurs palettes.
-    window.dispatchEvent(new Event('snitch-theme'))
+    window.dispatchEvent(new Event('wiretap-theme'))
   }
   const Icon = theme === 'dark' ? Sun : Moon
   return (

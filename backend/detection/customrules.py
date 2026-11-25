@@ -4,7 +4,7 @@ EN: User-defined alert rules — a deliberately SMALL matcher, not a
     one value; the first enabled rule matching a packet raises a
     CUSTOM_RULE alert carrying the rule name, so users can build their
     own detections ("warn me when curl touches port 4444", "flag any
-    process talking to *.onion-ish hosts") without waiting for a Snitch
+    process talking to *.onion-ish hosts") without waiting for a Wiretap
     release. Rules are persisted in the settings table and matched
     in-line in the packet path. The default action ALERTS only; a rule
     may opt into action="block" which additionally installs a real

@@ -7,7 +7,7 @@
 
 ## Heise-Forum / Golem — Beitrag
 
-**Titel:** `Snitch — quelloffene Anwendungs-Firewall: jede ausgehende Verbindung pro Prozess sehen und blockieren`
+**Titel:** `Wiretap — quelloffene Anwendungs-Firewall: jede ausgehende Verbindung pro Prozess sehen und blockieren`
 
 Volltext: Abschnitt 11 in `drafts-launch.md`.
 Redaktioneller Winkel: **Datenschutz** — ein Privacy-Tool, das
@@ -16,13 +16,13 @@ selbst keinerlei unkontrollierte Netzwerkaufrufe macht.
 ## Social-Post (de)
 
 ```
-Snitch — quelloffene Anwendungs-Firewall 🛡️
+Wiretap — quelloffene Anwendungs-Firewall 🛡️
 
 Jede ausgehende Verbindung pro Prozess sehen und per Klick
 blockieren (eBPF / NFQUEUE / nftables / WFP). Sigma-Regeln,
 Offline-Threat-Intel, DGA-/ICMP-Tunnel-Erkennung.
 100% lokal, keine Telemetrie, kein Konto. UI auf Deutsch.
 
-github.com/aixisstudio/Snitch
+github.com/aixisstudio/Wiretap
 #opensource #datenschutz #infosec
 ```

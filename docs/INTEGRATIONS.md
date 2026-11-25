@@ -1,14 +1,14 @@
-# Snitch — Enterprise integrations / Intégrations entreprise
+# Wiretap — Enterprise integrations / Intégrations entreprise
 
-**EN:** Step-by-step recipes for wiring Snitch into a SOC stack —
+**EN:** Step-by-step recipes for wiring Wiretap into a SOC stack —
 Wazuh, Splunk, Graylog/Loki, Ansible, Docker/Kubernetes — all free and
-self-hosted, matching Snitch's local-first posture. Snitch emits no
+self-hosted, matching Wiretap's local-first posture. Wiretap emits no
 telemetry of its own; the only outbound connections are the ones you
 configure below.
 
-**FR :** Recettes pas-à-pas pour brancher Snitch dans une stack SOC —
+**FR :** Recettes pas-à-pas pour brancher Wiretap dans une stack SOC —
 Wazuh, Splunk, Graylog/Loki, Ansible, Docker/Kubernetes — gratuites et
-auto-hébergées, dans l'esprit local-first de Snitch. Snitch n'émet
+auto-hébergées, dans l'esprit local-first de Wiretap. Wiretap n'émet
 aucune télémétrie propre ; les seules connexions sortantes sont celles
 configurées ci-dessous.
 
@@ -16,17 +16,17 @@ configurées ci-dessous.
 
 ## 1. SIEM output / Sortie SIEM
 
-Snitch ships three native formats for alert forwarding:
+Wiretap ships three native formats for alert forwarding:
 
 | Setting / Réglage | Values / Valeurs | Effect / Effet |
 |---|---|---|
 | `syslog_addr` | `host:514` or `tcp://host:514` | Enables syslog forwarding (UDP default, TCP with the `tcp://` prefix) |
 | `syslog_format` | `rfc3164` *(default)* | Classic BSD syslog — readable by every collector |
-| | `cef` | `CEF:0|Snitch|…` — ArcSight/Wazuh/Splunk auto-parse `src`, `dst`, `dpt`, `cs1` (process)… |
+| | `cef` | `CEF:0|Wiretap|…` — ArcSight/Wazuh/Splunk auto-parse `src`, `dst`, `dpt`, `cs1` (process)… |
 | `webhook_url` + `webhook_enabled` | URL | Generic JSON `POST` (or Discord/Slack/Telegram auto-detected payloads) |
 | `GET /forensics/export?format=…` | `json`, `csv`, `stix`, `ecs` | One-shot forensic bundles — `ecs` emits newline-delimited Elastic Common Schema |
 
-Set them in the UI (Settings → Security) or in `snitch.toml`:
+Set them in the UI (Settings → Security) or in `wiretap.toml`:
 
 ```toml
 syslog_addr = "siem.example.com:514"
@@ -46,14 +46,14 @@ syslog_format = "cef"
    </remote>
    ```
 
-2. Point each Snitch agent at it — Ansible:
+2. Point each Wiretap agent at it — Ansible:
 
    ```yaml
-   snitch_syslog_addr: "wazuh.example.com:514"
-   snitch_syslog_format: "cef"
+   wiretap_syslog_addr: "wazuh.example.com:514"
+   wiretap_syslog_format: "cef"
    ```
 
-3. Wazuh's CEF decoder picks the `CEF:0|Snitch|…` messages up; alert
+3. Wazuh's CEF decoder picks the `CEF:0|Wiretap|…` messages up; alert
    `severity` maps to syslog PRI (critical→2, warning→4, info→6).
 
 ## 3. Splunk
@@ -73,8 +73,8 @@ syslog_format = "cef"
 
 ## 5. Declarative configuration (Security-as-Code)
 
-The backend applies **one file** at startup — `$SNITCH_CONFIG`, else
-`snitch.toml`/`snitch.json` in the data dir. Every key it declares
+The backend applies **one file** at startup — `$WIRETAP_CONFIG`, else
+`wiretap.toml`/`wiretap.json` in the data dir. Every key it declares
 overrides the UI/DB value, so the file is the fleet source of truth:
 
 ```toml
@@ -86,7 +86,7 @@ gossip_peers = ["sec-01:8000"]
 ports = [80, 443]
 ```
 
-See `packaging/snitch.toml.example` for the full vocabulary.
+See `packaging/wiretap.toml.example` for the full vocabulary.
 
 ## 6. Ansible / Puppet / Salt / GPO
 
@@ -96,14 +96,14 @@ See `packaging/snitch.toml.example` for the full vocabulary.
   ansible-playbook -i inventory deploy/ansible/site.yml
   ```
 
-  It installs `/opt/snitch`, the venv, `/etc/snitch/snitch.toml` and the
-  hardened systemd unit, then enables `snitch.service`.
+  It installs `/opt/wiretap`, the venv, `/etc/wiretap/wiretap.toml` and the
+  hardened systemd unit, then enables `wiretap.service`.
 
 - **Puppet / SaltStack** — community skeletons in `deploy/puppet/` and
   `deploy/salt/` (label `help wanted`): the same three primitives —
-  copy the backend tree, render `snitch.toml`, manage `snitch.service`.
+  copy the backend tree, render `wiretap.toml`, manage `wiretap.service`.
 
-- **Windows GPO** — `deploy/gpo/Install-Snitch.ps1` performs the silent
+- **Windows GPO** — `deploy/gpo/Install-Wiretap.ps1` performs the silent
   install (ProgramData config, venv, SYSTEM scheduled task on 127.0.0.1)
   for GPO startup scripts or Intune win32 packaging. Ask-on-connect on
   Windows additionally needs the signed WFP callout — see
@@ -113,13 +113,13 @@ See `packaging/snitch.toml.example` for the full vocabulary.
 
 - **Single host**: `docker compose up` — `network_mode: host` +
   `cap_add: NET_RAW/NET_ADMIN` already configured in `docker-compose.yml`.
-- **Fleet console**: `deploy/helm/snitch` — `mode: collector` runs a
+- **Fleet console**: `deploy/helm/wiretap` — `mode: collector` runs a
   ClusterIP Deployment that merges every configured agent's audit into
   `GET /remote/fleet`; `mode: agent` renders a host-network DaemonSet
   with `NET_RAW`/`NET_ADMIN`.
 
   ```bash
-  helm install snitch ./deploy/helm/snitch \
+  helm install wiretap ./deploy/helm/wiretap \
       --set token=$(openssl rand -hex 32) \
       --set config.gossip_peers='["agent-1:8000","agent-2:8000"]'
   ```
@@ -129,7 +129,7 @@ See `packaging/snitch.toml.example` for the full vocabulary.
 `POST /alerts/rules/sigma` accepts a Sigma detection YAML and compiles the
 supported subset (field→value selections, `|contains`/`|startswith`/
 `|endswith`/`|re`/`|cidr`/`|gt`/`|lt`/`|all`, `1 of`/`all of` conditions)
-into Snitch custom rules — alert-only, `skipped` reasons returned for
+into Wiretap custom rules — alert-only, `skipped` reasons returned for
 anything outside the subset. Fields map to what a *packet* sensor sees
 (`DestinationIp→remote_ip`, `Image→process_name`, `Domain→host`, …).
 
@@ -137,7 +137,7 @@ YARA-L for Google SecOps/Chronicle: `GET /alerts/rules/yaral` exports all
 custom rules (including Sigma-imported ones) as a `.yar` file — the
 Sigma→YARA-L path is covered transitively.
 
-## 9. Remote agents (snitch-agent/1)
+## 9. Remote agents (wiretap-agent/1)
 
 `agent/` ships a zero-dependency Rust daemon (~1 MB single binary) that
 watches the host socket table (`/proc/net/*`, Linux) and pushes newly
@@ -145,7 +145,7 @@ observed outbound flows to `POST /ingest/events`. It observes sockets —
 no payloads/SNI (that's the local capture's job); `pid`/`process`
 attribution works on Linux via the `/proc/*/fd` inode walk and reports
 `0` elsewhere until the Windows/macOS backends land. Transport: HTTP,
-same trust-domain model as `gossip_peers`. A `snitch-agent.service`
+same trust-domain model as `gossip_peers`. A `wiretap-agent.service`
 unit lives in `deploy/systemd/`; CI compiles and tests the binary on
 Linux, macOS and Windows on every `agent/**` push.
 
@@ -157,18 +157,18 @@ can only impersonate that one agent, and revocation is per-name:
 ```bash
 # EN: mint on the collector (master token), returned once
 curl -X POST http://collector:8000/ingest/enroll \
-  -H "X-Snitch-Token: <master>" -d '{"name": "edge-01"}'
-# → {"token": "sagt_…"} — put it in the agent's SNITCH_TOKEN
+  -H "X-Wiretap-Token: <master>" -d '{"name": "edge-01"}'
+# → {"token": "sagt_…"} — put it in the agent's WIRETAP_TOKEN
 
 curl -X POST http://collector:8000/ingest/revoke \
-  -H "X-Snitch-Token: <master>" -d '{"name": "edge-01"}'
+  -H "X-Wiretap-Token: <master>" -d '{"name": "edge-01"}'
 
-curl http://collector:8000/ingest/agents -H "X-Snitch-Token: <master>"
+curl http://collector:8000/ingest/agents -H "X-Wiretap-Token: <master>"
 ```
 
-The ingest endpoint accepts `X-Snitch-Agent: sagt_…` (enrolled name is
+The ingest endpoint accepts `X-Wiretap-Agent: sagt_…` (enrolled name is
 authoritative — the body's `host` field can't override it) or the
-master `X-Snitch-Token` for local/small deployments. Only token hashes
+master `X-Wiretap-Token` for local/small deployments. Only token hashes
 are stored, so a leaked settings dump can't replay credentials.
 
 ## 10. Threat-intel feeds (free)
@@ -215,7 +215,7 @@ ti_feeds = [
   { preset = "netapi_compromised", action = "block", hours = 12 },
   { url  = "https://lists.blocklist.de/lists/all.txt",
     kind = "ip", action = "block", hours = 24 },
-  { path = "/etc/snitch/corp-domains.txt",
+  { path = "/etc/wiretap/corp-domains.txt",
     kind = "domain", action = "sinkhole", hours = 6 },
 ]
 ```
@@ -228,7 +228,7 @@ per refresh — giant feeds belong in a resolver, not here.
 
 ## 11. Passive TLS fingerprinting & C2 detection (JA3 / JA4)
 
-**EN:** Snitch parses TLS `ClientHello` packets passively in real time
+**EN:** Wiretap parses TLS `ClientHello` packets passively in real time
 without injecting any active network probes or terminating TLS sessions.
 On every outbound TLS handshake observed by the sniffer:
 
@@ -250,7 +250,7 @@ On every outbound TLS handshake observed by the sniffer:
    `GET /c2/fingerprints` or trigger an in-memory reload with
    `POST /c2/fingerprints/reload`.
 
-**FR :** Snitch analyse passivement les paquets TLS `ClientHello` en temps
+**FR :** Wiretap analyse passivement les paquets TLS `ClientHello` en temps
 réel sans injecter de sondes réseau actives ni interrompre le chiffrement TLS.
 Sur chaque négociation TLS sortante observée par le sniffer :
 
@@ -277,5 +277,5 @@ Sur chaque négociation TLS sortante observée par le sniffer :
 The GUI is optional: the backend is the whole product. Run it bare
 (`uvicorn api.main:app`), under the shipped systemd unit, or in the
 container — every feature above works without the frontend.
-`SNITCH_DEMO=1` still gives a no-root synthetic feed for training rooms
+`WIRETAP_DEMO=1` still gives a no-root synthetic feed for training rooms
 and CTFs.

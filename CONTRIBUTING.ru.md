@@ -2,7 +2,7 @@
 
 [English](CONTRIBUTING.md) | [Français](CONTRIBUTING.md) | [Español](CONTRIBUTING.es.md) | [Deutsch](CONTRIBUTING.de.md) | **Русский** | [日本語](CONTRIBUTING.ja.md) | [Português](CONTRIBUTING.pt-BR.md) | [中文](CONTRIBUTING.zh-CN.md)
 
-Спасибо за интерес! Snitch — двуязычный проект (EN/FR): комментарии к коду
+Спасибо за интерес! Wiretap — двуязычный проект (EN/FR): комментарии к коду
 и пользовательские тексты должны существовать на обоих языках по
 возможности. В UI 8 локалей в `frontend/src/locales/` — новый язык это
 файл, скопированный с `en.js` (сохраняйте паритет ключей), плюс запись в

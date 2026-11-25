@@ -2,7 +2,7 @@
 
 [English](threat-model.md) | [Français](threat-model.md) | [Español](threat-model.es.md) | **Deutsch** | [Русский](threat-model.ru.md) | [日本語](threat-model.ja.md) | [Português](threat-model.pt-BR.md) | [中文](threat-model.zh-CN.md)
 
-## Was Snitch ist
+## Was Wiretap ist
 
 Ein Local-first-Visualizer für Netzwerkverkehr. Er erfasst Pakete auf dem
 Host, ordnet sie Prozessen zu, reichert sie **offline** an (lokale
@@ -15,14 +15,14 @@ Cloud-Komponente, keine Telemetrie.**
 - Deine Verkehrs-Metadaten (Ziel-IPs, Ports, Volumen, Prozessnamen).
 - Das API-Token (pro Start in Electron, pro Installation in CLI/Docker).
 - Die lokale SQLite-DB (`traffic`, `alerts_log`, Historien, Einstellungen).
-- Die Integrität der Maschine selbst (ein kompromittiertes Snitch könnte
+- Die Integrität der Maschine selbst (ein kompromittiertes Wiretap könnte
   dich belügen).
 
 ## Vertrauensgrenzen
 
 | Grenze | Bedrohung | Mitigation |
 |---|---|---|
-| Browser/Remote-Client → REST | Ein LAN-Angreifer oder eine bösartige Webseite liest/steuert deine Verkehrsansicht | Token auf **jedem** Endpoint (`Authorization: Bearer`). Bind `127.0.0.1` standardmäßig. In Docker erfordert `0.0.0.0` ein explizites `SNITCH_TOKEN`. |
+| Browser/Remote-Client → REST | Ein LAN-Angreifer oder eine bösartige Webseite liest/steuert deine Verkehrsansicht | Token auf **jedem** Endpoint (`Authorization: Bearer`). Bind `127.0.0.1` standardmäßig. In Docker erfordert `0.0.0.0` ein explizites `WIRETAP_TOKEN`. |
 | Webseite → `/ws` | Cross-Site-WebSocket-Hijacking (CSWSH) | Token **und** `Origin`-Allowlist (Loopback + Electron `null`-Origin). |
 | Host → Dritte | Privacy-Leak | Null ausgehende Aufrufe standardmäßig. GeoIP-Download, Threat Intel, Webhooks und Updates sind **Opt-in** und in PRIVACY.md dokumentiert. |
 | Capture-Treiber → Parser | Malformed Frames crashen den Prozess | Der Parser prüft jeden Offset; malformed Pakete liefern `None` und werfen nie in die Capture-Schleife. |

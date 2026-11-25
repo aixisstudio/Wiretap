@@ -1,14 +1,14 @@
-// EN: Snitch launcher UI — mirrors the standard Pinokio server pattern:
+// EN: Wiretap launcher UI — mirrors the standard Pinokio server pattern:
 //     Install → Start (daemon) → "Open Web UI" once local.url is set.
 //     install.js creates backend/env (uv venv) and frontend_dist, so the
 //     presence of backend/env marks a completed install.
-// FR: UI du launcher Snitch — reprend le pattern serveur standard Pinokio :
+// FR: UI du launcher Wiretap — reprend le pattern serveur standard Pinokio :
 //     Install → Start (daemon) → « Open Web UI » une fois local.url posée.
 //     install.js crée backend/env (venv uv) et frontend_dist, donc la
 //     présence de backend/env marque une installation terminée.
 module.exports = {
   version: "7.0",
-  title: "Snitch",
+  title: "Wiretap",
   description: "Application firewall and network monitor — see who your computer talks to. / Pare-feu applicatif et moniteur réseau — voyez à qui parle votre ordinateur.",
   icon: "icon.png",
   menu: async (kernel, info) => {

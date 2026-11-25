@@ -1,5 +1,5 @@
 """
-Snitch — passive TLS certificate inspection / inspection passive des
+Wiretap — passive TLS certificate inspection / inspection passive des
 certificats TLS.
 
 EN: Reads the SERVER's TLS Certificate handshake message straight off the

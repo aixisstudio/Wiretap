@@ -1,5 +1,5 @@
 """
-Snitch — OUI lookup table.
+Wiretap — OUI lookup table.
 
 EN: Maps the first 6 hex chars of a MAC address (the Organizationally Unique
     Identifier) to a (vendor, device_type) pair.

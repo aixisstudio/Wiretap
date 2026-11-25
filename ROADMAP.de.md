@@ -2,7 +2,7 @@
 
 [English](ROADMAP.md) | [Français](ROADMAP.md) | [Español](ROADMAP.es.md) | **Deutsch** | [Русский](ROADMAP.ru.md) | [日本語](ROADMAP.ja.md) | [Português](ROADMAP.pt-BR.md) | [中文](ROADMAP.zh-CN.md)
 
-> Feature-Vorschläge und Votes in [GitHub Discussions](https://github.com/aixisstudio/Snitch/discussions) — Kategorie *Ideas*. Für konkrete Bugs die [Issues](https://github.com/aixisstudio/Snitch/issues) nutzen.
+> Feature-Vorschläge und Votes in [GitHub Discussions](https://github.com/aixisstudio/Wiretap/discussions) — Kategorie *Ideas*. Für konkrete Bugs die [Issues](https://github.com/aixisstudio/Wiretap/issues) nutzen.
 
 ## ✅ Ausgeliefert
 
@@ -11,16 +11,16 @@
 | **v1.0.4** | Erste öffentliche Release — Echtzeit-Graph + Weltkarte, Prozess-Attribution, Offline-Geolokalisierung (.mmdb), Anomalie-Alarme, Privacy Score, passive LAN-Erkennung (ARP/OUI), Mikro/Kamera-Monitoring (Windows/Linux), Demo-Modus, UI EN/FR |
 | **v1.0.5** | **Windows-Support** (Npcap, gepacktes Backend), Prozess-Icons, +24 Tracker-Domains, Fixes |
 | **v1.2 (main, ohne Tag)** | **Security- & Threat-Hunting-Suite** — OS-Firewall-Orchestrierung (Regeln IP/CIDR/Domain/Prozess/Port via `netsh`/`iptables`/`pf`, best-effort), Lockdown-Schalter, Kill/Suspend-Aktionen, Opt-in Threat Intel (AbuseIPDB/OTX/VirusTotal), Opt-in Webhooks (Discord/Slack/Telegram/generisch), DNS-Tunnel-/Klartext-/Länderabweichungs-Erkennung, Security-Audit, Forensik-Export (Prozessbaum + SHA-256, JSON/CSV/STIX), UI in 8 Sprachen |
-| **v1.5.x** | **Enterprise/SOC-Ebene** — deklaratives `snitch.toml`, CEF + RFC-3164-Syslog + `format=ecs` NDJSON, Sigma-Import + YARA-L-Export, `/remote/fleet`-Ansicht + Helm-Chart, Ansible/Puppet/Salt/GPO-Deployments, gehärtete systemd-Unit + nfpm `.deb`/`.rpm`, kostenlose TI-Feeds, MkDocs + `INTEGRATIONS.md` in 7 Sprachen |
-| **v1.6.x** | **Agent & Flottenidentität** — Zero-Dependency-Rust-Agent (`agent/`, Linux `/proc`-Socket→PID), Per-Agent-Enrollment (`sagt_…`-Tokens gehasht, `/ingest/revoke`), automatischer `ti_feeds`-Refresh-Worker, Agent-CI auf 3 OS, headless `snitchd`-Formel, alle CodeQL-Alerts geschlossen, 235 Backend-Tests |
+| **v1.5.x** | **Enterprise/SOC-Ebene** — deklaratives `wiretap.toml`, CEF + RFC-3164-Syslog + `format=ecs` NDJSON, Sigma-Import + YARA-L-Export, `/remote/fleet`-Ansicht + Helm-Chart, Ansible/Puppet/Salt/GPO-Deployments, gehärtete systemd-Unit + nfpm `.deb`/`.rpm`, kostenlose TI-Feeds, MkDocs + `INTEGRATIONS.md` in 7 Sprachen |
+| **v1.6.x** | **Agent & Flottenidentität** — Zero-Dependency-Rust-Agent (`agent/`, Linux `/proc`-Socket→PID), Per-Agent-Enrollment (`sagt_…`-Tokens gehasht, `/ingest/revoke`), automatischer `ti_feeds`-Refresh-Worker, Agent-CI auf 3 OS, headless `wiretapd`-Formel, alle CodeQL-Alerts geschlossen, 235 Backend-Tests |
 
-Außerdem live: Docker-Image auf GHCR, Homebrew-Tap (`brew install --cask aixisstudio/tap/snitch` + headless `snitchd`-Formel), winget-Paket [eingereicht](https://github.com/microsoft/winget-pkgs/pull/455520), README in 8 Sprachen, GitHub Discussions.
+Außerdem live: Docker-Image auf GHCR, Homebrew-Tap (`brew install --cask aixisstudio/tap/wiretap` + headless `wiretapd`-Formel), winget-Paket [eingereicht](https://github.com/microsoft/winget-pkgs/pull/455520), README in 8 Sprachen, GitHub Discussions.
 
 ## 🚧 v1.x — in Arbeit
 
 - [x] **Signierter Windows-Installer** — CI auf [SignPath](https://signpath.org) OSS vorbereitet (kostenloses Authenticode für genehmigte Projekte); aktiv sobald der Antrag angenommen wird — siehe `docs/SIGNING.md`
 - [ ] **Signierter & notarisierter macOS-Build** — braucht Apple-Developer-Account (99 $/Jahr), es gibt keinen Gratisweg. Bis dahin entfernt der [Tap](https://github.com/aixisstudio/homebrew-tap) die Quarantäne
-- [ ] **Homebrew-Upstream** (`brew install --cask snitch`) — blockiert: der Name `snitch` ist von einem anderen Projekt belegt; erneut prüfen sobald Developer-ID-Signatur existiert
+- [ ] **Homebrew-Upstream** (`brew install --cask wiretap`) — blockiert: der Name `wiretap` ist von einem anderen Projekt belegt; erneut prüfen sobald Developer-ID-Signatur existiert
 - [ ] **winget-Veröffentlichung** — [PR #455520](https://github.com/microsoft/winget-pkgs/pull/455520) (v1.0.8) offen; die Pipeline reicht neue NSIS-Builds automatisch pro Tag ein
 - [ ] **Chocolatey** — Paket bereit; wartet auf `CHOCO_API_KEY`-Secret
 - [ ] **Agent-Attribution Windows/macOS** — `GetExtendedTcpTable`/`libproc`-Backends
@@ -42,7 +42,7 @@ Außerdem live: Docker-Image auf GHCR, Homebrew-Tap (`brew install --cask aixiss
 
 ## 🔬 Forschung — dokumentiert, nicht implementiert
 
-Ideen, die Snitch Richtung Desktop-EDR/XDR führen würden. Ehrlich gelistet —
+Ideen, die Wiretap Richtung Desktop-EDR/XDR führen würden. Ehrlich gelistet —
 **keine davon ist implementiert**; jede braucht eigenes Design, native
 Komponenten und oft ein zweites Binär-Artefakt:
 
@@ -63,7 +63,7 @@ Komponenten und oft ein zweites Binär-Artefakt:
 Bewusst, by design:
 
 - **Telemetrie, Analytics, Konten, Cloud-Sync** — niemals.
-- **Passives IDS auf Netzwerkebene** — Snitch beobachtet *diesen* Rechner, nicht das ganze Netz.
+- **Passives IDS auf Netzwerkebene** — Wiretap beobachtet *diesen* Rechner, nicht das ganze Netz.
 - **User-Space-Paketfilterung** — Blockieren wird an die OS-native Firewall delegiert (oder künftige Kernel-Komponenten), nie neu implementiert.
 
 ## 🤝 Mitmachen

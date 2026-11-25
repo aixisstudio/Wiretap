@@ -1,12 +1,12 @@
 # EN: Demo mode — feeds synthetic packets into the normal pipeline so the UI
 #     can be explored (and screenshotted) without root/libpcap and without
-#     ever touching real traffic. Enable with SNITCH_DEMO=1.
+#     ever touching real traffic. Enable with WIRETAP_DEMO=1.
 #     Everything is fake: public IPs are well-known ranges so the bundled
 #     DB-IP Lite GeoIP resolves real countries, LAN devices get mDNS names,
 #     and a beaconing pattern demonstrates the anomaly alerts.
 # FR: Mode démo — injecte des paquets synthétiques dans le pipeline normal
 #     pour explorer (et capturer) l'interface sans root/libpcap et sans
-#     toucher au trafic réel. Activer avec SNITCH_DEMO=1.
+#     toucher au trafic réel. Activer avec WIRETAP_DEMO=1.
 #     Tout est fictif : les IP publiques sont des plages connues pour que le
 #     GeoIP DB-IP Lite embarqué résolve de vrais pays, les appareils LAN
 #     reçoivent des noms mDNS, et un pattern de balisage démontre les
@@ -152,9 +152,9 @@ class DemoFeeder(threading.Thread):
 
 
 def enabled() -> bool:
-    """EN: SNITCH_DEMO=1 (truthy) → synthetic traffic instead of libpcap.
-    FR: SNITCH_DEMO=1 (valeur vraie) → trafic synthétique au lieu de libpcap."""
-    return os.environ.get("SNITCH_DEMO", "").lower() in ("1", "true", "yes")
+    """EN: WIRETAP_DEMO=1 (truthy) → synthetic traffic instead of libpcap.
+    FR: WIRETAP_DEMO=1 (valeur vraie) → trafic synthétique au lieu de libpcap."""
+    return os.environ.get("WIRETAP_DEMO", "").lower() in ("1", "true", "yes")
 
 
 def start(callback) -> DemoFeeder:

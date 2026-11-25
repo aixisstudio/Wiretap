@@ -1,5 +1,5 @@
 """
-Snitch — eBPF egress enforcement (Linux cgroup_skb) / enforcement eBPF en
+Wiretap — eBPF egress enforcement (Linux cgroup_skb) / enforcement eBPF en
 sortie (cgroup_skb Linux).
 
 EN: The kernel-enforcement complement to the *attribution* probe
@@ -12,7 +12,7 @@ EN: The kernel-enforcement complement to the *attribution* probe
 
       * drop by remote IPv4 — `block_ip(ip)` inserts into the map
       * per-process scope — `isolate_pid(pid)` reparents it into
-        /sys/fs/cgroup/snitch (v2) so ONLY that process is filtered
+        /sys/fs/cgroup/wiretap (v2) so ONLY that process is filtered
       * honest gates: needs root, bcc (`from bcc import BPF`), a mounted
         cgroup2 tree and a kernel that allows cgroup_skb (≥4.10+)
 
@@ -38,7 +38,7 @@ import platform
 from pathlib import Path
 from typing import Optional
 
-_CGROUP_DIR = Path("/sys/fs/cgroup/snitch")
+_CGROUP_DIR = Path("/sys/fs/cgroup/wiretap")
 
 _PROG = r"""
 #include <uapi/linux/bpf.h>

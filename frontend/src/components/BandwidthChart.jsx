@@ -1,5 +1,5 @@
 /**
- * Snitch — bandwidth sparkline.
+ * Wiretap — bandwidth sparkline.
  *
  * EN: Tiny D3 area/line chart showing bytes-per-second over the last 60 s.
  *     Rendered at the top of the sidebar; redrawn whenever the `data` prop

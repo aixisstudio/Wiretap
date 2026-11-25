@@ -1,10 +1,10 @@
 """
-EN: Firewall orchestration — Snitch does NOT filter packets in user-space;
+EN: Firewall orchestration — Wiretap does NOT filter packets in user-space;
     it drives the OS-native firewall instead:
       * Windows → WFP USER-MODE filters via `fwpuclnt.dll` ctypes (ALE
                   connect layers, per-app ALE_APP_ID, per-key deletes —
                   see detection/wfp.py), `netsh advfirewall` as fallback,
-      * Linux   → `iptables` OUTPUT chain (a dedicated SNITCH_LOCK chain for
+      * Linux   → `iptables` OUTPUT chain (a dedicated WIRETAP_LOCK chain for
                   lockdown, per-destination DROP rules otherwise) +
                   `tc` clsact/flower policing for throttle rules,
       * macOS   → `pf` anchors (a generated ruleset loaded with pfctl).
@@ -36,10 +36,10 @@ EN: Firewall orchestration — Snitch does NOT filter packets in user-space;
     "lockdown" drops ALL outbound traffic to non-private destinations —
     loopback and LAN stay up so the UI remains reachable.
 
-FR: Orchestration du pare-feu — Snitch ne filtre PAS les paquets en
+FR: Orchestration du pare-feu — Wiretap ne filtre PAS les paquets en
     user-space ; il pilote le pare-feu natif de l'OS :
       * Windows → `netsh advfirewall`,
-      * Linux   → `iptables` (chaîne dédiée SNITCH_LOCK pour le lockdown),
+      * Linux   → `iptables` (chaîne dédiée WIRETAP_LOCK pour le lockdown),
       * macOS   → ancres `pf` (jeu de règles généré chargé avec pfctl).
     Les règles sont persistées dans la table settings (« firewall_rules »)
     donc elles survivent aux redémarrages. Chaque application/retrait est
@@ -91,7 +91,7 @@ class FirewallManager:
     def __init__(self, data_dir: str):
         self._lock = threading.Lock()
         self._platform = platform.system().lower()          # 'windows'|'linux'|'darwin'
-        self._demo = os.environ.get("SNITCH_DEMO") == "1"
+        self._demo = os.environ.get("WIRETAP_DEMO") == "1"
         self._data_dir = Path(data_dir)
         # EN: The pf anchor file lives here — make sure it exists up-front.
         # FR: Le fichier d'ancre pf vit ici — s'assurer qu'il existe d'emblée.
@@ -256,7 +256,7 @@ class FirewallManager:
 
     def set_lockdown(self, on: bool) -> dict:
         """EN: Global panic switch — drop all outbound traffic to public IPs,
-        keep loopback + LAN so the Snitch UI/API stays reachable.
+        keep loopback + LAN so the Wiretap UI/API stays reachable.
         FR: Bouton panique — coupe tout le trafic sortant vers les IP
         publiques, conserve loopback + LAN pour garder l'UI joignable."""
         ok, err = self._lockdown_apply(on)
@@ -474,7 +474,7 @@ class FirewallManager:
             ok, err = self._wfp_apply(kind, target, rid)
             if ok is not None:
                 return ok, err
-            name = f"SnitchRule-{rid}"
+            name = f"WiretapRule-{rid}"
             if kind == "process":
                 return self._run(["netsh", "advfirewall", "firewall", "add", "rule",
                                   f"name={name}", "dir=out", "action=block",
@@ -499,7 +499,7 @@ class FirewallManager:
                 args += ["-d", target]
             elif kind == "port":
                 args += ["-p", "tcp", "--dport", target]
-            args += ["-j", "DROP", "-m", "comment", "--comment", f"snitch-{rid}"]
+            args += ["-j", "DROP", "-m", "comment", "--comment", f"wiretap-{rid}"]
             return self._run(args)
         if self._platform == "darwin":
             return self._pf_apply()
@@ -653,10 +653,10 @@ class FirewallManager:
 
     def _sinkhole_apply(self, rule: dict) -> tuple[bool, str]:
         """EN: Redirect instead of drop. Domains land in the hosts file
-        between `# snitch-sinkhole <id>` markers (removal = strip the block);
+        between `# wiretap-sinkhole <id>` markers (removal = strip the block);
         IP/CIDR targets get an iptables DNAT rule to 127.0.0.1 on Linux.
         FR: Rediriger plutôt que dropper. Les domaines vont dans le fichier
-        hosts entre marqueurs `# snitch-sinkhole <id>` ; les IP/CIDR reçoivent
+        hosts entre marqueurs `# wiretap-sinkhole <id>` ; les IP/CIDR reçoivent
         une règle DNAT iptables vers 127.0.0.1 sous Linux."""
         kind, value, rid = rule["kind"], rule["value"], rule["id"]
         if kind == "domain":
@@ -666,10 +666,10 @@ class FirewallManager:
             # EN: Cover the bare name + www + wildcard-ish parents.
             # FR: Couvrir le nom nu + www + parents type wildcard.
             names = {value, f"www.{value}"}
-            lines = [f"# snitch-sinkhole {rid} begin"]
+            lines = [f"# wiretap-sinkhole {rid} begin"]
             lines += [f"127.0.0.1 {n}" for n in sorted(names)]
             lines += [f"::1 {n}" for n in sorted(names)]
-            lines.append(f"# snitch-sinkhole {rid} end")
+            lines.append(f"# wiretap-sinkhole {rid} end")
             try:
                 with open(hosts, "a", encoding="utf-8") as f:
                     f.write("\n".join(lines) + "\n")
@@ -687,7 +687,7 @@ class FirewallManager:
         return self._run(["iptables", "-w", "-t", "nat", "-I", "OUTPUT",
                           "-d", value, "-j", "DNAT",
                           "--to-destination", "127.0.0.1",
-                          "-m", "comment", "--comment", f"snitch-sinkhole-{rid}"])
+                          "-m", "comment", "--comment", f"wiretap-sinkhole-{rid}"])
 
     def _sinkhole_remove(self, rule: dict) -> None:
         """EN: Undo a sinkhole — strip the marked hosts block or delete the
@@ -704,10 +704,10 @@ class FirewallManager:
                                         errors="replace").splitlines()
                 out, skip = [], False
                 for line in lines:
-                    if line.strip() == f"# snitch-sinkhole {rid} begin":
+                    if line.strip() == f"# wiretap-sinkhole {rid} begin":
                         skip = True
                         continue
-                    if line.strip() == f"# snitch-sinkhole {rid} end":
+                    if line.strip() == f"# wiretap-sinkhole {rid} end":
                         skip = False
                         continue
                     if not skip:
@@ -717,12 +717,12 @@ class FirewallManager:
                 pass
         elif self._platform == "linux":
             if self._linux_tool() == "nft":
-                self._nft_del_comment(f"snitch-sinkhole-{rid}")
+                self._nft_del_comment(f"wiretap-sinkhole-{rid}")
                 return
             self._run(["iptables", "-w", "-t", "nat", "-D", "OUTPUT",
                        "-d", value, "-j", "DNAT",
                        "--to-destination", "127.0.0.1",
-                       "-m", "comment", "--comment", f"snitch-sinkhole-{rid}"])
+                       "-m", "comment", "--comment", f"wiretap-sinkhole-{rid}"])
 
     # ── Domain re-resolution / Re-résolution des domaines ───────────────────
 
@@ -772,18 +772,18 @@ class FirewallManager:
                         #     one scan covers every stale IP at once.
                         # FR: La suppression par commentaire fait tout le
                         #     delta en un scan.
-                        self._nft_del_comment(f"snitch-{rid}")
+                        self._nft_del_comment(f"wiretap-{rid}")
                         for t in new:
                             self._nft_apply("domain", t, rid)
                     else:
                         for t in sorted(set(old) - set(new)):
                             self._run(["iptables", "-w", "-D", "OUTPUT", "-d", t,
                                        "-j", "DROP", "-m", "comment",
-                                       "--comment", f"snitch-{rid}"])
+                                       "--comment", f"wiretap-{rid}"])
                         for t in sorted(set(new) - set(old)):
                             self._run(["iptables", "-w", "-I", "OUTPUT", "-d", t,
                                        "-j", "DROP", "-m", "comment",
-                                       "--comment", f"snitch-{rid}"])
+                                       "--comment", f"wiretap-{rid}"])
                 elif self._platform == "windows":
                     if self._wfp_engine() is not None:
                         # EN: True delta — per-IP keys mean stale addresses
@@ -830,13 +830,13 @@ class FirewallManager:
             #     puis les copies netsh (chemin de repli) sont nettoyées.
             self._wfp_delete(rule)
             self._run(["netsh", "advfirewall", "firewall", "delete", "rule",
-                       f"name=SnitchRule-{rid}"])
+                       f"name=WiretapRule-{rid}"])
             # EN: per-target suffixed copies / FR: copies suffixées par cible
             self._run(["netsh", "advfirewall", "firewall", "delete", "rule",
                        "name=all", "program=" + rule["value"]]) if kind == "process" else None
         elif self._platform == "linux":
             if self._linux_tool() == "nft":
-                self._nft_del_comment(f"snitch-{rid}")
+                self._nft_del_comment(f"wiretap-{rid}")
                 return
             targets = rule.get("resolved") if kind == "domain" else [rule["value"]]
             for t in targets:
@@ -847,7 +847,7 @@ class FirewallManager:
                     args += ["-p", "tcp", "--dport", t]
                 elif kind == "process":
                     continue
-                args += ["-j", "DROP", "-m", "comment", "--comment", f"snitch-{rid}"]
+                args += ["-j", "DROP", "-m", "comment", "--comment", f"wiretap-{rid}"]
                 self._run(args)
         elif self._platform == "darwin":
             self._pf_apply()   # EN: regenerates the anchor without this rule / FR: régénère l'ancre sans la règle
@@ -886,15 +886,15 @@ class FirewallManager:
     #
     # EN: iptables-nft already maps onto nftables, but some minimal systems
     #     ship ONLY `nft`. When iptables is absent we drive nftables
-    #     directly: a dedicated `inet snitch` table whose `output` chain
+    #     directly: a dedicated `inet wiretap` table whose `output` chain
     #     hooks the output path, plus a `dnat` chain for IP sinkholes.
-    #     Rules are removed by their `comment "snitch-<rid>"` tag — we
+    #     Rules are removed by their `comment "wiretap-<rid>"` tag — we
     #     scan `nft -a` handles and delete each match.
     # FR: iptables-nft mappe déjà sur nftables, mais certains systèmes
     #     minimaux n'ont QUE `nft`. Sans iptables on pilote nftables
-    #     directement : table `inet snitch` dédiée avec chaîne `output`
+    #     directement : table `inet wiretap` dédiée avec chaîne `output`
     #     accrochée au chemin sortant + chaîne `dnat` pour les sinkholes
-    #     IP. Les règles se suppriment par leur tag `comment "snitch-<rid>"`
+    #     IP. Les règles se suppriment par leur tag `comment "wiretap-<rid>"`
     #     via les handles de `nft -a`.
 
     def _linux_tool(self) -> Optional[str]:
@@ -916,11 +916,11 @@ class FirewallManager:
         """EN: Create the table + hooked chains once — idempotent, errors
         ignored (existing objects make nft exit non-zero harmlessly).
         FR: Crée la table + chaînes accrochées une fois — idempotent."""
-        self._run(["nft", "add", "table", "inet", "snitch"])
-        self._run(["nft", "add", "chain", "inet", "snitch", "output",
+        self._run(["nft", "add", "table", "inet", "wiretap"])
+        self._run(["nft", "add", "chain", "inet", "wiretap", "output",
                    "{", "type", "filter", "hook", "output", "priority",
                    "0", ";", "policy", "accept", ";", "}"])
-        self._run(["nft", "add", "chain", "inet", "snitch", "dnat",
+        self._run(["nft", "add", "chain", "inet", "wiretap", "dnat",
                    "{", "type", "nat", "hook", "output", "priority",
                    "-100", ";", "}"])
 
@@ -928,7 +928,7 @@ class FirewallManager:
         """EN: Append one drop rule with our comment tag.
         FR: Ajoute une règle drop avec notre tag de commentaire."""
         self._nft_setup()
-        rule = ["nft", "add", "rule", "inet", "snitch", "output"]
+        rule = ["nft", "add", "rule", "inet", "wiretap", "output"]
         if kind in ("ip", "cidr", "domain"):
             fam = "ip6" if ":" in target else "ip"
             rule += [fam, "daddr", target]
@@ -936,7 +936,7 @@ class FirewallManager:
             rule += ["tcp", "dport", str(target)]
         else:
             return False, f"nft backend cannot match kind {kind}"
-        rule += ["counter", "drop", "comment", f'"snitch-{rid}"']
+        rule += ["counter", "drop", "comment", f'"wiretap-{rid}"']
         return self._run(rule)
 
     def _nft_dnat(self, target: str, rid: str) -> tuple[bool, str]:
@@ -946,9 +946,9 @@ class FirewallManager:
         fam = "ip6" if ":" in target else "ip"
         loopback = "::1" if ":" in target else "127.0.0.1"
         return self._run([
-            "nft", "add", "rule", "inet", "snitch", "dnat",
+            "nft", "add", "rule", "inet", "wiretap", "dnat",
             fam, "daddr", target, "counter", "dnat", "to", loopback,
-            "comment", f'"snitch-sinkhole-{rid}"'])
+            "comment", f'"wiretap-sinkhole-{rid}"'])
 
     def _nft_del_comment(self, tag: str) -> None:
         """EN: Delete every rule in our chains carrying `comment "tag"` —
@@ -957,7 +957,7 @@ class FirewallManager:
         — scan des handles via `nft -a`. Au mieux."""
         for chain in ("output", "dnat"):
             ok, out = self._run(["nft", "-a", "list", "chain", "inet",
-                                 "snitch", chain])
+                                 "wiretap", chain])
             if not ok:
                 continue
             for line in out.splitlines():
@@ -965,7 +965,7 @@ class FirewallManager:
                     continue
                 try:
                     handle = line.rsplit("handle", 1)[1].strip().split()[0]
-                    self._run(["nft", "delete", "rule", "inet", "snitch",
+                    self._run(["nft", "delete", "rule", "inet", "wiretap",
                                chain, "handle", handle])
                 except (IndexError, ValueError):
                     continue
@@ -973,9 +973,9 @@ class FirewallManager:
     # ── macOS pf / pf macOS ──────────────────────────────────────────────────
 
     def _pf_apply(self) -> tuple[bool, str]:
-        """EN: Regenerate the com.snitch anchor from enabled rules + lockdown
+        """EN: Regenerate the com.wiretap anchor from enabled rules + lockdown
         and load it with pfctl. The anchor file lives in the data dir.
-        FR: Régénère l'ancre com.snitch depuis les règles actives + lockdown
+        FR: Régénère l'ancre com.wiretap depuis les règles actives + lockdown
         et la charge avec pfctl."""
         dests, procs_note = [], []
         with self._lock:
@@ -990,17 +990,17 @@ class FirewallManager:
                 dests.append(f"port {r['value']}")
             elif r["kind"] == "process":
                 procs_note.append(r["value"])   # EN: pf can't match processes / FR: pf ne filtre pas par processus
-        lines = [f'table <snitch_block> const {{ {", ".join(d for d in dests if "/" in d or ":" not in d)} }}']
-        lines.append("block drop out quick inet from any to <snitch_block>")
+        lines = [f'table <wiretap_block> const {{ {", ".join(d for d in dests if "/" in d or ":" not in d)} }}']
+        lines.append("block drop out quick inet from any to <wiretap_block>")
         port_rules = [r["value"] for r in rules if r["kind"] == "port"]
         for p in port_rules:
             lines.append(f"block drop out quick inet proto tcp from any to any port {p}")
         if lockdown:
             nets = ", ".join(_PRIVATE_NETS)
             lines.append(f"block drop out quick inet from any to ! {{ {nets} }}")
-        anchor = self._data_dir / "pf-snitch.anchor"
+        anchor = self._data_dir / "pf-wiretap.anchor"
         anchor.write_text("\n".join(lines) + "\n")
-        return self._run(["pfctl", "-a", "com.snitch", "-f", str(anchor)])
+        return self._run(["pfctl", "-a", "com.wiretap", "-f", str(anchor)])
 
     # ── Lockdown internals / Internes lockdown ───────────────────────────────
 
@@ -1022,28 +1022,28 @@ class FirewallManager:
                 if on:
                     self._nft_setup()
                     nets = ", ".join(_PRIVATE_NETS[:5])
-                    self._run(["nft", "add", "rule", "inet", "snitch",
+                    self._run(["nft", "add", "rule", "inet", "wiretap",
                                "output", "ip", "daddr", "{", nets, "}",
-                               "return", "comment", '"snitch-lock"'])
-                    self._run(["nft", "add", "rule", "inet", "snitch",
+                               "return", "comment", '"wiretap-lock"'])
+                    self._run(["nft", "add", "rule", "inet", "wiretap",
                                "output", "oif", '"lo"', "return",
-                               "comment", '"snitch-lock"'])
+                               "comment", '"wiretap-lock"'])
                     return self._run(["nft", "add", "rule", "inet",
-                                      "snitch", "output", "counter",
-                                      "drop", "comment", '"snitch-lock"'])
-                self._nft_del_comment("snitch-lock")
+                                      "wiretap", "output", "counter",
+                                      "drop", "comment", '"wiretap-lock"'])
+                self._nft_del_comment("wiretap-lock")
                 return True, ""
             if on:
-                self._run(["iptables", "-w", "-N", "SNITCH_LOCK"])
-                self._run(["iptables", "-w", "-F", "SNITCH_LOCK"])
+                self._run(["iptables", "-w", "-N", "WIRETAP_LOCK"])
+                self._run(["iptables", "-w", "-F", "WIRETAP_LOCK"])
                 for net in _PRIVATE_NETS[:5]:
-                    self._run(["iptables", "-w", "-A", "SNITCH_LOCK", "-d", net, "-j", "ACCEPT"])
-                self._run(["iptables", "-w", "-A", "SNITCH_LOCK", "-o", "lo", "-j", "ACCEPT"])
-                ok, err = self._run(["iptables", "-w", "-A", "SNITCH_LOCK", "-j", "DROP"])
-                self._run(["iptables", "-w", "-I", "OUTPUT", "1", "-j", "SNITCH_LOCK"])
+                    self._run(["iptables", "-w", "-A", "WIRETAP_LOCK", "-d", net, "-j", "ACCEPT"])
+                self._run(["iptables", "-w", "-A", "WIRETAP_LOCK", "-o", "lo", "-j", "ACCEPT"])
+                ok, err = self._run(["iptables", "-w", "-A", "WIRETAP_LOCK", "-j", "DROP"])
+                self._run(["iptables", "-w", "-I", "OUTPUT", "1", "-j", "WIRETAP_LOCK"])
                 return ok, err
-            self._run(["iptables", "-w", "-D", "OUTPUT", "-j", "SNITCH_LOCK"])
-            ok, err = self._run(["iptables", "-w", "-F", "SNITCH_LOCK"])
+            self._run(["iptables", "-w", "-D", "OUTPUT", "-j", "WIRETAP_LOCK"])
+            ok, err = self._run(["iptables", "-w", "-F", "WIRETAP_LOCK"])
             return ok, err
         if self._platform == "darwin":
             with self._lock:

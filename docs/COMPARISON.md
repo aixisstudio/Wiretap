@@ -1,4 +1,4 @@
-# Snitch vs Little Snitch vs GlassWire vs Portmaster vs LuLu
+# Wiretap vs Little Snitch vs GlassWire vs Portmaster vs LuLu
 
 **English** | [Français](COMPARISON.fr.md)
 
@@ -8,7 +8,7 @@ we call out where competitors genuinely win.
 
 ## Quick table
 
-| | **Snitch** | **Little Snitch** | **GlassWire** | **Portmaster** | **LuLu** |
+| | **Wiretap** | **Little Snitch** | **GlassWire** | **Portmaster** | **LuLu** |
 |---|---|---|---|---|---|
 | License | AGPL-3.0 (FOSS) | Proprietary | Proprietary (freemium) | AGPL-3.0 | GPL-3.0 (FOSS) |
 | Price | Free | ~€59 (macOS) | Free + paid tiers | Free (+ paid SPN) | Free / donation |
@@ -30,7 +30,7 @@ we call out where competitors genuinely win.
 **Little Snitch** — the most polished per-app firewall on macOS, bar none. Deep
 rules UI, research assistant, years of refinement. If you want the smoothest
 macOS-only experience and don't need source access, packet inspection or an
-API, it's the safe pick. Snitch exists because there was no Little Snitch for
+API, it's the safe pick. Wiretap exists because there was no Little Snitch for
 Windows/Linux that is also open-source and inspects traffic, not just flows.
 
 **GlassWire** — the prettiest bandwidth/usage graphs on Windows and an easy
@@ -40,20 +40,20 @@ stance.
 
 **Portmaster (Safing)** — the closest philosophical sibling: FOSS, local-first,
 great DNS-level filtering with filter lists, and a paid SPN network. Stronger
-than Snitch on DNS ad/tracker blocking out of the box; weaker on raw packet
-visibility — Snitch shows you the actual bytes (TLS ClientHello, DNS questions,
+than Wiretap on DNS ad/tracker blocking out of the box; weaker on raw packet
+visibility — Wiretap shows you the actual bytes (TLS ClientHello, DNS questions,
 JA3 fingerprints) and lets you write rules on them.
 
 **LuLu** — the minimalist, free macOS outbound firewall from Objective-See.
 Excellent if all you want is "block app X from phoning home" on a Mac with zero
 cruft. No inspection, no cross-platform, no API — by design.
 
-**Snitch** — the only one of the five that combines: cross-platform FOSS,
+**Wiretap** — the only one of the five that combines: cross-platform FOSS,
 passive TLS fingerprinting (JA3/JA4) for C2 beacon detection, pluggable
 threat-intel feeds (ThreatFox/abuse.ch, your own lists), a scriptable
 authenticated API, SIEM exports, and per-process context — all local, no
 account, no vendor telemetry. The trade-off: the UI is younger than Little
-Snitch's, and kernel-level enforcement varies by OS (pf/netsh/nftables under
+Wiretap's, and kernel-level enforcement varies by OS (pf/netsh/nftables under
 the hood — see FIREWALL.md for the honest matrix).
 
 ## One-line summary
@@ -62,4 +62,4 @@ the hood — see FIREWALL.md for the honest matrix).
 - Need **bandwidth graphs** on Windows → **GlassWire**
 - Need **DNS ad/tracker blocking** + optional VPN-like SPN → **Portmaster**
 - Need a **minimal free macOS** outbound blocker → **LuLu**
-- Need **open, cross-platform, inspectable traffic + C2 detection** → **Snitch**
+- Need **open, cross-platform, inspectable traffic + C2 detection** → **Wiretap**

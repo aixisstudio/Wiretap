@@ -1,7 +1,7 @@
 # Promotion kit / Kit de promotion
 
 [English](promotion.md) | [Français](promotion.md) | [Español](promotion.es.md) | [Deutsch](promotion.de.md) | [Русский](promotion.ru.md) | [日本語](promotion.ja.md) | [Português](promotion.pt-BR.md) | [中文](promotion.zh-CN.md)
-Ready-to-paste drafts for sharing Snitch. Post these from your own accounts —
+Ready-to-paste drafts for sharing Wiretap. Post these from your own accounts —
 the order below maximises traction (HN first for timing, Reddit next, then
 evergreen listings).
 
@@ -15,12 +15,12 @@ les listes evergreen).
 
 **Title:**
 ```
-Show HN: Snitch – open-source app firewall, Sigma rules and one-click blocking
+Show HN: Wiretap – open-source app firewall, Sigma rules and one-click blocking
 ```
 
 **Text (first comment):**
 ```
-I built Snitch because I kept wondering what my machine was actually
+I built Wiretap because I kept wondering what my machine was actually
 talking to. It passively captures packets (libpcap, own parser — no
 external dependencies), enriches them 100% locally (DNS, TLS SNI, offline
 DB-IP Lite GeoIP, IEEE OUI vendor table) and draws a live force graph:
@@ -34,12 +34,12 @@ What it does differently:
 - Process attribution — which app is talking, not just which IP
 - No Scapy — ctypes→libpcap with an in-project parser (GPL-compatible)
 - Fully bilingual EN/FR, one click
-- SNITCH_DEMO=1 runs synthetic traffic for a safe preview — no root needed
+- WIRETAP_DEMO=1 runs synthetic traffic for a safe preview — no root needed
 
 Stack: Python/FastAPI/WebSockets backend, React/D3.js frontend, Electron
 desktop app, Docker, one-click install via Pinokio. AGPL-3.0.
 
-Repo: https://github.com/aixisstudio/Snitch
+Repo: https://github.com/aixisstudio/Wiretap
 ```
 
 ---
@@ -54,7 +54,7 @@ Repo: https://github.com/aixisstudio/Snitch
 
 ### r/opensource — title + body
 ```
-Snitch — open-source, local-first application firewall & network monitor (AGPL)
+Wiretap — open-source, local-first application firewall & network monitor (AGPL)
 
 I made this: a privacy-first firewall that shows every outbound
 connection per process — and blocks it in one click via eBPF,
@@ -64,24 +64,24 @@ behind a token, and even geolocation is offline (bundled DB-IP Lite).
 
 It ships Sigma-compatible detection rules, offline threat intel,
 DGA/ICMP-tunnel/beaconing detection, and rates your exposure with a
-live privacy score. UI in 8 languages. SNITCH_DEMO=1 runs a
+live privacy score. UI in 8 languages. WIRETAP_DEMO=1 runs a
 synthetic-traffic preview without root.
 
-https://github.com/aixisstudio/Snitch
+https://github.com/aixisstudio/Wiretap
 ```
 
 ### r/netsec — shorter, technical
 ```
-Snitch — local-first application firewall (ctypes→libpcap, own parser, Sigma rules, AGPL)
+Wiretap — local-first application firewall (ctypes→libpcap, own parser, Sigma rules, AGPL)
 
 Passive pcap → per-process attribution → one-click blocking via
 eBPF / NFQUEUE / nftables / WFP. Sigma-compatible rules, offline
 threat intel, DGA domain + ICMP-tunnel + beaconing detection.
 Offline GeoIP only, loopback API + token. Rust fleet agent,
 ECS/CEF/JSON/Syslog export. macOS/Windows/Linux.
-Demo mode (SNITCH_DEMO=1) needs no root.
+Demo mode (WIRETAP_DEMO=1) needs no root.
 
-https://github.com/aixisstudio/Snitch
+https://github.com/aixisstudio/Wiretap
 ```
 
 ### r/selfhosted & r/SideProject & r/macapps — adapt from the r/opensource text.
@@ -109,7 +109,7 @@ Tags: `opensource`, `privacy`, `networking`, `python`, `showdev`
 
 ## 4. AlternativeTo.net — listing draft
 
-- **Name:** Snitch
+- **Name:** Wiretap
 - **Tagline:** Open-source application firewall — see every connection
   your computer makes and block it. 100% local, no account, no telemetry.
 - **Platforms:** Mac, Windows, Linux (Docker), self-hosted
@@ -117,7 +117,7 @@ Tags: `opensource`, `privacy`, `networking`, `python`, `showdev`
   Wireshark (adjacent)
 - **Tags:** network-monitor, privacy, open-source, packet-capture
 - **License:** Free, open source (AGPL-3.0)
-- **Website:** https://github.com/aixisstudio/Snitch
+- **Website:** https://github.com/aixisstudio/Wiretap
 - **Developer:** aiXis — https://aixis.fr/
 
 ---

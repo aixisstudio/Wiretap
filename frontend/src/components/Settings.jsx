@@ -1,5 +1,5 @@
 /**
- * Snitch — settings panel.
+ * Wiretap — settings panel.
  *
  * EN: A slide-over panel for persisted settings: language, port filter,
  *     excluded processes, IP whitelist, retention hours, and the opt-in
@@ -70,17 +70,17 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
         setPairing(p)
         setAskStatus(a)
       } catch { setSettings({}) }
-      if (window.snitch?.getAutoLaunch) {
-        setAutoLaunch(await window.snitch.getAutoLaunch())
+      if (window.wiretap?.getAutoLaunch) {
+        setAutoLaunch(await window.wiretap.getAutoLaunch())
       }
-      if (window.snitch?.getUpdateStatus) {
-        setUpdStatus(await window.snitch.getUpdateStatus())
-        setUpdCheck(await window.snitch.getUpdateCheck())
+      if (window.wiretap?.getUpdateStatus) {
+        setUpdStatus(await window.wiretap.getUpdateStatus())
+        setUpdCheck(await window.wiretap.getUpdateCheck())
       }
     })()
     // EN: Live update progress pushed by the main process.
     // FR: Progression des mises à jour poussée par le processus principal.
-    const off = window.snitch?.onUpdateStatus?.(setUpdStatus)
+    const off = window.wiretap?.onUpdateStatus?.(setUpdStatus)
     return () => off?.()
   }, [])
 
@@ -133,7 +133,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
 
   async function openLogs() {
     // EN: Electron only — via preload bridge. / FR: Electron seulement — via le pont preload.
-    if (window.snitch?.openLogs) await window.snitch.openLogs()
+    if (window.wiretap?.openLogs) await window.wiretap.openLogs()
   }
 
   async function exportDiagnostics() {
@@ -141,7 +141,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
     const data = await fetch(`${base}/diagnostics`, { headers: await authHeaders() }).then(r => r.json())
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
-    a.download = `snitch-diagnostics-${Date.now()}.json`
+    a.download = `wiretap-diagnostics-${Date.now()}.json`
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -245,13 +245,13 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
         </div>
 
         {/* Auto-launch (Electron only) / Lancement auto (Electron seul) */}
-        {window.snitch?.setAutoLaunch && (
+        {window.wiretap?.setAutoLaunch && (
           <div style={row}>
             <div>
               <div style={label}>{t('settings_autolaunch')}</div>
               <div style={hint}>{t('settings_autolaunch_hint')}</div>
             </div>
-            <button onClick={async () => setAutoLaunch(await window.snitch.setAutoLaunch(!autoLaunch))}
+            <button onClick={async () => setAutoLaunch(await window.wiretap.setAutoLaunch(!autoLaunch))}
               role="switch" aria-checked={autoLaunch}
               style={{
                 width: 36, height: 20, borderRadius: 10, border: 'none',
@@ -839,7 +839,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
         </div>
 
         {/* Updates (Electron only) / Mises à jour (Electron seul) */}
-        {window.snitch?.getUpdateStatus && (
+        {window.wiretap?.getUpdateStatus && (
           <div style={{ ...row, display: 'block' }}>
             <div style={label}>{t('update_title')}</div>
             <div style={hint}>
@@ -853,13 +853,13 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
             </div>
             <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center' }}>
               {updStatus?.state === 'downloaded' ? (
-                <button onClick={() => window.snitch.installUpdate()} style={{
+                <button onClick={() => window.wiretap.installUpdate()} style={{
                   background: '#3b82f6', border: 'none', borderRadius: 6,
                   color: '#fff', padding: '6px 12px', fontSize: 11,
                   cursor: 'pointer', fontWeight: 600,
                 }}>{t('update_restart')}</button>
               ) : (
-                <button onClick={() => window.snitch.checkUpdates()} style={{
+                <button onClick={() => window.wiretap.checkUpdates()} style={{
                   background: 'var(--bg)', border: '1px solid var(--border)',
                   borderRadius: 6, color: 'var(--text-dim)',
                   padding: '6px 12px', fontSize: 11, cursor: 'pointer',
@@ -867,7 +867,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
               )}
               <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--text-muted)', cursor: 'pointer' }}>
                 <input type="checkbox" checked={updCheck}
-                  onChange={async e => setUpdCheck(await window.snitch.setUpdateCheck(e.target.checked))} />
+                  onChange={async e => setUpdCheck(await window.wiretap.setUpdateCheck(e.target.checked))} />
                 {t('update_auto')}
               </label>
             </div>
@@ -901,7 +901,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
             <div style={hint}>{t('diag_hint')}</div>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
-            {window.snitch?.openLogs && (
+            {window.wiretap?.openLogs && (
               <button onClick={openLogs} aria-label={t('diag_open_logs')} style={{
                 background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
                 color: 'var(--text-dim)', padding: '5px 10px', fontSize: 11, cursor: 'pointer',

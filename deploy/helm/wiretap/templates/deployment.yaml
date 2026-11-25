@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: {{ if eq .Values.mode "agent" }}DaemonSet{{ else }}Deployment{{ end }}
+metadata:
+  name: {{ include "wiretap.fullname" . }}
+  labels:
+    app: {{ include "wiretap.name" . }}
+spec:
+  {{- if ne .Values.mode "agent" }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "wiretap.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "wiretap.name" . }}
+    spec:
+      hostNetwork: {{ eq .Values.mode "agent" }}
+      containers:
+        - name: wiretap
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: WIRETAP_BIND
+              value: "0.0.0.0"
+            - name: WIRETAP_PORT
+              value: "8000"
+            - name: WIRETAP_CONFIG
+              value: /etc/wiretap/wiretap.toml
+            - name: WIRETAP_DATA_DIR
+              value: /var/lib/wiretap
+            {{- if .Values.token }}
+            - name: WIRETAP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "wiretap.fullname" . }}-token
+                  key: token
+            {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            {{- if and (eq .Values.mode "agent") .Values.agentCapabilities }}
+            capabilities:
+              add: ["NET_RAW", "NET_ADMIN"]
+            {{- else }}
+            capabilities:
+              drop: ["ALL"]
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/wiretap
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/wiretap
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "wiretap.fullname" . }}-config
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "wiretap.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

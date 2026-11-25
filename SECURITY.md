@@ -17,7 +17,7 @@ N'ouvrez pas d'issue publique pour les problèmes de sécurité.
 **EN:** The API exposes your full traffic graph — it is protected by design:
 
 - **Token auth** on every REST endpoint and the WebSocket
-  (`X-Snitch-Token` header; `?token=` is honoured on the WebSocket
+  (`X-Wiretap-Token` header; `?token=` is honoured on the WebSocket
   handshake only — it never authenticates REST). Generated per launch
   under Electron, persisted 0600 otherwise.
 - **Loopback bind** (`127.0.0.1`) in all modes by default.
@@ -30,16 +30,16 @@ N'ouvrez pas d'issue publique pour les problèmes de sécurité.
   tokens for fleet agents; only the hash is stored and each is revocable
   (`/ingest/revoke`). Agent tokens may submit events as themselves only —
   no read access, no impersonation.
-- **Optional TLS** — the collector terminates TLS when `SNITCH_TLS_CERT` +
-  `SNITCH_TLS_KEY` are set; `snitch-agent` speaks TLS with `SNITCH_TLS=1`
-  (rustls, WebPKI roots, `SNITCH_CA` for private CAs). Plain HTTP stays
+- **Optional TLS** — the collector terminates TLS when `WIRETAP_TLS_CERT` +
+  `WIRETAP_TLS_KEY` are set; `wiretap-agent` speaks TLS with `WIRETAP_TLS=1`
+  (rustls, WebPKI roots, `WIRETAP_CA` for private CAs). Plain HTTP stays
   the default for loopback/mesh-VPN deployments.
 
 **FR :** L'API expose tout votre graphe de trafic — elle est protégée par
 conception :
 
 - **Authentification par jeton** sur chaque endpoint REST et le WebSocket
-  (en-tête `X-Snitch-Token` ; `?token=` n'est honoré qu'au handshake
+  (en-tête `X-Wiretap-Token` ; `?token=` n'est honoré qu'au handshake
   WebSocket — jamais pour REST). Généré à chaque lancement sous Electron,
   persisté en 0600 sinon.
 - **Bind loopback** (`127.0.0.1`) par défaut dans tous les modes.
@@ -52,9 +52,9 @@ conception :
   `sagt_…` pour les agents de flotte ; seul le hash est stocké et chacun
   est révocable (`/ingest/revoke`). Un jeton agent ne peut qu'envoyer des
   événements en son nom — pas de lecture, pas d'usurpation.
-- **TLS optionnel** — le collecteur termine TLS quand `SNITCH_TLS_CERT` +
-  `SNITCH_TLS_KEY` sont posés ; `snitch-agent` parle TLS avec
-  `SNITCH_TLS=1` (rustls, racines WebPKI, `SNITCH_CA` pour CA privée).
+- **TLS optionnel** — le collecteur termine TLS quand `WIRETAP_TLS_CERT` +
+  `WIRETAP_TLS_KEY` sont posés ; `wiretap-agent` parle TLS avec
+  `WIRETAP_TLS=1` (rustls, racines WebPKI, `WIRETAP_CA` pour CA privée).
   HTTP clair reste le défaut sur loopback/VPN mesh.
 
 ## Privileges / Privilèges

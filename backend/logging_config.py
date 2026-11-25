@@ -1,16 +1,16 @@
 """
-Snitch — logging configuration.
+Wiretap — logging configuration.
 
 EN: Central logging setup. Logs go to stdout AND a rotating file in the data
-    directory (<data>/logs/snitch.log, 3 × 1 MB). Called once from
-    run_backend.py; library modules just do `logging.getLogger("snitch.x")`.
+    directory (<data>/logs/wiretap.log, 3 × 1 MB). Called once from
+    run_backend.py; library modules just do `logging.getLogger("wiretap.x")`.
     Replaces the old `except Exception: pass` pattern with real, debuggable
     diagnostics.
 
 FR: Configuration centralisée des logs. Sortie vers stdout ET un fichier
-    rotatif dans le dossier de données (<data>/logs/snitch.log, 3 × 1 Mo).
+    rotatif dans le dossier de données (<data>/logs/wiretap.log, 3 × 1 Mo).
     Appelé une fois depuis run_backend.py ; les modules utilisent simplement
-    `logging.getLogger("snitch.x")`. Remplace l'ancien motif
+    `logging.getLogger("wiretap.x")`. Remplace l'ancien motif
     `except Exception: pass` par de vrais diagnostics exploitables.
 """
 
@@ -23,9 +23,9 @@ from paths import data_dir, chown_to_user
 
 def setup_logging(level: int = logging.INFO) -> Path:
     """
-    EN: Configure the root "snitch" logger. Returns the log file path.
+    EN: Configure the root "wiretap" logger. Returns the log file path.
         Idempotent — safe to call twice.
-    FR: Configurer le logger racine « snitch ». Renvoie le chemin du fichier
+    FR: Configurer le logger racine « wiretap ». Renvoie le chemin du fichier
         de log. Idempotent — appelable plusieurs fois sans effet.
     """
     log_dir = data_dir() / "logs"
@@ -35,9 +35,9 @@ def setup_logging(level: int = logging.INFO) -> Path:
     # FR: Run élevé → dossier/fichier en root ; les rendre à l'utilisateur
     #     pour que le lancement non privilégié suivant puisse encore écrire.
     chown_to_user(log_dir)
-    log_file = log_dir / "snitch.log"
+    log_file = log_dir / "wiretap.log"
 
-    root = logging.getLogger("snitch")
+    root = logging.getLogger("wiretap")
     if root.handlers:
         return log_file  # EN: already configured / FR: déjà configuré
 

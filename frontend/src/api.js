@@ -1,12 +1,12 @@
 /**
- * Snitch — API endpoint helpers + auth token plumbing.
+ * Wiretap — API endpoint helpers + auth token plumbing.
  *
  * EN: Under Electron the app is loaded from file://, so there is no dev-server
  *     proxy — all backend calls use the absolute loopback URL.
  *     In dev/browser mode we rely on the Vite proxy and relative URLs.
  *
  *     AUTH: every request needs the API token. Resolution order:
- *       1. window.snitch.getToken()  — Electron preload bridge (IPC)
+ *       1. window.wiretap.getToken()  — Electron preload bridge (IPC)
  *       2. ?token= URL param         — Docker/browser first open
  *       3. sessionStorage            — survives reloads in the same tab
  *       4. window.prompt()           — last-resort manual entry
@@ -18,7 +18,7 @@
  *     relatives.
  *
  *     AUTH : chaque requête exige le jeton API. Ordre de résolution :
- *       1. window.snitch.getToken()  — pont preload Electron (IPC)
+ *       1. window.wiretap.getToken()  — pont preload Electron (IPC)
  *       2. paramètre ?token= d'URL   — première ouverture Docker/navigateur
  *       3. sessionStorage            — survit aux rechargements de l'onglet
  *       4. window.prompt()           — saisie manuelle en dernier recours
@@ -31,18 +31,18 @@
 const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:'
 
 // EN: Backend port — Electron picks a FREE port at launch and exposes it via
-//     the preload bridge (window.snitch.getPort()). Browsers/Docker use the
+//     the preload bridge (window.wiretap.getPort()). Browsers/Docker use the
 //     page origin (same-origin deployment) or the vite proxy. Falls back to
 //     8000 only for compatibility.
 // FR: Port du backend — Electron choisit un port LIBRE au lancement et
-//     l'expose via le pont preload (window.snitch.getPort()). Navigateur/
+//     l'expose via le pont preload (window.wiretap.getPort()). Navigateur/
 //     Docker utilisent l'origine de la page (déploiement same-origin) ou le
 //     proxy vite. Repli 8000 uniquement pour compatibilité.
 let _portPromise = null
 export function getApiPort() {
   if (_portPromise) return _portPromise
   _portPromise = (async () => {
-    if (window.snitch?.getPort) return await window.snitch.getPort()
+    if (window.wiretap?.getPort) return await window.wiretap.getPort()
     if (isElectron) return 8000
     return window.location.port || (window.location.protocol === 'https:' ? 443 : 80)
   })()
@@ -84,12 +84,12 @@ export function getToken() {
   _tokenPromise = (async () => {
     // EN: Electron — the token never touches the URL or the DOM.
     // FR: Electron — le jeton ne touche jamais l'URL ni le DOM.
-    if (window.snitch?.getToken) {
-      return await window.snitch.getToken()
+    if (window.wiretap?.getToken) {
+      return await window.wiretap.getToken()
     }
     const fromUrl = new URLSearchParams(window.location.search).get('token')
     if (fromUrl) {
-      sessionStorage.setItem('snitch_token', fromUrl)
+      sessionStorage.setItem('wiretap_token', fromUrl)
       // EN: Strip the token from the address bar so it cannot linger in
       //     browser history — the stored copy keeps auth working.
       // FR: Retirer le jeton de la barre d'adresse pour qu'il ne reste pas
@@ -99,12 +99,12 @@ export function getToken() {
       window.history.replaceState(null, '', clean)
       return fromUrl
     }
-    const stored = sessionStorage.getItem('snitch_token')
+    const stored = sessionStorage.getItem('wiretap_token')
     if (stored) return stored
-    const manual = window.prompt('Snitch API token / Jeton API Snitch :')
+    const manual = window.prompt('Wiretap API token / Jeton API Wiretap :')
     if (manual) {
       const t = manual.trim()
-      sessionStorage.setItem('snitch_token', t)
+      sessionStorage.setItem('wiretap_token', t)
       return t
     }
     return null
@@ -113,12 +113,12 @@ export function getToken() {
 }
 
 /**
- * EN: Headers for an authenticated fetch — merges X-Snitch-Token into `extra`.
- * FR: En-têtes pour un fetch authentifié — fusionne X-Snitch-Token dans `extra`.
+ * EN: Headers for an authenticated fetch — merges X-Wiretap-Token into `extra`.
+ * FR: En-têtes pour un fetch authentifié — fusionne X-Wiretap-Token dans `extra`.
  */
 export async function authHeaders(extra = {}) {
   const token = await getToken()
-  return token ? { ...extra, 'X-Snitch-Token': token } : extra
+  return token ? { ...extra, 'X-Wiretap-Token': token } : extra
 }
 
 /**

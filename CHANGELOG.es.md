@@ -2,7 +2,7 @@
 
 [English](CHANGELOG.md) | [Français](CHANGELOG.md) | **Español** | [Deutsch](CHANGELOG.de.md) | [Русский](CHANGELOG.ru.md) | [日本語](CHANGELOG.ja.md) | [Português](CHANGELOG.pt-BR.md) | [中文](CHANGELOG.zh-CN.md)
 
-Todos los cambios notables de Snitch.
+Todos los cambios notables de Wiretap.
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/).
 
@@ -15,21 +15,21 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/).
 - **Detección de alta entropía** — cabeceras de payload casi aleatorias (≥4,7 bits/byte) en sockets en claro → `HIGH_ENTROPY` (indicio de cifrado encubierto/estego).
 - **Isolation Forest (Python puro)** — `detection/iforest.py` + `mlflow.py` puntúan flujos salientes con 6 features; `ML_ANOMALY` a partir de score 0,62, inerte bajo 384 flujos aprendidos.
 - **Ask-on-connect (Linux NFQUEUE, opt-in)** — `ask_enabled` retiene nuevos flujos salientes en la cola 7 hasta `POST /security/ask/verdict` — veredicto real, el timeout droppea por defecto.
-- **Enforcement eBPF de egress** — `detection/ebpf_enforce.py` + `POST /security/ebpf/isolate|block` — drops en kernel solo para procesos del cgroup snitch.
+- **Enforcement eBPF de egress** — `detection/ebpf_enforce.py` + `POST /security/ebpf/isolate|block` — drops en kernel solo para procesos del cgroup wiretap.
 - **Prueba de hollowing** — `POST /security/hollow` compara páginas ejecutables en RAM con el fichero en disco (Linux, `/proc`).
 - **Sincronización IOC entre pares** — `gossip_peers` + `gossip_enabled`: paquetes Merkle salados cada 5 min a pares explícitamente listados — solo compromisos hash, sin discovery.
 - **Syslog** — `syslog_addr` (UDP o `tcp://`) reenvía alertas warning/críticas como RFC 3164 — camino SIEM/Wazuh.
 - **Reglas geo + auto-bloqueo** — reglas custom con `asn`/`country` (mmdb local) y `action:"block"` instalan reglas de firewall reales por IP coincidente.
 - **Alertas accionables + UI de ajustes** — Bloquear IP / Matar / Suspender / Permitir-Denegar por alerta; nuevos controles en ajustes (syslog, ask, pares).
-- **Backend nftables + firejail** — `nft` cuando falta iptables (tabla `inet snitch` dedicada); `firejail --net=none` como fallback de sandbox.
+- **Backend nftables + firejail** — `nft` cuando falta iptables (tabla `inet wiretap` dedicada); `firejail --net=none` como fallback de sandbox.
 
 ## [Unreleased]
 
 ### Añadido
 
 - **Orquestación del firewall de salida** — reglas de usuario (`ip`, `cidr`, `domain`, `process`, `port`) aplicadas al firewall nativo del SO al mejor esfuerzo: `netsh advfirewall` en Windows, `iptables` en Linux, ancla `pf` generada en macOS. Persistidas, reaplicadas al inicio, `applied=False` honesto sin privilegios (el matching y los contadores `BLOCKED_ATTEMPT` siguen activos).
-- **Lockdown** — interruptor de pánico que corta el tráfico saliente hacia IPs públicas preservando loopback/LAN (cadena `SNITCH_LOCK` en Linux, reglas `netsh`, ancla `pf`).
-- **Acciones de proceso** — `POST /processes/kill` y `POST /processes/suspend` (por PID, rechaza PID ≤ 3 y al propio Snitch); botones kill/suspend en la lista de procesos.
+- **Lockdown** — interruptor de pánico que corta el tráfico saliente hacia IPs públicas preservando loopback/LAN (cadena `WIRETAP_LOCK` en Linux, reglas `netsh`, ancla `pf`).
+- **Acciones de proceso** — `POST /processes/kill` y `POST /processes/suspend` (por PID, rechaza PID ≤ 3 y al propio Wiretap); botones kill/suspend en la lista de procesos.
 - **Threat intelligence (opt-in)** — verificación de reputación contra AbuseIPDB, AlienVault OTX o VirusTotal con tu propia clave API; desactivado por defecto, una llamada por IP pública nueva, caché LRU acotada + dedup, alertas `THREAT_HIT` en veredictos sospechosos/maliciosos.
 - **Webhooks externos (opt-in)** — alertas warning/critical enviadas por POST en vivo a Discord, Slack, Telegram (con chat ID) o cualquier endpoint; desactivado por defecto.
 - **Nuevas detecciones** — `DNS_TUNNEL` (nombres/labels DNS sobredimensionados), `CLEARTEXT` (egreso FTP/Telnet/HTTP/mail en claro), `BASELINE_DEVIATION` (perfil de países aprendido por proceso, persistido).
@@ -42,11 +42,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/).
 
 ### Añadido
 
-- **Auto-actualización** — la app de escritorio comprueba GitHub Releases al arrancar y cada 6 h via electron-updater (los feeds `latest-*.yml` ya se publicaban). Las descargas se instalan al reiniciar; el tray y Ajustes muestran el estado en vivo. Opt-out en Ajustes o con `SNITCH_NO_UPDATE=1`.
+- **Auto-actualización** — la app de escritorio comprueba GitHub Releases al arrancar y cada 6 h via electron-updater (los feeds `latest-*.yml` ya se publicaban). Las descargas se instalan al reiniciar; el tray y Ajustes muestran el estado en vivo. Opt-out en Ajustes o con `WIRETAP_NO_UPDATE=1`.
 - **Visibilidad QUIC / HTTP/3** — los flujos UDP/443 se etiquetan `QUIC/HTTP3` en lugar de agruparse en HTTPS o desconocido. El SNI del Initial QUIC está cifrado y nunca se lee — la etiqueta es honesta sobre lo observable.
 - **Watchlist** — fija IPs o sufijos de dominio (`example.com` también casa `api.example.com`); una alerta dedicada `WATCHLIST_HIT` salta en el primer contacto, limitada por (entrada, host). Persistida, gestionada en Ajustes.
 - **Alerta de subida por proceso** — `UPLOAD_SPIKE` avisa cuando un proceso supera un techo MB/min configurable (50 por defecto, 0 = off) — cubre exfiltración que el `VOLUME_SPIKE` relativo pierde en procesos recién arrancados.
-- **Selector de interfaz de captura** — `GET/POST /capture/interfaces` + desplegable en Ajustes con dispositivos libpcap; el cambio reinicia la captura al instante. Sustituye la variable `SNITCH_IFACE` para usuarios de escritorio.
+- **Selector de interfaz de captura** — `GET/POST /capture/interfaces` + desplegable en Ajustes con dispositivos libpcap; el cambio reinicia la captura al instante. Sustituye la variable `WIRETAP_IFACE` para usuarios de escritorio.
 - **Contexto Wi-Fi** — la barra muestra el SSID actual (o la interfaz cuando no hay Wi-Fi). Al mejor esfuerzo por OS, caché 60 s.
 - **UI en español** — diccionario `es` completo (194 claves, paridad verificada); el selector pasa a EN/FR/ES.
 - **Paquete snap** — electron-builder emite ahora un `.snap` en confinamiento estricto (con el plug `network-observe` para captura AF_PACKET). Flatpak deliberadamente no publicado — la sandbox no puede exponer captura cruda (documentado en `docs/PACKAGING.md`).
@@ -66,16 +66,16 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/).
 
 ### Corregido
 
-- **Cumplimiento del catálogo AppImage** — el asset Linux se nombra ahora `Snitch-x86_64.AppImage` (nomenclatura de arquitectura correcta) y electron-builder publica metadatos de actualización (`latest-linux.yml` + `.zsync`), habilitando auto-actualización con herramientas compatibles con AppImageUpdate.
+- **Cumplimiento del catálogo AppImage** — el asset Linux se nombra ahora `Wiretap-x86_64.AppImage` (nomenclatura de arquitectura correcta) y electron-builder publica metadatos de actualización (`latest-linux.yml` + `.zsync`), habilitando auto-actualización con herramientas compatibles con AppImageUpdate.
 
 ## [1.0.6] — 2026-10-21
 
 ### Añadido
 
 - **Una descarga por OS** — cada tag publica apps listas para usar construidas por CI:
-  - **Windows** — `Snitch Setup <versión>.exe` (Electron + NSIS: ventana nativa, tray, detección Npcap integrada, prompt UAC) y `Snitch-Lite-Setup-<versión>-windows-x64.exe` (Inno Setup: solo backend, la UI abre en el navegador).
-  - **macOS (Apple Silicon)** — `Snitch-<versión>-macos-arm64.zip` + `.dmg` construidos en CI (antes manual).
-  - **Linux** — `Snitch-<versión>.AppImage` + `.deb` — Docker ya no es obligatorio para la app de escritorio.
+  - **Windows** — `Wiretap Setup <versión>.exe` (Electron + NSIS: ventana nativa, tray, detección Npcap integrada, prompt UAC) y `Wiretap-Lite-Setup-<versión>-windows-x64.exe` (Inno Setup: solo backend, la UI abre en el navegador).
+  - **macOS (Apple Silicon)** — `Wiretap-<versión>-macos-arm64.zip` + `.dmg` construidos en CI (antes manual).
+  - **Linux** — `Wiretap-<versión>.AppImage` + `.deb` — Docker ya no es obligatorio para la app de escritorio.
 - **Modo backend `--launcher`** — elige un puerto loopback libre, computa el token de API y abre el navegador; usado por el acceso directo del instalador Lite.
 
 ### Corregido
@@ -97,7 +97,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/).
 ### Corregido
 
 - Crash del backend en builds PyInstaller `console=False` (`sys.stdout`/`sys.stderr` = None) — issue #25.
-- Selección de interfaz de captura en Windows — Snitch elige ahora la interfaz de la ruta por defecto en vez de `vEthernet (WSL)`.
+- Selección de interfaz de captura en Windows — Wiretap elige ahora la interfaz de la ruta por defecto en vez de `vEthernet (WSL)`.
 - `NaNh ago` en los timestamps de alertas con offsets de zona horaria.
 - El splash de Electron ya no oculta diálogos de error; el mensaje de timeout lista causas + carpeta de logs.
 - Cuatro cadenas inglesas restantes traducidas en el diccionario francés (contribución externa).

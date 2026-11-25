@@ -13,7 +13,7 @@ issue。
 API 会暴露你的完整流量图——它从设计上就受到保护：
 
 - **令牌认证**：每个 REST 端点和 WebSocket 都要求令牌
-  （`X-Snitch-Token` 或 `?token=`）。Electron 每次启动生成；其他模式
+  （`X-Wiretap-Token` 或 `?token=`）。Electron 每次启动生成；其他模式
   下以 0600 权限持久化。
 - **默认仅回环绑定**（`127.0.0.1`），适用于所有模式。
 - **Origin 白名单**：WebSocket 握手中仅允许回环主机 + `null`，阻止

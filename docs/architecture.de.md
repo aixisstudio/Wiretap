@@ -1,11 +1,11 @@
-# Snitch — Architektur
+# Wiretap — Architektur
 
 [English](architecture.md) | [Français](architecture.md) | [Español](architecture.es.md) | **Deutsch** | [Русский](architecture.ru.md) | [日本語](architecture.ja.md) | [Português](architecture.pt-BR.md) | [中文](architecture.zh-CN.md)
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  Browser / Electron renderer (React + D3)                    │
-│  WS ◄──── batch (250 ms) ──── REST (token: X-Snitch-Token)   │
+│  WS ◄──── batch (250 ms) ──── REST (token: X-Wiretap-Token)   │
 └───────────────────────────▲──────────────────────────────────┘
                             │ 127.0.0.1 only
 ┌───────────────────────────┴──────────────────────────────────┐

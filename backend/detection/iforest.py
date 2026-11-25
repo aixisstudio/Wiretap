@@ -1,12 +1,12 @@
 """
-Snitch — embedded isolation forest / forêt d'isolation embarquée.
+Wiretap — embedded isolation forest / forêt d'isolation embarquée.
 
 EN: A tiny pure-Python IsolationForest (Liu, Ting & Zhou 2008) — no numpy,
     no ONNX runtime, ~150 lines. Random trees split the training window on
     random feature/value pairs; anomalies isolate in few splits, so the
     score is s = 2^(-E(h)/c(n)) where c(n) is the expected path length of
     an unsuccessful BST search. Honest scope: this is UNSUPERVISED
-    statistical outlier scoring on Snitch's own flow summaries — it
+    statistical outlier scoring on Wiretap's own flow summaries — it
     complements the heuristic detectors, it does not replace them and it
     carries no learned notion of "malware" (there are no labels). High
     score = unusual vs this machine's own recent traffic.
@@ -19,7 +19,7 @@ FR: Petite IsolationForest en pur Python (Liu, Ting & Zhou 2008) — sans
     numpy ni ONNX. Des arbres aléatoires découpent la fenêtre d'entraînement
     sur des paires feature/valeur tirées au hasard ; les anomalies
     s'isolent en peu de splits → score s = 2^(-E(h)/c(n)). Portée honnête :
-    score statistique non supervisé sur les flux de Snitch — complète les
+    score statistique non supervisé sur les flux de Wiretap — complète les
     détecteurs heuristiques, ne les remplace pas, aucune notion apprise de
     « malware » (pas d'étiquettes). Score élevé = inhabituel vs le trafic
     récent de CETTE machine. Bornes constantes : 64 arbres, échantillon

@@ -1,4 +1,4 @@
-# Snitch macOS content filter — skeleton
+# Wiretap macOS content filter — skeleton
 
 [English](#english) · [Français](#français)
 
@@ -8,7 +8,7 @@
 
 This directory contains a **reference skeleton** for a NetworkExtension
 `NEFilterDataProvider` — the only Apple-supported way to filter
-**outbound** traffic per-application on macOS. Snitch's built-in
+**outbound** traffic per-application on macOS. Wiretap's built-in
 enforcement uses `pf` (destination-level, not process-aware); this
 extension is what real per-app outbound control would require.
 
@@ -23,7 +23,7 @@ extension is what real per-app outbound control would require.
   notarization for distribution outside the App Store, and — on macOS —
   user approval in System Settings → Network Filters.
 - `NEFilterDataProvider` decisions are per-flow verdicts
-  (`allow`/`drop`/`filterRules`); Snitch's user-mode rule engine would
+  (`allow`/`drop`/`filterRules`); Wiretap's user-mode rule engine would
   feed verdicts over XPC to this provider.
 
 Verified alternative assessment: `socketfilterfw` (Application Firewall)
@@ -45,7 +45,7 @@ There is no user-mode equivalent.
 
 - `handleNewFlow(_:)` — inspect `flow.remoteEndpoint` + the audit-token
   → process mapping, return a `NEFilterNewFlowVerdict`.
-- Rule updates arrive over XPC from the Snitch backend (not shown —
+- Rule updates arrive over XPC from the Wiretap backend (not shown —
   that transport is the real work).
 
 ---
@@ -55,7 +55,7 @@ There is no user-mode equivalent.
 Ce répertoire contient un **squelette de référence** pour un
 `NEFilterDataProvider` NetworkExtension — la seule voie prise en charge
 par Apple pour filtrer le trafic **sortant** par application sur macOS.
-L'application des règles intégrée de Snitch utilise `pf` (au niveau
+L'application des règles intégrée de Wiretap utilise `pf` (au niveau
 destination, sans notion de processus) ; cette extension est ce que le
 contrôle sortant par-app réel exigerait.
 
@@ -71,7 +71,7 @@ faut :
   (`OSSystemExtensionRequest`), la notarization, et l'approbation
   utilisateur dans Réglages Système → Filtres réseau.
 - Les verdicts `NEFilterDataProvider` sont par flux
-  (`allow`/`drop`) ; le moteur de règles Snitch les alimenterait via XPC.
+  (`allow`/`drop`) ; le moteur de règles Wiretap les alimenterait via XPC.
 
 Alternative vérifiée : `socketfilterfw` (pare-feu applicatif) ne filtre
 que l'**entrant** — aucun équivalent user-mode pour le sortant par-app.

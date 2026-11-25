@@ -328,7 +328,7 @@ class TestApiC2Endpoints:
         return TestClient(app)
 
     def test_get_c2_fingerprints_authenticated(self, client: TestClient) -> None:
-        resp = client.get("/c2/fingerprints", headers={"X-Snitch-Token": API_TOKEN})
+        resp = client.get("/c2/fingerprints", headers={"X-Wiretap-Token": API_TOKEN})
         assert resp.status_code == 200
         data = resp.json()
         assert data["ok"] is True
@@ -337,7 +337,7 @@ class TestApiC2Endpoints:
 
     def test_get_c2_fingerprints_alias(self, client: TestClient) -> None:
         resp = client.get(
-            "/security/c2/fingerprints", headers={"X-Snitch-Token": API_TOKEN}
+            "/security/c2/fingerprints", headers={"X-Wiretap-Token": API_TOKEN}
         )
         assert resp.status_code == 200
         data = resp.json()
@@ -346,7 +346,7 @@ class TestApiC2Endpoints:
 
     def test_post_c2_fingerprints_reload(self, client: TestClient) -> None:
         resp = client.post(
-            "/c2/fingerprints/reload", headers={"X-Snitch-Token": API_TOKEN}
+            "/c2/fingerprints/reload", headers={"X-Wiretap-Token": API_TOKEN}
         )
         assert resp.status_code == 200
         data = resp.json()
@@ -358,7 +358,7 @@ class TestApiC2Endpoints:
         assert resp.status_code == 401
 
     def test_alerts_rules_fields_include_ja3_and_ja4(self, client: TestClient) -> None:
-        resp = client.get("/alerts/rules", headers={"X-Snitch-Token": API_TOKEN})
+        resp = client.get("/alerts/rules", headers={"X-Wiretap-Token": API_TOKEN})
         assert resp.status_code == 200
         data = resp.json()
         fields = data.get("fields", [])

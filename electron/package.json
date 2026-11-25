@@ -1,7 +1,7 @@
 {
-  "name": "snitch",
+  "name": "wiretap",
   "version": "1.6.4",
-  "description": "Snitch \u2014 application firewall and real-time network monitor / pare-feu applicatif et moniteur r\u00e9seau en temps r\u00e9el",
+  "description": "Wiretap \u2014 application firewall and real-time network monitor / pare-feu applicatif et moniteur r\u00e9seau en temps r\u00e9el",
   "main": "main.js",
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -16,8 +16,8 @@
     "electron-builder": "^26.18.0"
   },
   "build": {
-    "appId": "com.snitch.app",
-    "productName": "Snitch",
+    "appId": "com.wiretap.app",
+    "productName": "Wiretap",
     "directories": {
       "output": "../dist/installer"
     },
@@ -34,8 +34,8 @@
         "to": "icon.png"
       },
       {
-        "from": "../dist/backend/snitch-backend",
-        "to": "snitch-backend"
+        "from": "../dist/backend/wiretap-backend",
+        "to": "wiretap-backend"
       },
       {
         "from": "../frontend/dist",
@@ -52,7 +52,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Snitch"
+      "shortcutName": "Wiretap"
     },
     "mac": {
       "target": [
@@ -71,7 +71,7 @@
       "category": "Utility",
       "icon": "icon.png",
       "synopsis": "See every connection your computer makes - 100% local",
-      "description": "Snitch is a local-first application firewall and network observer: live map of outbound connections, per-process attribution, Sigma rules, offline GeoIP, one-click blocking. No account, no telemetry.",
+      "description": "Wiretap is a local-first application firewall and network observer: live map of outbound connections, per-process attribution, Sigma rules, offline GeoIP, one-click blocking. No account, no telemetry.",
       "maintainer": "aiXis Studio",
       "syncDesktopName": true,
       "artifactName": "${productName}-${arch}.${ext}"
@@ -95,12 +95,12 @@
       {
         "provider": "github",
         "owner": "aixisstudio",
-        "repo": "Snitch"
+        "repo": "Wiretap"
       }
     ]
   },
-  "homepage": "https://github.com/aixisstudio/Snitch",
-  "desktopName": "Snitch",
+  "homepage": "https://github.com/aixisstudio/Wiretap",
+  "desktopName": "Wiretap",
   "author": "aiXis Studio",
   "dependencies": {
     "electron-updater": "^6.8.11"

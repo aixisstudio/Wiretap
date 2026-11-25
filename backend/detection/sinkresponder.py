@@ -1,6 +1,6 @@
 """
 EN: Sinkhole responder — turns "redirect to 127.0.0.1" from a blind drop
-    into a sensor. When Snitch sinkholes a domain/IP, the victim process
+    into a sensor. When Wiretap sinkholes a domain/IP, the victim process
     still connects — it just reaches this tiny listener instead of the
     real server. We log what it tried to send:
 
@@ -18,7 +18,7 @@ EN: Sinkhole responder — turns "redirect to 127.0.0.1" from a blind drop
     (the hosts/DNAT redirect still lands the connection on a refused port).
 
 FR: Répondeur de sinkhole — transforme la redirection vers 127.0.0.1 en
-    capteur au lieu d'un trou noir. Quand Snitch sinkhole un domaine/IP,
+    capteur au lieu d'un trou noir. Quand Wiretap sinkhole un domaine/IP,
     le processus victime se connecte quand même — il atteint ce petit
     écouteur à la place du vrai serveur. On journalise ce qu'il tente :
 
@@ -103,7 +103,7 @@ class SinkholeResponder:
             self._listening[port] = True
             t = threading.Thread(target=self._accept_loop,
                                  args=(s, handler), daemon=True,
-                                 name=f"snitch-sink-{port}")
+                                 name=f"wiretap-sink-{port}")
             t.start()
             self._threads.append(t)
 

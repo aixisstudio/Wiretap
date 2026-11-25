@@ -1,11 +1,11 @@
 //
 //  FilterDataProvider.swift
-//  Snitch macOS content-filter skeleton — research only, NOT shipped.
+//  Wiretap macOS content-filter skeleton — research only, NOT shipped.
 //
-//  EN: Minimal NEFilterDataProvider showing where Snitch verdicts would
+//  EN: Minimal NEFilterDataProvider showing where Wiretap verdicts would
 //      land. Every new flow arrives in handleNewFlow(_:); you map the
 //      flow's sourceAppAuditToken to a process, look it up in the rule
-//      set pushed by the Snitch backend (over XPC — that transport is
+//      set pushed by the Wiretap backend (over XPC — that transport is
 //      the real work, not shown here), and return a verdict.
 //
 //      Requires: Apple Developer account, the
@@ -16,10 +16,10 @@
 //      References: Apple SimpleFirewall (WWDC), elastic/endpoint,
 //      NuAppFirewall (GPL-2.0 — reference only).
 //
-//  FR: NEFilterDataProvider minimal montrant où les verdicts Snitch
+//  FR: NEFilterDataProvider minimal montrant où les verdicts Wiretap
 //      arriveraient. Chaque nouveau flux passe par handleNewFlow(_:) ;
 //      on mappe sourceAppAuditToken vers un processus, on consulte les
-//      règles poussées par le backend Snitch (via XPC — non montré), et
+//      règles poussées par le backend Wiretap (via XPC — non montré), et
 //      on renvoie un verdict.
 //
 //      Requiert : compte Apple Developer, entitlement content-filter,
@@ -28,12 +28,12 @@
 
 import NetworkExtension
 
-/// EN: Rule snapshot shared with the Snitch backend — in a real build
+/// EN: Rule snapshot shared with the Wiretap backend — in a real build
 ///     this is fed over XPC and hot-swapped on policy change.
 /// FR: Instantané de règles partagé avec le backend — dans un vrai
 ///     build il arrive par XPC et est remplacé à chaud à chaque
 ///     changement de politique.
-struct SnitchPolicy {
+struct WiretapPolicy {
     /// EN: Bundle IDs / signing identifiers allowed outbound. Empty =
     ///     allow-all skeleton behaviour.
     /// FR: Identifiants autorisés en sortie. Vide = comportement
@@ -44,7 +44,7 @@ struct SnitchPolicy {
 
 final class FilterDataProvider: NEFilterDataProvider {
 
-    private var policy = SnitchPolicy()
+    private var policy = WiretapPolicy()
 
     // EN: Provider lifecycle — bring up your XPC listener and load the
     //     last-known policy here, BEFORE flows start arriving.

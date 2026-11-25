@@ -1,5 +1,5 @@
 """
-Snitch — ARP scanner parsing tests.
+Wiretap — ARP scanner parsing tests.
 
 EN: macOS `arp -a` drops leading zeros in MAC octets ("be:18:9d:a0:c1:3") —
     a strict two-digit regex silently skips whole devices (this actually

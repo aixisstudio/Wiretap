@@ -1,5 +1,5 @@
 """
-Snitch — API security tests.
+Wiretap — API security tests.
 
 EN: Verifies the token gate (401 without / wrong token, 200 with header;
     ?token= is WebSocket-only and now 401 on REST), the per-IP brute-force
@@ -32,12 +32,12 @@ def test_missing_token_is_401():
 
 
 def test_wrong_token_is_401():
-    r = client.get("/protected", headers={"X-Snitch-Token": "0" * 48})
+    r = client.get("/protected", headers={"X-Wiretap-Token": "0" * 48})
     assert r.status_code == 401
 
 
 def test_valid_header_token_passes():
-    r = client.get("/protected", headers={"X-Snitch-Token": API_TOKEN})
+    r = client.get("/protected", headers={"X-Wiretap-Token": API_TOKEN})
     assert r.status_code == 200
 
 

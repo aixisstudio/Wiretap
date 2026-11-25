@@ -1,5 +1,5 @@
 """
-Snitch — security-features tests (firewall, threat intel, new detectors).
+Wiretap — security-features tests (firewall, threat intel, new detectors).
 
 EN: Covers the FirewallManager rule matching/lockdown/counters (OS commands
     are never executed — _apply is monkeypatched or the rules stay in demo
@@ -303,7 +303,7 @@ def test_sinkhole_domain_writes_hosts_block(tmp_path, monkeypatch):
     rule = fw.add_rule("domain", "ads.example", action="sinkhole")
     assert rule["applied"] is True
     body = hosts.read_text()
-    assert f"# snitch-sinkhole {rule['id']} begin" in body
+    assert f"# wiretap-sinkhole {rule['id']} begin" in body
     assert "127.0.0.1 ads.example" in body
     fw._demo = False
     fw._remove(rule)
@@ -734,7 +734,7 @@ def test_iocpack_roundtrip(monkeypatch):
     retrouvent, les étrangers non."""
     monkeypatch.setattr(iocshare, "_FLIP", 0.0)
     pack = iocshare.build_pack(["203.0.113.7", "evil.example"])
-    assert pack["format"].startswith("snitch-ioc-pack")
+    assert pack["format"].startswith("wiretap-ioc-pack")
     res = iocshare.check_pack(pack, ["203.0.113.7", "9.9.9.9"])
     assert res["ok"]
     hints = {h["indicator"] for h in res["hints"]}
@@ -756,7 +756,7 @@ def test_iocpack_rejects_garbage():
     """EN: Bad format/params/bits → honest error, not a crash.
     FR: Format/params/bits mauvais → erreur honnête, pas de crash."""
     assert iocshare.check_pack({}, ["x"])["ok"] is False
-    pack = {"format": "snitch-ioc-pack/1", "m": 8192, "k": 4,
+    pack = {"format": "wiretap-ioc-pack/1", "m": 8192, "k": 4,
             "bits_b64": "AAAA"}
     assert iocshare.check_pack(pack, ["x"])["ok"] is False
 
@@ -1233,11 +1233,11 @@ def test_windows_netsh_firewall_rule_lifecycle(tmp_path, monkeypatch):
     assert ok is True
     assert len(runs) == 1
     assert runs[0] == ["netsh", "advfirewall", "firewall", "add", "rule",
-                       "name=SnitchRule-rule123", "dir=out", "action=block",
+                       "name=WiretapRule-rule123", "dir=out", "action=block",
                        "remoteip=203.0.113.5", "enable=yes"]
 
     # 2. Test remove rule
     runs.clear()
     fw._remove({"id": "rule123", "kind": "ip", "value": "203.0.113.5"})
     assert any(cmd == ["netsh", "advfirewall", "firewall", "delete", "rule",
-                       "name=SnitchRule-rule123"] for cmd in runs)
+                       "name=WiretapRule-rule123"] for cmd in runs)

@@ -1,5 +1,5 @@
 """
-Snitch — anomaly detector tests.
+Wiretap — anomaly detector tests.
 
 EN: Covers per-packet rules: private-IP skip, NEW_HOST once-only, suspicious
     ports/processes, MEDIA_EXFIL (whitelisting), forget(), and the

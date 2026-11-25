@@ -1,4 +1,4 @@
-# Snitch — continuous integration.
+# Wiretap — continuous integration.
 # EN: Python lint (ruff, critical rules only) + pytest on all three OSes,
 #     frontend vitest + production build on every push/PR.
 #     Release job (tags only): per-OS PyInstaller build + SHA256 checksums.
@@ -58,7 +58,7 @@ jobs:
           npm run build
 
   # EN: Real-OS integration — exercises the actual platform primitives the
-  #     unit suite only mocks, gated on SNITCH_OS_INTEGRATION=1:
+  #     unit suite only mocks, gated on WIRETAP_OS_INTEGRATION=1:
   #       Linux   unshare netns egress denial, real iptables DROP + live
   #               connect check, tc clsact/flower, perf_event_open
   #       Windows fwpuclnt engine open + ALE BLOCK filter proven by a TCP
@@ -67,7 +67,7 @@ jobs:
   #     Everything cleans up in `finally` and skips honestly when the
   #     runner cannot provide the primitive (no egress, userns off, etc.).
   # FR: Intégration OS réel — exerce les vraies primitives que les tests
-  #     unitaires ne font que mocker (SNITCH_OS_INTEGRATION=1) :
+  #     unitaires ne font que mocker (WIRETAP_OS_INTEGRATION=1) :
   #     unshare/iptables/tc/perf sous Linux, filtres WFP prouvés par une
   #     vraie connexion sous Windows, sandbox-exec + hosts sous macOS.
   #     Nettoyage en `finally`, skip honnête si le runner ne peut pas.
@@ -87,7 +87,7 @@ jobs:
       - name: Integration tests — real OS primitives (${{ matrix.os }})
         shell: bash
         env:
-          SNITCH_OS_INTEGRATION: '1'
+          WIRETAP_OS_INTEGRATION: '1'
         run: cd backend && python -m pytest tests/test_integration_os.py -v
 
   # EN: Per-OS PyInstaller build — runs on tags; verifies the spec compiles
@@ -124,8 +124,8 @@ jobs:
       - name: Stage frontend_dist into bundle
         shell: bash
         run: |
-          mkdir -p dist/backend/snitch-backend/frontend_dist
-          cp -r frontend/dist/. dist/backend/snitch-backend/frontend_dist/
+          mkdir -p dist/backend/wiretap-backend/frontend_dist
+          cp -r frontend/dist/. dist/backend/wiretap-backend/frontend_dist/
       # EN: Backend tarball FIRST — it is the core artifact; an optional
       #     installer failure below must never cost us this upload.
       # FR: Tarball backend D'ABORD — c'est l'artefact cœur ; un échec
@@ -134,11 +134,11 @@ jobs:
         shell: bash
         run: |
           cd dist/backend
-          tar czf snitch-backend-${{ matrix.os }}.tar.gz snitch-backend
-          sha256sum snitch-backend-${{ matrix.os }}.tar.gz > snitch-backend-${{ matrix.os }}.sha256
+          tar czf wiretap-backend-${{ matrix.os }}.tar.gz wiretap-backend
+          sha256sum wiretap-backend-${{ matrix.os }}.tar.gz > wiretap-backend-${{ matrix.os }}.sha256
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: snitch-backend-${{ matrix.os }}
+          name: wiretap-backend-${{ matrix.os }}
           path: dist/backend/*.tar.gz*
       # EN: One download per OS — the Electron app is the flagship artifact
       #     everywhere: Windows NSIS installer, macOS zip+dmg, Linux
@@ -191,7 +191,7 @@ jobs:
         run: |
           choco install innosetup --no-progress -y
           $v = "${{ github.ref_name }}" -replace '^v',''
-          & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" "/DMyAppVersion=$v" "installer\snitch.iss"
+          & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" "/DMyAppVersion=$v" "installer\wiretap.iss"
       # EN: FREE Authenticode signing via the SignPath Foundation OSS
       #     program (https://signpath.org) — the only legal no-cost path to
       #     publicly-trusted Windows code signing. Completely inert until the
@@ -212,7 +212,7 @@ jobs:
         id: upload-unsigned-exe
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: snitch-unsigned-exe
+          name: wiretap-unsigned-exe
           path: dist/installer/*.exe
       - name: SignPath — submit signing request
         if: ${{ matrix.os == 'windows-latest' && vars.SIGNPATH_ORGANIZATION_ID != '' }}
@@ -242,7 +242,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' && vars.SIGNPATH_ORGANIZATION_ID != '' }}
         shell: pwsh
         run: |
-          $exe = Get-Item "dist/installer/Snitch Setup *.exe" | Select-Object -First 1
+          $exe = Get-Item "dist/installer/Wiretap Setup *.exe" | Select-Object -First 1
           $sha = [System.Security.Cryptography.SHA512]::Create()
           $fs = [System.IO.File]::OpenRead($exe.FullName)
           try { $b64 = [Convert]::ToBase64String($sha.ComputeHash($fs)) } finally { $fs.Close() }
@@ -271,7 +271,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
-          name: snitch-app-${{ matrix.os }}
+          name: wiretap-app-${{ matrix.os }}
           path: |
             dist/installer/*.exe
             dist/installer/*.AppImage
@@ -303,13 +303,13 @@ jobs:
           #     certificate flow; keep secrets in GitHub Secrets, never inline.
           # FR: Exemple — Azure Trusted Signing / signtool. Remplacez par votre
           #     flux de certificat ; secrets dans GitHub Secrets, jamais en clair.
-          Write-Host "signing would run here: signtool sign dist/backend/snitch-backend/snitch-backend.exe"
+          Write-Host "signing would run here: signtool sign dist/backend/wiretap-backend/wiretap-backend.exe"
           exit 1  # EN: fail loudly if enabled but not implemented / FR: échouer si activé mais non implémenté
       - name: Code-sign + notarize backend (macOS placeholder)
         if: ${{ matrix.os == 'macos-latest' && vars.ENABLE_CODESIGNING == 'true' }}
         shell: bash
         run: |
-          echo "signing would run here: codesign --sign 'Developer ID' dist/backend/snitch-backend"
+          echo "signing would run here: codesign --sign 'Developer ID' dist/backend/wiretap-backend"
           exit 1  # EN: fail loudly if enabled but not implemented / FR: échouer si activé mais non implémenté
 
   # EN: Publish the Docker image to GHCR — on tags and manual dispatch only,
@@ -334,8 +334,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/snitch:latest
-            ghcr.io/${{ github.repository_owner }}/snitch:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/wiretap:latest
+            ghcr.io/${{ github.repository_owner }}/wiretap:${{ github.ref_name }}
 
   # EN: Tag release — gathers every build artifact (backend tarballs,
   #     checksums, Electron NSIS/zip/dmg/AppImage/deb, Inno Lite) and
@@ -355,12 +355,12 @@ jobs:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: artifacts
-          pattern: snitch-*
+          pattern: wiretap-*
       # EN: Rename installer assets to versionless names before upload so
-      #     links like releases/latest/download/Snitch-Setup-windows.exe
+      #     links like releases/latest/download/Wiretap-Setup-windows.exe
       #     stay valid forever — the website's download button depends on it.
       # FR: Renommer les installeurs sans version avant l'upload pour que des
-      #     liens comme releases/latest/download/Snitch-Setup-windows.exe
+      #     liens comme releases/latest/download/Wiretap-Setup-windows.exe
       #     restent valables à vie — le bouton du site en dépend.
       - name: Rename installer assets to stable names
         run: |
@@ -368,12 +368,12 @@ jobs:
           for f in artifacts/**/*.exe artifacts/**/*.AppImage artifacts/**/*.deb artifacts/**/*.snap artifacts/**/*.dmg artifacts/**/*.zip; do
             b="$(basename "$f")"
             case "$b" in
-              "Snitch Setup "*)   mv "$f" "$f.renamed" && mv "$f.renamed" "$(dirname "$f")/Snitch-Setup-windows.exe" ;;
-              Snitch-Lite-Setup*) mv "$f" "$(dirname "$f")/Snitch-Lite-Setup-windows.exe" ;;
-              *-arm64.dmg)        mv "$f" "$(dirname "$f")/Snitch-macos-arm64.dmg" ;;
-              *-arm64-mac.zip)    mv "$f" "$(dirname "$f")/Snitch-macos-arm64.zip" ;;
-              *amd64.deb)         mv "$f" "$(dirname "$f")/snitch-linux-amd64.deb" ;;
-              *amd64.snap)        mv "$f" "$(dirname "$f")/snitch-linux-amd64.snap" ;;
+              "Wiretap Setup "*)   mv "$f" "$f.renamed" && mv "$f.renamed" "$(dirname "$f")/Wiretap-Setup-windows.exe" ;;
+              Wiretap-Lite-Setup*) mv "$f" "$(dirname "$f")/Wiretap-Lite-Setup-windows.exe" ;;
+              *-arm64.dmg)        mv "$f" "$(dirname "$f")/Wiretap-macos-arm64.dmg" ;;
+              *-arm64-mac.zip)    mv "$f" "$(dirname "$f")/Wiretap-macos-arm64.zip" ;;
+              *amd64.deb)         mv "$f" "$(dirname "$f")/wiretap-linux-amd64.deb" ;;
+              *amd64.snap)        mv "$f" "$(dirname "$f")/wiretap-linux-amd64.snap" ;;
             esac
           done
           # EN: latest.yml must point at the renamed stable asset name,
@@ -381,7 +381,7 @@ jobs:
           # FR: latest.yml doit pointer vers le nom d'asset renommé, sinon
           #     electron-updater télécharge une URL en 404.
           for y in artifacts/**/latest.yml; do
-            sed -i.bak -E 's/(url|path): Snitch Setup [^ ]+\.exe/\1: Snitch-Setup-windows.exe/' "$y" && rm -f "$y.bak"
+            sed -i.bak -E 's/(url|path): Wiretap Setup [^ ]+\.exe/\1: Wiretap-Setup-windows.exe/' "$y" && rm -f "$y.bak"
           done
           find artifacts -type f -name "*" | sort
       - name: Publish GitHub release with all assets
@@ -397,6 +397,6 @@ jobs:
           echo "publishing ${#files[@]} files"
           gh release create "${{ github.ref_name }}" "${files[@]}" \
             -R "${{ github.repository }}" \
-            --title "Snitch ${{ github.ref_name }}" --generate-notes \
+            --title "Wiretap ${{ github.ref_name }}" --generate-notes \
             || gh release upload "${{ github.ref_name }}" "${files[@]}" \
             -R "${{ github.repository }}" --clobber

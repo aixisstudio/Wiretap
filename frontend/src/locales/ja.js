@@ -1,5 +1,5 @@
 /**
- * Snitch — 日本語UI辞書。
+ * Wiretap — 日本語UI辞書。
  *
  * EN: Isolated locale file — one per language, so community contributors can
  *     add translations via a simple pull request (see CONTRIBUTING.md).
@@ -33,7 +33,7 @@ export default {
   legend_dns: 'DNS',
 
   // サイドバーヘッダー + 統計
-  app_name: 'SNITCH',
+  app_name: 'WIRETAP',
   tagline: '隠れた通信をすべて追跡。',
   footer_credit: 'aiXis 開発',
   stat_lan: 'LANデバイス',
@@ -79,7 +79,7 @@ export default {
 
   // ノード名 + ヒント
   node_local: 'このデバイス',
-  hint_local: 'これはこのマシン — Snitch が動作しているマシンです。送受信するすべてがグラフの中心から放射されます。',
+  hint_local: 'これはこのマシン — Wiretap が動作しているマシンです。送受信するすべてがグラフの中心から放射されます。',
   unidentified: '未識別',
   devtype_router: 'ルーター',
   devtype_phone: 'スマホ',
@@ -157,7 +157,7 @@ export default {
   capture_stopping: '停止中…',
   capture_starting: '開始中…',
   capture_error_title: 'キャプチャに失敗しました — トラフィックは表示されません',
-  capture_error_hint: 'キャプチャ権限で Snitch を再起動してください（Windows では管理者＋Npcap 必須、macOS/Linux では sudo）、または「開始」で再試行。',
+  capture_error_hint: 'キャプチャ権限で Wiretap を再起動してください（Windows では管理者＋Npcap 必須、macOS/Linux では sudo）、または「開始」で再試行。',
 
   // ポートフィルター
   port_filter: 'ポート',
@@ -228,7 +228,7 @@ export default {
   update_available: v => `アップデートあり: v${v} — ダウンロード中`,
   update_downloading: p => `アップデートをダウンロード中… ${p}%`,
   update_ready: v => `v${v} ダウンロード済み — 再起動でインストール`,
-  update_none: 'Snitch は最新です',
+  update_none: 'Wiretap は最新です',
   update_error: 'アップデート確認に失敗',
   update_idle: 'まだ確認していません',
   update_restart: '再起動してインストール',
@@ -247,7 +247,7 @@ export default {
   diag_hint: 'バグ報告用のログとシステム情報',
   diag_open_logs: 'ログ',
   diag_export: 'エクスポート',
-  settings_note: '設定はすべてローカルに保存されます。Snitch は明示的なオプトインなしに第三者へデータを送信しません。',
+  settings_note: '設定はすべてローカルに保存されます。Wiretap は明示的なオプトインなしに第三者へデータを送信しません。',
   nav_apps: 'アプリ',
   ignore_alert: 'このアラート種別/ホストを無視',
 
@@ -261,10 +261,10 @@ export default {
   apps_history_60m: '直近1時間（バイト/分）',
   alertmsg_NEW_HOSTS: n => `新規ホスト ${n} 件へ接続`,
   settings_autolaunch: 'ログイン時に起動',
-  settings_autolaunch_hint: 'サインイン時に Snitch を自動起動',
+  settings_autolaunch_hint: 'サインイン時に Wiretap を自動起動',
 
   // オンボーディング
-  onboard_title: 'Snitch へようこそ',
+  onboard_title: 'Wiretap へようこそ',
   onboard_sub: 'リアルタイム・ネットワークトラフィック可視化ツール — 設計からプライバシー重視。',
   onboard_priv_title: 'すべてこのマシンに留まる',
   onboard_priv_body: 'トラフィックのメタデータ、アラート、履歴はローカル SQLite データベースに保存。アカウントもクラウドもテレメトリもなし。',
@@ -395,7 +395,7 @@ export default {
   bl_src_file: 'ファイル',
   bl_src_url: 'URL',
   bl_import: 'インポート',
-  bl_url_confirm: 'この URL を取得すると Snitch が外部へ送信リクエストを行います — 数少ない例外の一つです。続行しますか？',
+  bl_url_confirm: 'この URL を取得すると Wiretap が外部へ送信リクエストを行います — 数少ない例外の一つです。続行しますか？',
   bl_result: (a, s) => `${a} 件のルールを追加 · ${s} 件は既存`,
   bl_truncated: '上限で切り詰められました',
   bl_remote: 'リモート取得を実行しました',
@@ -456,7 +456,7 @@ export default {
   ask_unavailable: 'このシステムではAskモードは利用できません',
   ask_not_running: 'Askモードは有効ですが動作していません — バックエンドログを確認',
   gs_title: 'IOCピア同期',
-  gs_hint: '塩付きMerkleプルーフパックを明示的にペアリングしたSnitchインスタンスへ5分毎にプッシュ — ハッシュコミットメントのみ、生インジケーターは送信しません。',
+  gs_hint: '塩付きMerkleプルーフパックを明示的にペアリングしたWiretapインスタンスへ5分毎にプッシュ — ハッシュコミットメントのみ、生インジケーターは送信しません。',
   gs_peers_ph: 'host:port（カンマ区切り）',
   gs_privacy: 'オプトインのフリート共有 — パックはここに列挙したピアにのみ送信されます。',
   ks_title: 'ボリュームキルスイッチ',

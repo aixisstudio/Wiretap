@@ -1,5 +1,5 @@
 /**
- * Snitch — bottom timeline chart.
+ * Wiretap — bottom timeline chart.
  *
  * EN: Collapsible per-minute bar chart of packets (with bytes and alert
  *     counts in the tooltip) over the last 15/30/60 min. Data comes from the

@@ -14,7 +14,7 @@ API はあなたのトラフィックグラフ全体を公開します — 設�
 います:
 
 - **トークン認証** — すべての REST エンドポイントと WebSocket で必須
-  （`X-Snitch-Token` または `?token=`）。Electron では起動ごとに生成、
+  （`X-Wiretap-Token` または `?token=`）。Electron では起動ごとに生成、
   それ以外では 0600 で永続化。
 - **loopback バインド**（`127.0.0.1`）が全モードでデフォルト。
 - **Origin 許可リスト** — WebSocket ハンドシェイクで（loopback ホスト

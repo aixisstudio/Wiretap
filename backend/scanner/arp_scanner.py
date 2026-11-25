@@ -1,5 +1,5 @@
 """
-Snitch — LAN device discovery via the system ARP table.
+Wiretap — LAN device discovery via the system ARP table.
 
 EN: Scapy is gone (GPL-2.0-only), so active ARP broadcast scanning went with
     it. Discovery now reads the OS neighbour cache — populated passively by
@@ -45,7 +45,7 @@ import psutil
 from scanner.oui import lookup, is_local_mac, DEVICE_TYPE_COLORS
 from procutils import spawn_kwargs
 
-logger = logging.getLogger("snitch.scanner")
+logger = logging.getLogger("wiretap.scanner")
 
 # EN: MAC address matcher — handles : and - separators AND macOS's
 #     non-zero-padded octets ("be:18:9d:a0:c1:3" — that trailing "3" is real:

@@ -1,5 +1,5 @@
 /**
- * Snitch — русский словарь интерфейса.
+ * Wiretap — русский словарь интерфейса.
  *
  * EN: Isolated locale file — one per language, so community contributors can
  *     add translations via a simple pull request (see CONTRIBUTING.md).
@@ -33,7 +33,7 @@ export default {
   legend_dns: 'DNS',
 
   // Заголовок боковой панели + статистика
-  app_name: 'SNITCH',
+  app_name: 'WIRETAP',
   tagline: 'Отслеживайте каждый скрытый поток.',
   footer_credit: 'Разработано aiXis',
   stat_lan: 'LAN-устройства',
@@ -79,7 +79,7 @@ export default {
 
   // Имена узлов + подсказки
   node_local: 'Это устройство',
-  hint_local: 'Это ЭТА машина — та, где работает Snitch. Всё, что она отправляет или получает, исходит из центра графа.',
+  hint_local: 'Это ЭТА машина — та, где работает Wiretap. Всё, что она отправляет или получает, исходит из центра графа.',
   unidentified: 'не опознано',
   devtype_router: 'Роутер',
   devtype_phone: 'Телефон',
@@ -157,7 +157,7 @@ export default {
   capture_stopping: 'Остановка…',
   capture_starting: 'Запуск…',
   capture_error_title: 'Ошибка захвата — трафик не будет отображаться',
-  capture_error_hint: 'Перезапустите Snitch с правами захвата (администратор в Windows — требуется Npcap, sudo в macOS/Linux) или нажмите «Старт» для повтора.',
+  capture_error_hint: 'Перезапустите Wiretap с правами захвата (администратор в Windows — требуется Npcap, sudo в macOS/Linux) или нажмите «Старт» для повтора.',
 
   // Фильтр портов
   port_filter: 'Порты',
@@ -228,7 +228,7 @@ export default {
   update_available: v => `Доступно обновление: v${v} — загрузка`,
   update_downloading: p => `Загрузка обновления… ${p}%`,
   update_ready: v => `v${v} загружена — перезапустите для установки`,
-  update_none: 'Snitch обновлён',
+  update_none: 'Wiretap обновлён',
   update_error: 'Проверка обновлений не удалась',
   update_idle: 'Проверок ещё не было',
   update_restart: 'Перезапуск и установка',
@@ -247,7 +247,7 @@ export default {
   diag_hint: 'Логи и данные системы для баг-репортов',
   diag_open_logs: 'Логи',
   diag_export: 'Экспорт',
-  settings_note: 'Все настройки хранятся локально. Snitch никогда не отправляет данные третьим лицам без вашего явного согласия.',
+  settings_note: 'Все настройки хранятся локально. Wiretap никогда не отправляет данные третьим лицам без вашего явного согласия.',
   nav_apps: 'Приложения',
   ignore_alert: 'Игнорировать этот тип тревоги/хост',
 
@@ -261,10 +261,10 @@ export default {
   apps_history_60m: 'Последний час (байт/мин)',
   alertmsg_NEW_HOSTS: n => `Контактировано новых хостов: ${n}`,
   settings_autolaunch: 'Запускать при входе',
-  settings_autolaunch_hint: 'Запускать Snitch автоматически при входе в систему',
+  settings_autolaunch_hint: 'Запускать Wiretap автоматически при входе в систему',
 
   // Онбординг
-  onboard_title: 'Добро пожаловать в Snitch',
+  onboard_title: 'Добро пожаловать в Wiretap',
   onboard_sub: 'Визуализатор сетевого трафика в реальном времени — приватный по устройству.',
   onboard_priv_title: 'Всё остаётся на этой машине',
   onboard_priv_body: 'Метаданные трафика, тревоги и история хранятся в локальной базе SQLite. Ни аккаунта, ни облака, ни телеметрии.',
@@ -395,7 +395,7 @@ export default {
   bl_src_file: 'Файл',
   bl_src_url: 'URL',
   bl_import: 'Импорт',
-  bl_url_confirm: 'Загрузка этого URL заставит Snitch отправить ИСХОДЯЩИЙ запрос — один из немногих возможных. Продолжить?',
+  bl_url_confirm: 'Загрузка этого URL заставит Wiretap отправить ИСХОДЯЩИЙ запрос — один из немногих возможных. Продолжить?',
   bl_result: (a, s) => `${a} правил добавлено · ${s} уже существовали`,
   bl_truncated: 'список обрезан до лимита',
   bl_remote: 'выполнена удалённая загрузка',
@@ -456,7 +456,7 @@ export default {
   ask_unavailable: 'Режим ask недоступен на этой системе',
   ask_not_running: 'Режим ask включён, но не запущен — см. логи бэкенда',
   gs_title: 'Синхронизация IOC с пирами',
-  gs_hint: 'Отправлять солёные Merkle-пакеты доказательств явно спаренным экземплярам Snitch каждые 5 мин — только хеш-коммитменты, никогда сырые индикаторы.',
+  gs_hint: 'Отправлять солёные Merkle-пакеты доказательств явно спаренным экземплярам Wiretap каждые 5 мин — только хеш-коммитменты, никогда сырые индикаторы.',
   gs_peers_ph: 'хост:порт, через запятую',
   gs_privacy: 'Opt-in обмен внутри флота — пакеты уходят только перечисленным здесь пирам.',
   ks_title: 'Килл-свитч по объёму',

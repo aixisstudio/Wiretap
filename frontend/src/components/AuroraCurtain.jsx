@@ -1,5 +1,5 @@
 /**
- * Snitch — Aurora Curtain background
+ * Wiretap — Aurora Curtain background
  * ==================================
  * EN: Northern-lights ribbons drifting behind the graph, rendered as ONE
  *     WebGL2 fragment shader (single draw call, zero extra DOM). Ported
@@ -39,8 +39,8 @@ const DEFAULT_SPEED = 1;
 const DEFAULT_BLUR = 0.5;
 const DEFAULT_INTENSITY = 1;
 
-// EN: Snitch palette — warm orange/pink aurora over the dark slate base.
-// FR: Palette Snitch — aurore orangée/rosée sur le fond ardoise sombre.
+// EN: Wiretap palette — warm orange/pink aurora over the dark slate base.
+// FR: Palette Wiretap — aurore orangée/rosée sur le fond ardoise sombre.
 const DEFAULT_COLORS = ["#fb923c", "#f472b6", "#e879f9"];
 const FALLBACK_COLORS = [
   [0.984, 0.573, 0.235],

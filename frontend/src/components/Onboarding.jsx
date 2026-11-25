@@ -1,12 +1,12 @@
 /**
- * Snitch — first-run onboarding modal.
+ * Wiretap — first-run onboarding modal.
  *
- * EN: Shown exactly once (localStorage flag `snitch_onboarded`). Explains the
+ * EN: Shown exactly once (localStorage flag `wiretap_onboarded`). Explains the
  *     three things a privacy tool owes its user up front: what privileges the
  *     capture needs, WHAT is actually captured (headers/metadata — never
  *     payloads), and what leaves the machine (nothing, except the opt-in
  *     GeoIP download the user triggers themselves).
- * FR: Affiché une seule fois (drapeau localStorage `snitch_onboarded`).
+ * FR: Affiché une seule fois (drapeau localStorage `wiretap_onboarded`).
  *     Explique les trois choses qu'un outil de vie privée doit à son
  *     utilisateur d'emblée : les privilèges requis par la capture, CE qui est
  *     réellement capturé (en-têtes/métadonnées — jamais les contenus), et ce
@@ -20,7 +20,7 @@ export default function Onboarding({ onDone }) {
   const { t } = useT()
 
   function dismiss() {
-    localStorage.setItem('snitch_onboarded', '1')
+    localStorage.setItem('wiretap_onboarded', '1')
     onDone()
   }
 

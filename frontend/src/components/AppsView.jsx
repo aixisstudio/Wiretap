@@ -1,5 +1,5 @@
 /**
- * Snitch — per-application view.
+ * Wiretap — per-application view.
  *
  * EN: Aggregates live node "processes" maps into a per-process table:
  *     destinations reached, volumes, and a click-through to per-process

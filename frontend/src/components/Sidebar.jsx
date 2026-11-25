@@ -1,5 +1,5 @@
 /**
- * Snitch — left sidebar.
+ * Wiretap — left sidebar.
  *
  * EN: Column layout: brand header + bandwidth sparkline, quick stats,
  *     privacy score, selected-node detail card, search bar, scrollable
@@ -127,9 +127,9 @@ export default function Sidebar({ nodes, lanDevices, packets, selected, onClose,
               commencent en dessous. */}
       <div style={{ padding: '8px 8px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-          {/* EN: Snitch mark — the white radar-eye sigil.
-              FR: Emblème Snitch — le sigle radar-œil blanc. */}
-          <img src="./logo.png" alt="Snitch" style={{ width: 22, height: 22, borderRadius: 5 }} />
+          {/* EN: Wiretap mark — the white radar-eye sigil.
+              FR: Emblème Wiretap — le sigle radar-œil blanc. */}
+          <img src="./logo.png" alt="Wiretap" style={{ width: 22, height: 22, borderRadius: 5 }} />
           <span style={{ fontSize: 17, fontWeight: 800, color: 'var(--text)', letterSpacing: 1 }}>{t('app_name')}</span>
         </div>
         <span style={{ fontSize: 10, color: 'var(--text-faint)', letterSpacing: 1 }}>{t('tagline')}</span>

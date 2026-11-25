@@ -2,27 +2,27 @@
 
 [English](PRIVACY.md) | [Français](PRIVACY.md) | [Español](PRIVACY.es.md) | **Deutsch** | [Русский](PRIVACY.ru.md) | [日本語](PRIVACY.ja.md) | [Português](PRIVACY.pt-BR.md) | [中文](PRIVACY.zh-CN.md)
 
-Snitch ist ein Datenschutz-Werkzeug — es darf niemals genau die Daten
+Wiretap ist ein Datenschutz-Werkzeug — es darf niemals genau die Daten
 verlieren, deren Überwachung es dir ermöglicht.
 
 **Telemetrie: keine.** Keine Analytics, kein Crash-Reporting, keinerlei
 „Phone-Home“.
 
-**Ausgehende Netzwerkaufrufe von Snitch: alle optional, alle standardmäßig
+**Ausgehende Netzwerkaufrufe von Wiretap: alle optional, alle standardmäßig
 aus.** Alles andere ist passive Beobachtung oder von dir ausgelöst — es
 gibt keinen stillen Traffic:
 
 - Paket-Capture auf deinen lokalen Interfaces (passive Beobachtung),
 - Lesen der System-ARP-/Nachbartabelle (kein aktives Scannen),
 - Reverse-DNS über den OS-Resolver — Standard-PTR-Lookups, die bei jeder
-  Netzwerkaktivität ohnehin implizit passieren (`SNITCH_DISABLE_PTR=1`
+  Netzwerkaktivität ohnehin implizit passieren (`WIRETAP_DISABLE_PTR=1`
   deaktiviert sie komplett),
 - Bereitstellen einer Web-UI auf `127.0.0.1` für deinen eigenen Browser.
 
 **Die Desktop-App prüft github.com auf neue Releases** beim Start und alle
 6 h (electron-updater, liest die öffentlichen `latest-*.yml`). Das ist der
 einzige periodische ausgehende Aufruf. Abschaltbar in *Einstellungen →
-Updates → Automatisch prüfen* (persistiert) oder via `SNITCH_NO_UPDATE=1`.
+Updates → Automatisch prüfen* (persistiert) oder via `WIRETAP_NO_UPDATE=1`.
 Docker-Build und Backend prüfen nie.
 
 **Der GeoIP-Datenbank-Download** (*Einstellungen → Geolokalisierung*) holt
@@ -30,10 +30,10 @@ Docker-Build und Backend prüfen nie.
 
 **Threat Intelligence (Opt-in, standardmäßig aus).** Wenn du einen Anbieter
 (AbuseIPDB, AlienVault OTX oder VirusTotal) konfigurierst *und* deinen
-eigenen API-Key in den Einstellungen einträgst, fragt Snitch den Anbieter
+eigenen API-Key in den Einstellungen einträgst, fragt Wiretap den Anbieter
 nach der Reputation neu gesehener öffentlicher Hosts — es wird nur die
 abgefragte IP gesendet. Urteile werden lokal gecacht; der Key liegt in
-`snitch.db` (nie geloggt, in der UI maskiert). Ohne Anbieter oder Key:
+`wiretap.db` (nie geloggt, in der UI maskiert). Ohne Anbieter oder Key:
 null Lookups — `ti.check()` ist ein No-Op.
 
 **Externe Webhooks (Opt-in, standardmäßig aus).** Wenn du eine Webhook-URL
@@ -47,7 +47,7 @@ Ollama-kompatibles Modell gehen — **ausschließlich Loopback**: der
 Backend lehnt jeden Endpunkt ab, der nicht nach 127.0.0.1 / ::1
 auflöst. Deterministische Vorlagen bleiben der Standard.
 
-**IOC-Pakete werden von Snitch nie übertragen.** `GET /security/iocpack`
+**IOC-Pakete werden von Wiretap nie übertragen.** `GET /security/iocpack`
 kodiert deine Indikatoren als Bloom-Filter + randomized response
 (ε≈4,6) und übergibt dir die Datei — du entscheidest, ob und wohin.
 Ein Import liefert nur probabilistische Hinweise; nie Auto-Blocking.
@@ -67,15 +67,15 @@ an Dritte schickte.
 
 | Daten | Ort | Aufbewahrung |
 |---|---|---|
-| Pro-Minute-Traffic-Aggregate | `snitch.db` | 24 h (einstellbar: `retention_hours`) |
-| Alarm-Historie | `snitch.db` | gleiches Fenster |
-| Einstellungen (Filter, Whitelist, Sprache…) | `snitch.db` | bis du sie änderst |
+| Pro-Minute-Traffic-Aggregate | `wiretap.db` | 24 h (einstellbar: `retention_hours`) |
+| Alarm-Historie | `wiretap.db` | gleiches Fenster |
+| Einstellungen (Filter, Whitelist, Sprache…) | `wiretap.db` | bis du sie änderst |
 | API-Token | `api_token.txt` (0600) | unter Electron pro Start neu |
-| Logs | `logs/snitch.log` (rotierend) | max. ~5 MB |
+| Logs | `logs/wiretap.log` (rotierend) | max. ~5 MB |
 
-Datenverzeichnis: `data/` in Dev/Docker, `%LOCALAPPDATA%\Snitch` unter
-Windows, `~/Library/Application Support/Snitch` unter macOS,
-`~/.local/share/snitch` unter Linux bei installierter Nutzung.
+Datenverzeichnis: `data/` in Dev/Docker, `%LOCALAPPDATA%\Wiretap` unter
+Windows, `~/Library/Application Support/Wiretap` unter macOS,
+`~/.local/share/wiretap` unter Linux bei installierter Nutzung.
 
 ## Neu in v1.4 (Privatsphäre)
 
@@ -83,12 +83,12 @@ Windows, `~/Library/Application Support/Snitch` unter macOS,
 - **Fernkopplung (opt-in, aus)** — die API lauscht nur auf 127.0.0.1; Aktivieren persistiert `lan_bind` für den nächsten Start — Token bleibt pro Anfrage Pflicht.
 - **Sandbox ohne Netzwerk** — `POST /security/sandbox` führt eine Binärdatei in einem netzlosen Namespace (`unshare -n` Linux) bzw. Seatbelt-Profil (`sandbox-exec` macOS) aus: null Egress, Ausgabe bleibt lokal.
 - **IOC `format=proof`** — gesalzene SHA-256-Blätter + Merkle-Wurzel: exakte Mitgliedschaft ohne Aufzählung unverdächtiger Indikatoren; nichts wird automatisch übertragen.
-- **Eingebettetes Modell** — `slm_mode=embedded` lädt Ihr `.gguf` im Prozess via `llama-cpp-python` — null Netzwerk; Snitch lädt nie Gewichte herunter.
+- **Eingebettetes Modell** — `slm_mode=embedded` lädt Ihr `.gguf` im Prozess via `llama-cpp-python` — null Netzwerk; Wiretap lädt nie Gewichte herunter.
 
 ## Neu in v1.5 (Privatsphäre)
 
 - **Syslog-Ausgabe (opt-in, aus)** — `syslog_addr` (`host:port` UDP oder `tcp://host:port`) leitet warning/critical-Alarmtexte als RFC-3164-Datagramme an Ihren SIEM — ein echter ausgehender Fluss zur konfigurierten Adresse, unabhängig vom Webhook-Schalter.
-- **IOC-Peer-Sync (opt-in, aus)** — `gossip_peers` (explizite Liste von Snitch-Backends unter Ihrer Kontrolle) lässt `POST /remote/ioc_sync` Ihr gesalzenes Merkle-Proof-Paket an deren authentifizierten Import-Endpunkt pushen — NUR das Paket (Hash-Commitments, nie rohe Indikatoren, Hostnamen oder Pfade). `gossip_enabled` wiederholt den Push alle 5 Minuten. Keine Discovery, nichts geht an ungelistete Adressen.
+- **IOC-Peer-Sync (opt-in, aus)** — `gossip_peers` (explizite Liste von Wiretap-Backends unter Ihrer Kontrolle) lässt `POST /remote/ioc_sync` Ihr gesalzenes Merkle-Proof-Paket an deren authentifizierten Import-Endpunkt pushen — NUR das Paket (Hash-Commitments, nie rohe Indikatoren, Hostnamen oder Pfade). `gossip_enabled` wiederholt den Push alle 5 Minuten. Keine Discovery, nichts geht an ungelistete Adressen.
 - **Passive TLS-Zertifikatslektüre bleibt auf der Leitung** — der Handshake-Watcher liest die Certificate-Nachricht *des Servers* im Klartext — kein Abfangen, kein Einfügen, kein Entschlüsseln. TLS 1.3 verschlüsselt diese Nachricht, was wir ehrlich als unbeobachtbar melden. Metadaten (Issuer, Subject, SANs) speisen nur lokale Anomalie-Checks und werden nie als rohe Zertifikatsbytes persistiert.
 - **Ask-on-Connect (opt-in)** — `ask_enabled` hält neue Ausgangsflüsse lokal in NFQUEUE 7, bis Sie urteilen; Timeout droppt standardmäßig. Es ist ein Verdict, kein Relay — nichts wird dadurch ins Netz gesendet.
 - **eBPF-Enforcement & Hollow-Check** — laufen vollständig im Kernel bzw. `/proc` der eigenen Maschine; Ergebnisse bleiben lokal.

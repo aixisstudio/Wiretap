@@ -1,8 +1,8 @@
 """
-Snitch — Sigma rule import (bounded subset) / import de règles Sigma
+Wiretap — Sigma rule import (bounded subset) / import de règles Sigma
 (sous-ensemble borné).
 
-EN: Converts a Sigma detection YAML into Snitch custom rules with an
+EN: Converts a Sigma detection YAML into Wiretap custom rules with an
     honest, documented subset of the spec:
 
       supported   — `detection` selections that are field→value maps
@@ -25,7 +25,7 @@ EN: Converts a Sigma detection YAML into Snitch custom rules with an
     SNI/DNS host, protocol, ASN, country) — a Sigma rule referencing
     e.g. `CommandLine` is skipped rather than mistranslated.
 
-FR: Convertit un YAML de détection Sigma en règles custom Snitch avec
+FR: Convertit un YAML de détection Sigma en règles custom Wiretap avec
     un sous-ensemble honnête et documenté de la spec : sélections
     champ→valeur (AND implicite), modificateurs contains/startswith/
     endswith/re/cidr/gt/lt/all, listes (OR intra-champ → regex,
@@ -45,9 +45,9 @@ from typing import Optional
 _MAX_RULES = 64        # EN: per import / FR: par import
 _MAX_VALUE = 200       # EN: chars per clause value / FR: caractères par valeur
 
-# EN: Sigma (log) field names → Snitch packet fields, lowercased and
+# EN: Sigma (log) field names → Wiretap packet fields, lowercased and
 #     normalised (underscores/dots removed). / FR: Champs Sigma (logs) →
-#     champs paquet Snitch, en minuscules et normalisés.
+#     champs paquet Wiretap, en minuscules et normalisés.
 _FIELD_MAP = {
     "destinationip": "remote_ip", "dst_ip": "remote_ip",
     "dstip": "remote_ip", "destination_ip": "remote_ip",

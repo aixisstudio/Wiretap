@@ -2,7 +2,7 @@
 
 [English](CHANGELOG.md) | [Français](CHANGELOG.md) | [Español](CHANGELOG.es.md) | [Deutsch](CHANGELOG.de.md) | [Русский](CHANGELOG.ru.md) | **日本語** | [Português](CHANGELOG.pt-BR.md) | [中文](CHANGELOG.zh-CN.md)
 
-Snitch の全ての注目すべき変更。
+Wiretap の全ての注目すべき変更。
 
 フォーマットは [Keep a Changelog](https://keepachangelog.com/) に準拠。
 
@@ -15,21 +15,21 @@ Snitch の全ての注目すべき変更。
 - **高エントロピー検知** — 平文ソケット上のほぼランダムなペイロード先頭（≥4.7ビット/バイト）→ `HIGH_ENTROPY`（秘匿暗号/ステガノの兆候）。
 - **Isolation Forest（純Python）** — `detection/iforest.py` + `mlflow.py` が送信フローを6特徴量でスコアリング；スコア0.62以上で `ML_ANOMALY`、学習384フロー未満では不活性。
 - **Ask-on-Connect（Linux NFQUEUE、オプトイン）** — `ask_enabled` が新規送信フローをキュー7に保留し `POST /security/ask/verdict` まで保持 — 本物の判定権、タイムアウトは既定でdrop。
-- **eBPF egressエンフォースメント** — `detection/ebpf_enforce.py` + `POST /security/ebpf/isolate|block` — snitch cgroup内のプロセスのみカーネルdrop。
+- **eBPF egressエンフォースメント** — `detection/ebpf_enforce.py` + `POST /security/ebpf/isolate|block` — wiretap cgroup内のプロセスのみカーネルdrop。
 - **ハロウィング証拠** — `POST /security/hollow` が実行可能RAMページとディスク上ファイルを比較（Linux、`/proc`）。
 - **IOCピア同期** — `gossip_peers` + `gossip_enabled`：塩付きMerkleパックを5分毎に明示リストのピアへ — ハッシュコミットメントのみ、探索なし。
 - **Syslog** — `syslog_addr`（UDPまたは `tcp://`）が警告/重大アラートをRFC 3164で転送 — SIEM/Wazuh経路。
 - **ジオルール + 自動ブロック** — カスタムルールの `asn`/`country`（ローカルmmdb）と `action:"block"` が一致IPへ実ファイアウォールルールを追加。
 - **アクション可能アラート + 設定UI** — アラート毎にIPブロック/強制終了/一時停止/許可・拒否；設定画面に新コントロール（syslog、ask、ピア）。
-- **nftablesバックエンド + firejail** — iptables不在時は `nft`（専用 `inet snitch` テーブル）；`firejail --net=none` をサンドボックスのフォールバックに。
+- **nftablesバックエンド + firejail** — iptables不在時は `nft`（専用 `inet wiretap` テーブル）；`firejail --net=none` をサンドボックスのフォールバックに。
 
 ## [Unreleased]
 
 ### 追加
 
 - **送信ファイアウォール連携** — ユーザールール（`ip`、`cidr`、`domain`、`process`、`port`）を OS ネイティブのファイアウォールへ best-effort で適用: Windows は `netsh advfirewall`、Linux は `iptables`、macOS は生成した `pf` アンカー。永続化・起動時に再適用、権限不足時は正直に `applied=False`（マッチングと `BLOCKED_ATTEMPT` カウンタは継続動作）。
-- **Lockdown** — パブリック IP への送信トラフィックを遮断しつつ loopback/LAN を維持するパニックスイッチ（Linux の `SNITCH_LOCK` チェーン、`netsh` ルール、`pf` アンカー）。
-- **プロセス操作** — `POST /processes/kill` と `POST /processes/suspend`（PID 指定、PID ≤ 3 と Snitch 自身は拒否）；プロセス一覧に kill/suspend ボタン。
+- **Lockdown** — パブリック IP への送信トラフィックを遮断しつつ loopback/LAN を維持するパニックスイッチ（Linux の `WIRETAP_LOCK` チェーン、`netsh` ルール、`pf` アンカー）。
+- **プロセス操作** — `POST /processes/kill` と `POST /processes/suspend`（PID 指定、PID ≤ 3 と Wiretap 自身は拒否）；プロセス一覧に kill/suspend ボタン。
 - **脅威インテリジェンス（オプトイン）** — 自分の API キーで AbuseIPDB、AlienVault OTX または VirusTotal の評判照会；デフォルト無効、新規パブリック IP ごとに 1 コール、上限付き LRU キャッシュ＋重複排除、疑わしい/悪性の判定で `THREAT_HIT` アラート。
 - **外部 Webhook（オプトイン）** — warning/critical アラートを Discord、Slack、Telegram（chat ID 付き）または任意エンドポイントへライブ POST；デフォルト無効。
 - **検知追加** — `DNS_TUNNEL`（異常に長い DNS 名/ラベル）、`CLEARTEXT`（FTP/Telnet/HTTP/平文メールの送信）、`BASELINE_DEVIATION`（プロセス毎に学習した国プロファイル、永続化）。
@@ -42,11 +42,11 @@ Snitch の全ての注目すべき変更。
 
 ### 追加
 
-- **自動更新** — デスクトップアプリが起動時と 6 時間毎に electron-updater で GitHub Releases を確認（`latest-*.yml` フィードは公開済）。ダウンロードは再起動時にインストール；トレイと設定にステータスをライブ表示。設定または `SNITCH_NO_UPDATE=1` で無効化可。
+- **自動更新** — デスクトップアプリが起動時と 6 時間毎に electron-updater で GitHub Releases を確認（`latest-*.yml` フィードは公開済）。ダウンロードは再起動時にインストール；トレイと設定にステータスをライブ表示。設定または `WIRETAP_NO_UPDATE=1` で無効化可。
 - **QUIC / HTTP/3 の可視化** — UDP/443 フローを HTTPS や不明にまとめず `QUIC/HTTP3` とラベル付け。QUIC Initial の SNI は暗号化され一切読まない — 観測可能な範囲に正直なラベル。
 - **Watchlist** — IP やドメイン接尾辞をピン留め（`example.com` は `api.example.com` にも一致）；専用 `WATCHLIST_HIT` アラートが初回接触で発火、（エントリ, ホスト）毎にレート制限。永続化、設定で管理。
 - **プロセス別アップロードアラート** — `UPLOAD_SPIKE` はプロセスが設定可能な MB/分上限（デフォルト 50、0 = 無効）を超えると警告 — 起動直後のプロセスでベースライン相対の `VOLUME_SPIKE` が逃す exfiltration をカバー。
-- **キャプチャインターフェース選択** — `GET/POST /capture/interfaces` ＋設定内の libpcap デバイス一覧ドロップダウン；切替でキャプチャ即時再起動。デスクトップユーザー向けに `SNITCH_IFACE` 環境変数を置き換え。
+- **キャプチャインターフェース選択** — `GET/POST /capture/interfaces` ＋設定内の libpcap デバイス一覧ドロップダウン；切替でキャプチャ即時再起動。デスクトップユーザー向けに `WIRETAP_IFACE` 環境変数を置き換え。
 - **Wi-Fi コンテキスト** — ツールバーに現在の SSID（Wi-Fi 非接続時はキャプチャインターフェース）を表示。OS 毎に best-effort、60 秒キャッシュ。
 - **スペイン語 UI** — `es` 辞書完備（194 キー、パリティ検証済）；言語切替は EN/FR/ES に。
 - **Snap パッケージ** — electron-builder が strict confinement の `.snap` を出力（AF_PACKET キャプチャ用 `network-observe` プラグ付き）。Flatpak は意図的に未提供 — サンドボックスが生キャプチャを公開できないため（`docs/PACKAGING.md` に記載）。
@@ -66,16 +66,16 @@ Snitch の全ての注目すべき変更。
 
 ### 修正
 
-- **AppImage カタログ準拠** — Linux アセットは `Snitch-x86_64.AppImage`（正しいアーキ命名）に改名し、electron-builder が GitHub 更新メタデータ（`latest-linux.yml` + `.zsync`）を公開 — AppImageUpdate 互換ツールでの自動更新が可能に。
+- **AppImage カタログ準拠** — Linux アセットは `Wiretap-x86_64.AppImage`（正しいアーキ命名）に改名し、electron-builder が GitHub 更新メタデータ（`latest-linux.yml` + `.zsync`）を公開 — AppImageUpdate 互換ツールでの自動更新が可能に。
 
 ## [1.0.6] — 2026-10-21
 
 ### 追加
 
 - **OS 毎のダウンロード 1 本** — 各タグで CI ビルドの即実行アプリを提供：
-  - **Windows** — `Snitch Setup <version>.exe`（Electron + NSIS: ネイティブウィンドウ、トレイ、Npcap チェック内蔵、バックエンド起動時 UAC）と `Snitch-Lite-Setup-<version>-windows-x64.exe`（Inno Setup: バックエンドのみ、UI はブラウザ）。
-  - **macOS (Apple Silicon)** — `Snitch-<version>-macos-arm64.zip` + `.dmg` を CI でビルド（以前は手動）。
-  - **Linux** — `Snitch-<version>.AppImage` + `.deb` — デスクトップアプリに Docker 不要に。
+  - **Windows** — `Wiretap Setup <version>.exe`（Electron + NSIS: ネイティブウィンドウ、トレイ、Npcap チェック内蔵、バックエンド起動時 UAC）と `Wiretap-Lite-Setup-<version>-windows-x64.exe`（Inno Setup: バックエンドのみ、UI はブラウザ）。
+  - **macOS (Apple Silicon)** — `Wiretap-<version>-macos-arm64.zip` + `.dmg` を CI でビルド（以前は手動）。
+  - **Linux** — `Wiretap-<version>.AppImage` + `.deb` — デスクトップアプリに Docker 不要に。
 - **`--launcher` バックエンドモード** — 空き loopback ポートを選択し API トークンを算出してブラウザを開く；Lite インストーラのショートカットが使用。
 
 ### 修正

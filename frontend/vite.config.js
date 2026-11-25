@@ -1,5 +1,5 @@
 /**
- * Snitch — Vite configuration.
+ * Wiretap — Vite configuration.
  *
  * EN: In dev, the API and WebSocket are proxied to the Python backend on
  *     :8000 so the frontend code can use relative URLs. `base: './'` makes

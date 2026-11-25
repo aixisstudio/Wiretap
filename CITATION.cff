@@ -4,12 +4,12 @@
 #     repository » et les gestionnaires de références peuvent l'importer.
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below. / Si vous utilisez ce logiciel, merci de le citer ainsi."
-title: "Snitch — Real-time network monitor + outbound firewall"
+title: "Wiretap — Real-time network monitor + outbound firewall"
 authors:
   - name: "aiXis"
     website: "https://aixis.fr/"
-url: "https://github.com/aixisstudio/Snitch"
-repository-code: "https://github.com/aixisstudio/Snitch"
+url: "https://github.com/aixisstudio/Wiretap"
+repository-code: "https://github.com/aixisstudio/Wiretap"
 license: AGPL-3.0-or-later
 keywords:
   - network monitor

@@ -1,5 +1,5 @@
 /**
- * Snitch — Electron preload script.
+ * Wiretap — Electron preload script.
  *
  * EN: Minimal bridge between the sandboxed renderer and the main process.
  *     `contextIsolation` is enabled, so this is the ONLY surface the web
@@ -20,39 +20,39 @@
 
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('snitch', {
+contextBridge.exposeInMainWorld('wiretap', {
   // EN: Async — resolves to the per-launch API token held by the main process.
   // FR: Asynchrone — résout vers le jeton API par lancement détenu par le processus principal.
-  getToken:   () => ipcRenderer.invoke('snitch:get-token'),
+  getToken:   () => ipcRenderer.invoke('wiretap:get-token'),
   // EN: Async — resolves to the free port the backend was spawned on.
   // FR: Asynchrone — résout vers le port libre sur lequel le backend a été lancé.
-  getPort:    () => ipcRenderer.invoke('snitch:get-port'),
+  getPort:    () => ipcRenderer.invoke('wiretap:get-port'),
   // EN: Async — real app version (package.json via app.getVersion()).
   // FR: Asynchrone — vraie version de l'app (package.json via app.getVersion()).
-  getVersion: () => ipcRenderer.invoke('snitch:get-version'),
+  getVersion: () => ipcRenderer.invoke('wiretap:get-version'),
   // EN: Async — asks the main process to open the log directory in the OS
   //     file manager (shell.openPath — cross-platform, no shelling out).
   // FR: Asynchrone — demande au processus principal d'ouvrir le dossier des
   //     logs dans le gestionnaire de fichiers (shell.openPath — multi-OS).
-  openLogs:   () => ipcRenderer.invoke('snitch:open-logs'),
+  openLogs:   () => ipcRenderer.invoke('wiretap:open-logs'),
   // EN: Launch-at-login getters/setters (Windows/macOS; Linux always false).
   // FR: Lecture/écriture du lancement au démarrage (Windows/macOS ; toujours
   //     false sous Linux).
-  getAutoLaunch: () => ipcRenderer.invoke('snitch:get-auto-launch'),
-  setAutoLaunch: (enabled) => ipcRenderer.invoke('snitch:set-auto-launch', enabled),
+  getAutoLaunch: () => ipcRenderer.invoke('wiretap:get-auto-launch'),
+  setAutoLaunch: (enabled) => ipcRenderer.invoke('wiretap:set-auto-launch', enabled),
   // EN: Auto-update bridge — status push channel plus the four controls the
   //     Settings panel needs. `onUpdateStatus` returns an unsubscribe fn.
   // FR: Pont de mise à jour — canal de statut poussé + les quatre contrôles
   //     du panneau Réglages. `onUpdateStatus` renvoie une fonction de
   //     désabonnement.
-  getUpdateStatus:  () => ipcRenderer.invoke('snitch:get-update-status'),
-  getUpdateCheck:   () => ipcRenderer.invoke('snitch:get-update-check'),
-  setUpdateCheck:   (on) => ipcRenderer.invoke('snitch:set-update-check', on),
-  checkUpdates:     () => ipcRenderer.invoke('snitch:check-updates'),
-  installUpdate:    () => ipcRenderer.invoke('snitch:install-update'),
+  getUpdateStatus:  () => ipcRenderer.invoke('wiretap:get-update-status'),
+  getUpdateCheck:   () => ipcRenderer.invoke('wiretap:get-update-check'),
+  setUpdateCheck:   (on) => ipcRenderer.invoke('wiretap:set-update-check', on),
+  checkUpdates:     () => ipcRenderer.invoke('wiretap:check-updates'),
+  installUpdate:    () => ipcRenderer.invoke('wiretap:install-update'),
   onUpdateStatus:   (cb) => {
     const handler = (_e, s) => cb(s)
-    ipcRenderer.on('snitch:update-status', handler)
-    return () => ipcRenderer.removeListener('snitch:update-status', handler)
+    ipcRenderer.on('wiretap:update-status', handler)
+    return () => ipcRenderer.removeListener('wiretap:update-status', handler)
   },
 })

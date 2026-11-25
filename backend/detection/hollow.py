@@ -1,5 +1,5 @@
 """
-Snitch — process-hollowing evidence check / vérification de hollowing.
+Wiretap — process-hollowing evidence check / vérification de hollowing.
 
 EN: The missing disk↔memory half of integrity.py: read the FILE-BACKED
     executable pages straight out of /proc/<pid>/mem and compare their

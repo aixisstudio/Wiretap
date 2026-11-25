@@ -1,4 +1,4 @@
-# Snitch — Campagne growth vers GitHub Trending & 10K ⭐
+# Wiretap — Campagne growth vers GitHub Trending & 10K ⭐
 
 [English](growth-campaign.md) | [Français](growth-campaign.md) | [Español](growth-campaign.es.md) | [Deutsch](growth-campaign.de.md) | [Русский](growth-campaign.ru.md) | [日本語](growth-campaign.ja.md) | [Português](growth-campaign.pt-BR.md) | [中文](growth-campaign.zh-CN.md)
 > **Objectif : 100–300⭐ en 24h le jour J → entrée GitHub Trending → boucle auto-alimentée.**
@@ -38,7 +38,7 @@ Couche 1 — CONVERSION (toujours on)   repo qui convertit visiteur → star
 |---|---|---|---|
 | 09h01 | Product Hunt live (00:01 PT) | PH | galerie + vidéo mp4 |
 | 10h00 | Repost Show HN | HN | nouveau titre (story, pas feature) |
-| 11h00 | Post X + vidéo | X | snitch-demo.mp4 |
+| 11h00 | Post X + vidéo | X | wiretap-demo.mp4 |
 | 11h30 | Post LinkedIn | LinkedIn | vidéo + texte FR/EN |
 | 14h00 | Post r/selfhosted | Reddit Ezra_Hell | angle Docker/GHCR |
 | 17h00 | Commentaires PH — répondre à CHAQUE commentaire | PH | boost classement |
@@ -55,7 +55,7 @@ Voir le fichier séparé — copiable-collable.
 
 - v1.1 (features utilisateurs des issues) → nouvelle vague posts dans 2-3 semaines
 - Changelog structuré → cross-post dev.to/Medium
-- « State of Snitch » post mensuel : métriques, ce qu'on a appris (HN adore la transparence chiffrée)
+- « State of Wiretap » post mensuel : métriques, ce qu'on a appris (HN adore la transparence chiffrée)
 
 ---
 
@@ -67,13 +67,13 @@ Requêtes visées (volume réel, faible compétition) :
 
 | Requête Google | Article à écrire |
 |---|---|
-| "little snitch alternative windows" | Snitch: a free open-source Little Snitch alternative for Windows |
+| "little snitch alternative windows" | Wiretap: a free open-source Little Snitch alternative for Windows |
 | "little snitch alternative linux" | idem Linux/Docker |
-| "glasswire alternative open source" | Snitch vs GlassWire: 100% local, no account |
+| "glasswire alternative open source" | Wiretap vs GlassWire: 100% local, no account |
 | "see what my computer is connecting to" | How to see every connection your computer makes |
 | "network monitor open source macos" | Why I built a privacy-first network monitor |
 
-→ 5 articles, 1/semaine, angle honnête (ce que Snitch fait / ne fait PAS — pas de firewall).
+→ 5 articles, 1/semaine, angle honnête (ce que Wiretap fait / ne fait PAS — pas de firewall).
 Chaque article = backlink SEO + trafic récurrent pendant des années.
 
 ### 4.2 Q&A evergreen (indexés Google, trafic pendant des années)
@@ -106,7 +106,7 @@ Comptes qui republient des repos (DM ou reply public) :
 - Prochaines cibles : **japonais** (Qiita = dev.to japonais, énorme audience OSS, signup email OK), **espagnol** (gros marché, peu d'outils traduits)
 - Qiita article : traduire le post dev.to v1.0.5 en japonais → canal bleu océan
 
-### 4.6 Forums de niche où Snitch a sa place
+### 4.6 Forums de niche où Wiretap a sa place
 
 | Forum | Pourquoi |
 |---|---|
@@ -118,7 +118,7 @@ Comptes qui republient des repos (DM ou reply public) :
 
 ### 4.7 Le différenciateur viral : le « catch »
 
-Le contenu le plus viral possible pour Snitch = **des captures inattendues** (« mon imprimante parlait à un serveur en X »). Mécanique :
+Le contenu le plus viral possible pour Wiretap = **des captures inattendues** (« mon imprimante parlait à un serveur en X »). Mécanique :
 - Discussion « What did you catch? » déjà épinglée sur le repo
 - Série X hebdo : 1 capture anonymisée/semaine (mode demo, marquée comme telle)
 - Chaque release note inclut une capture sympa

@@ -1,5 +1,5 @@
 """
-Snitch — traffic classifier.
+Wiretap — traffic classifier.
 
 EN: Assigns each connection a label (HTTPS, DNS, SSH…), a category
     (safe / tracking / cdn / dns / admin / unknown), a risk level and a UI
@@ -20,7 +20,7 @@ from typing import Optional
 
 from paths import data_dir
 
-logger = logging.getLogger("snitch.classifier")
+logger = logging.getLogger("wiretap.classifier")
 
 
 def _list_dir() -> Path:

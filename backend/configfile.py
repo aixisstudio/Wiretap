@@ -1,13 +1,13 @@
 """
-Snitch — declarative config file (Security-as-Code) / fichier de
+Wiretap — declarative config file (Security-as-Code) / fichier de
 configuration déclaratif (Security-as-Code).
 
-EN: Lets admins provision Snitch entirely by file — Ansible, Puppet,
+EN: Lets admins provision Wiretap entirely by file — Ansible, Puppet,
     SaltStack, GPO or a docker-compose bind-mount drop ONE file and the
     backend applies it at startup, no clicks:
 
-      * path resolution — `$SNITCH_CONFIG` first, then
-        `data_dir()/snitch.toml`, then `data_dir()/snitch.json`
+      * path resolution — `$WIRETAP_CONFIG` first, then
+        `data_dir()/wiretap.toml`, then `data_dir()/wiretap.json`
       * format — TOML (stdlib tomllib, Python ≥3.11) or JSON; the file
         is a FLAT map of the same keys `/settings` accepts
         (`syslog_addr`, `kill_switch_enabled`, `firewall_rules`, …)
@@ -15,11 +15,11 @@ EN: Lets admins provision Snitch entirely by file — Ansible, Puppet,
         the point of Security-as-Code: the repo is the source of truth);
         undeclared keys keep whatever the DB/UI last persisted
       * failure honesty — an unreadable or invalid file logs a warning
-        and yields {}; Snitch never refuses to start on a typo
+        and yields {}; Wiretap never refuses to start on a typo
 
     Example::
 
-        # snitch.toml — dropped by Ansible onto every host
+        # wiretap.toml — dropped by Ansible onto every host
         syslog_addr = "siem.corp:514"
         syslog_format = "cef"
         kill_switch_enabled = true
@@ -27,10 +27,10 @@ EN: Lets admins provision Snitch entirely by file — Ansible, Puppet,
         ports = [443]
         gossip_peers = ["sec-01.corp:8080"]
 
-FR: Permet de provisionner Snitch entièrement par fichier — Ansible,
+FR: Permet de provisionner Wiretap entièrement par fichier — Ansible,
     Puppet, GPO ou un bind-mount Docker déposent UN fichier et le backend
-    l'applique au démarrage, sans clic. Résolution : `$SNITCH_CONFIG`,
-    puis `data_dir()/snitch.toml`, puis `snitch.json`. TOML (stdlib) ou
+    l'applique au démarrage, sans clic. Résolution : `$WIRETAP_CONFIG`,
+    puis `data_dir()/wiretap.toml`, puis `wiretap.json`. TOML (stdlib) ou
     JSON, map plate des mêmes clés que `/settings`. Le FICHIER gagne pour
     les clés déclarées — le dépôt est la source de vérité. Un fichier
     invalide log un warning et n'empêche jamais le démarrage.
@@ -44,17 +44,17 @@ import os
 import tomllib
 from pathlib import Path
 
-logger = logging.getLogger("snitch.configfile")
+logger = logging.getLogger("wiretap.configfile")
 
 
 def _candidate_paths(data_dir: Path) -> list[Path]:
-    """EN: $SNITCH_CONFIG wins, then the conventional names inside the
-    data dir. / FR: $SNITCH_CONFIG d'abord, puis les noms usuels."""
-    env = os.environ.get("SNITCH_CONFIG", "").strip()
+    """EN: $WIRETAP_CONFIG wins, then the conventional names inside the
+    data dir. / FR: $WIRETAP_CONFIG d'abord, puis les noms usuels."""
+    env = os.environ.get("WIRETAP_CONFIG", "").strip()
     out = []
     if env:
         out.append(Path(env))
-    out += [data_dir / "snitch.toml", data_dir / "snitch.json"]
+    out += [data_dir / "wiretap.toml", data_dir / "wiretap.json"]
     return out
 
 

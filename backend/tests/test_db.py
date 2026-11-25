@@ -1,11 +1,11 @@
 """
-Snitch — SQLite persistence tests.
+Wiretap — SQLite persistence tests.
 
-EN: Uses an isolated SNITCH_DATA_DIR (set in conftest.py) so the real
-    snitch.db is never touched. Covers accumulate→flush→timeline and alert
+EN: Uses an isolated WIRETAP_DATA_DIR (set in conftest.py) so the real
+    wiretap.db is never touched. Covers accumulate→flush→timeline and alert
     logging.
-FR: Utilise un SNITCH_DATA_DIR isolé (posé dans conftest.py) pour ne jamais
-    toucher la vraie snitch.db. Couvre accumulate→flush→timeline et le
+FR: Utilise un WIRETAP_DATA_DIR isolé (posé dans conftest.py) pour ne jamais
+    toucher la vraie wiretap.db. Couvre accumulate→flush→timeline et le
     journal d'alertes.
 """
 

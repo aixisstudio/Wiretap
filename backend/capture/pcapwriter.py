@@ -1,5 +1,5 @@
 """
-Snitch — libpcap (.pcap) file writer / écrivain de fichiers pcap.
+Wiretap — libpcap (.pcap) file writer / écrivain de fichiers pcap.
 
 EN: Classic libpcap savefile format, written in pure Python — the same
     byte layout tcpdump/Wireshark expects, produced from the frames the

@@ -1,9 +1,9 @@
 /*
- * Snitch — WFP kernel callout skeleton (research only, NOT shipped).
+ * Wiretap — WFP kernel callout skeleton (research only, NOT shipped).
  *
  * EN: Minimal WFP callout registration for the ALE_AUTH_CONNECT_V4 layer —
  *     the outbound-connect authorization point. The classify callback here
- *     PERMITS everything: deciding what to block is policy, and Snitch
+ *     PERMITS everything: deciding what to block is policy, and Wiretap
  *     policy lives in user mode (backend/detection/wfp.py drives
  *     fwpuclnt.dll). This file shows the register → classify → unregister
  *     skeleton that Microsoft's network/trans/inspect sample and
@@ -35,7 +35,7 @@
  * FR: GUID du callout — un vrai pilote génère le sien avec uuidgen et le
  *     garde stable entre versions. Placeholder ici. */
 // {5fb216a0-0000-0000-0000-000000000001}
-static const GUID SNITCH_CALLOUT_KEY = {
+static const GUID WIRETAP_CALLOUT_KEY = {
     0x5fb216a0, 0x0000, 0x0000,
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}
 };
@@ -53,7 +53,7 @@ static UINT32 g_callout_id = 0;   /* EN: runtime id chosen by WFP / FR: id chois
  *     décisions sont immédiates (permit/block) ou différées via
  *     clone-block-reinject (cf. sample inspect). Ici on autorise tout. */
 static void NTAPI
-SnitchClassify(
+WiretapClassify(
     _In_ const FWPS_INCOMING_VALUES *fixedValues,
     _In_ const FWPS_INCOMING_METADATA_VALUES *metaValues,
     _Inout_opt_ void *layerData,
@@ -82,7 +82,7 @@ SnitchClassify(
  *     this callout. / FR: notifyFn — notifications de cycle de vie des
  *     filtres référençant ce callout. */
 static NTSTATUS NTAPI
-SnitchNotify(
+WiretapNotify(
     _In_ FWPS_CALLOUT_NOTIFY_TYPE notifyType,
     _In_ const GUID *filterKey,
     _Inout_ FWPS_FILTER *filter)
@@ -96,7 +96,7 @@ SnitchNotify(
 /* EN: flowDeleteFn — mandatory even with no per-flow state.
  * FR: flowDeleteFn — obligatoire même sans état par flux. */
 static void NTAPI
-SnitchFlowDelete(
+WiretapFlowDelete(
     _In_ UINT16 layerId,
     _In_ UINT32 calloutId,
     _In_ UINT64 flowContext)
@@ -107,21 +107,21 @@ SnitchFlowDelete(
 }
 
 static NTSTATUS
-SnitchRegisterCallout(_In_ PDEVICE_OBJECT device)
+WiretapRegisterCallout(_In_ PDEVICE_OBJECT device)
 {
     FWPS_CALLOUT callout = {0};
 
-    callout.calloutKey = SNITCH_CALLOUT_KEY;
+    callout.calloutKey = WIRETAP_CALLOUT_KEY;
     callout.flags = 0;
-    callout.classifyFn = SnitchClassify;
-    callout.notifyFn = SnitchNotify;
-    callout.flowDeleteFn = SnitchFlowDelete;
+    callout.classifyFn = WiretapClassify;
+    callout.notifyFn = WiretapNotify;
+    callout.flowDeleteFn = WiretapFlowDelete;
 
     return FwpsCalloutRegister(device, &callout, &g_callout_id);
 }
 
 static void
-SnitchUnregisterCallout(void)
+WiretapUnregisterCallout(void)
 {
     /* EN: Removes the callout object AND every filter still referencing
      *     it — safe teardown order matters (callout id vs key form).
@@ -131,10 +131,10 @@ SnitchUnregisterCallout(void)
 }
 
 static void NTAPI
-SnitchUnload(_In_ PDRIVER_OBJECT driver)
+WiretapUnload(_In_ PDRIVER_OBJECT driver)
 {
     UNREFERENCED_PARAMETER(driver);
-    SnitchUnregisterCallout();
+    WiretapUnregisterCallout();
     if (g_device != NULL) {
         IoDeleteDevice(g_device);
         g_device = NULL;
@@ -151,16 +151,16 @@ DriverEntry(
 
     UNREFERENCED_PARAMETER(registryPath);
 
-    driver->DriverUnload = SnitchUnload;
+    driver->DriverUnload = WiretapUnload;
 
-    RtlInitUnicodeString(&name, L"\\Device\\SnitchCallout");
+    RtlInitUnicodeString(&name, L"\\Device\\WiretapCallout");
     status = IoCreateDevice(driver, 0, &name, FILE_DEVICE_UNKNOWN,
                             0, FALSE, &g_device);
     if (!NT_SUCCESS(status)) {
         return status;
     }
 
-    status = SnitchRegisterCallout(g_device);
+    status = WiretapRegisterCallout(g_device);
     if (!NT_SUCCESS(status)) {
         IoDeleteDevice(g_device);
         g_device = NULL;

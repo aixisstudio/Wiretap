@@ -1,6 +1,6 @@
 """
 EN: Deep process inspection — the honest user-mode stand-in for dynamic
-    taint analysis. Instead of simulating DTA, Snitch uses Frida (optional,
+    taint analysis. Instead of simulating DTA, Wiretap uses Frida (optional,
     user-installed) to attach to ONE suspicious process for a bounded
     window and instrument its socket entry points (connect / WSAConnect /
     sendto / sendmsg). For every outbound connection attempt it reports
@@ -15,7 +15,7 @@ EN: Deep process inspection — the honest user-mode stand-in for dynamic
     honestly). Nothing is simulated when Frida is absent.
 
 FR: Inspection profonde de processus — le remplaçant user-mode honnête de
-    l'analyse de teinte dynamique. Au lieu de simuler la DTA, Snitch
+    l'analyse de teinte dynamique. Au lieu de simuler la DTA, Wiretap
     utilise Frida (optionnel, installé par l'utilisateur) pour s'attacher
     à UN processus suspect pendant une fenêtre bornée et instrumenter ses
     points d'entrée socket (connect / WSAConnect / sendto / sendmsg). Pour

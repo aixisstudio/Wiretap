@@ -7,7 +7,7 @@ EN: Blocklist import — turn a hosts-file, plain domain/IP list, or
         ThreatFox exports you downloaded yourself…). Purely local:
         nothing leaves the host.
       * REMOTE URL — an OPT-IN outbound HTTPS fetch. This is one of the
-        few places Snitch can ever touch the network, so the code is
+        few places Wiretap can ever touch the network, so the code is
         honest about it: the URL is fetched verbatim (no telemetry, no
         referer), bounded to 4 MiB and 10 s, and the import reports
         exactly what it did.
@@ -24,7 +24,7 @@ FR: Import de blocklist — transformer un fichier hosts, une liste
 
       * FICHIER LOCAL — un chemin sur la machine. Purement local.
       * URL DISTANTE — fetch HTTPS OPT-IN. Un des rares endroits où
-        Snitch peut toucher le réseau : URL fetchée telle quelle, bornée
+        Wiretap peut toucher le réseau : URL fetchée telle quelle, bornée
         à 4 Mio / 10 s, et l'import rapporte exactement ce qu'il a fait.
       * PRÉRÉGLAGES — flux publics sélectionnés (ex. indicateurs C2
         ThreatFox d'abuse.ch, CC0 / Domaine Public) avec valeurs sûres.
@@ -199,7 +199,7 @@ def fetch_url(url: str, auth_key: str = "") -> str:
     2026-10-21. Jamais journalisé."""
     if not url.lower().startswith(("https://", "http://")):
         raise ValueError("url must be http(s)")
-    headers = {"User-Agent": "Snitch/1.3"}
+    headers = {"User-Agent": "Wiretap/1.3"}
     if auth_key.strip():
         headers["Auth-Key"] = auth_key.strip()
     req = urllib.request.Request(url, headers=headers)

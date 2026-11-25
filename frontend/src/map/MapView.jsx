@@ -1,5 +1,5 @@
 /**
- * Snitch — world map view.
+ * Wiretap — world map view.
  *
  * EN: D3 + TopoJSON natural-earth map. The user's position (browser
  *     geolocation, Paris fallback) sits at the origin; geolocated remote

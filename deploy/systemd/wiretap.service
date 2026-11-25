@@ -1,0 +1,55 @@
+# Wiretap backend — systemd unit (headless/daemon mode)
+# EN: Runs the FastAPI backend as a hardened system service. Packet
+#     capture needs CAP_NET_RAW (libpcap); firewall management needs
+#     CAP_NET_ADMIN — both granted via AmbientCapabilities, no full
+#     root required for the process identity.
+#     Install:  sudo install -m644 deploy/systemd/wiretap.service /etc/systemd/system/
+#               sudo systemctl daemon-reload && sudo systemctl enable --now wiretap
+# FR: Lance le backend FastAPI en service système durci. La capture
+#     exige CAP_NET_RAW (libpcap) ; le pare-feu CAP_NET_ADMIN — via
+#     AmbientCapabilities, sans root complet pour l'identité du processus.
+
+[Unit]
+Description=Wiretap — local-first network observability & outbound firewall
+Documentation=https://github.com/aixisstudio/Wiretap
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+# EN: Dedicated unprivileged user; create with:
+#     useradd --system --no-create-home --shell /usr/sbin/nologin wiretap
+# FR: Utilisateur dédié non privilégié :
+#     useradd --system --no-create-home --shell /usr/sbin/nologin wiretap
+User=wiretap
+Group=wiretap
+WorkingDirectory=/opt/wiretap/backend
+ExecStart=/opt/wiretap/backend/env/bin/python -m uvicorn api.main:app \
+    --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5s
+
+# EN: Exactly the two capabilities capture+firewall need — nothing more.
+# FR: Exactement les deux capacités capture+pare-feu — rien de plus.
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN
+
+# EN: Headless mode — set WIRETAP_DEMO=1 here for a synthetic-traffic
+#     demo box; WIRETAP_CONFIG points at the declarative settings file.
+# FR: Mode headless — WIRETAP_DEMO=1 pour une démo synthétique ;
+#     WIRETAP_CONFIG pointe le fichier de settings déclaratif.
+Environment=WIRETAP_CONFIG=/etc/wiretap/wiretap.toml
+Environment=WIRETAP_DATA_DIR=/var/lib/wiretap
+
+# EN: Hardening — the backend only needs its data dir writable.
+# FR: Durcissement — le backend n'a besoin d'écrire que dans son data dir.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/wiretap
+StateDirectory=wiretap
+ConfigurationDirectory=wiretap
+
+[Install]
+WantedBy=multi-user.target

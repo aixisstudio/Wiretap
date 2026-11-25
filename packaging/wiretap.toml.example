@@ -1,0 +1,52 @@
+# Wiretap — declarative config example / exemple de config déclarative.
+# Copy to /etc/wiretap/wiretap.toml (or $WIRETAP_CONFIG, or the data dir).
+# Copier vers /etc/wiretap/wiretap.toml (ou $WIRETAP_CONFIG, ou le data dir).
+
+# EN: SIEM forwarding — syslog_format: "cef" | "rfc3164"
+# FR: Relais SIEM — syslog_format : « cef » | « rfc3164 »
+# syslog_addr = "siem.example.com:514"     # udp — tcp://host:514 for TCP
+# syslog_format = "cef"
+
+# EN: Ask-on-first-connect (Linux NFQUEUE) — needs root, off on headless.
+# FR: Ask-on-first-connect (NFQUEUE Linux) — root requis, off en headless.
+ask_enabled = false
+ask_timeout = 20
+ask_failopen = false
+
+# EN: Automatic volume kill-switch. / FR: Kill-switch de volume auto.
+kill_switch_enabled = true
+upload_threshold_mb = 500
+
+# EN: Fleet peers for IOC gossip + /remote/fleet merge.
+# FR: Pairs de flotte pour le gossip IOC + fusion /remote/fleet.
+# gossip_peers = ["sec-01.corp:8000"]
+
+# EN: Monitored ports (empty = all). / FR: Ports surveillés (vide = tous).
+# ports = [80, 443]
+
+# EN: Scheduled threat feeds — refreshed every `hours` per feed, hot-reloaded
+#     into the firewall. Remote urls are an explicit opt-in; path: feeds are
+#     fully offline. Built-in presets: "threatfox", "threatfox_ip", "threatfox_domain",
+#     "netapi_compromised".
+#     kind: "ip"|"domain"|"threatfox"|"threatfox_ip"|"threatfox_domain",
+#     action: "block"|"sinkhole". Optional filters: malware = "cobalt_strike", min_confidence = 75.
+# FR: Flux TI planifiés — rafraîchis toutes les `hours`, rechargés à chaud
+#     dans le pare-feu. Les url distantes = opt-in explicite ; `path:` reste
+#     hors-ligne. Préréglages intégrés : « threatfox », « threatfox_ip », « threatfox_domain »,
+#     « netapi_compromised ».
+#     kind : « ip »|« domain »|« threatfox »|« threatfox_ip »|« threatfox_domain »,
+#     action : « block »|« sinkhole ». Filtres optionnels : malware = « cobalt_strike », min_confidence = 75.
+# ti_feeds = [
+#   # Preset for ThreatFox C2 export (abuse.ch, CC0 / Public Domain).
+#   # abuse.ch retired keyless exports on 2026-10-21 — set auth_key to your
+#   # free abuse.ch Auth-Key or the preset imports nothing.
+#   { preset = "threatfox", action = "block", hours = 12, min_confidence = 75,
+#     auth_key = "<your abuse.ch Auth-Key>" },
+#   # NetAPI honeypot malware sources, last 48 h (CC BY 4.0), no key needed.
+#   # FR : sources de malware des honeypots NetAPI, 48 h (CC BY 4.0), sans clé.
+#   { preset = "netapi_compromised", action = "block", hours = 12 },
+#   { url = "https://lists.blocklist.de/lists/all.txt", kind = "ip",
+#     action = "block", hours = 24 },
+#   { path = "/etc/wiretap/corp-domains.txt", kind = "domain",
+#     action = "sinkhole", hours = 6 },
+# ]

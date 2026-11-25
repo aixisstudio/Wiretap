@@ -1,5 +1,5 @@
 """
-Snitch — OUI lookup tests.
+Wiretap — OUI lookup tests.
 
 EN: MAC normalization (colons/dashes/case) and the unknown-prefix fallback.
 FR: Normalisation des MAC (deux-points/tirets/casse) et le repli pour préfixe

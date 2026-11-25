@@ -2,7 +2,7 @@
 
 [English](ROADMAP.md) | [Français](ROADMAP.md) | [Español](ROADMAP.es.md) | [Deutsch](ROADMAP.de.md) | [Русский](ROADMAP.ru.md) | **日本語** | [Português](ROADMAP.pt-BR.md) | [中文](ROADMAP.zh-CN.md)
 
-> 機能の提案・投票は [GitHub Discussions](https://github.com/aixisstudio/Snitch/discussions) の *Ideas* カテゴリへ。具体的なバグは [Issues](https://github.com/aixisstudio/Snitch/issues) へ。
+> 機能の提案・投票は [GitHub Discussions](https://github.com/aixisstudio/Wiretap/discussions) の *Ideas* カテゴリへ。具体的なバグは [Issues](https://github.com/aixisstudio/Wiretap/issues) へ。
 
 ## ✅ リリース済み
 
@@ -11,16 +11,16 @@
 | **v1.0.4** | 初公開リリース — リアルタイムグラフ＋世界地図、プロセス帰属、オフラインジオロケーション（.mmdb）、異常アラート、プライバシースコア、パッシブ LAN 検出（ARP/OUI）、マイク/カメラ監視（Windows/Linux）、デモモード、UI EN/FR |
 | **v1.0.5** | **Windows 対応**（Npcap、パッケージ済みバックエンド）、プロセスアイコン、トラッカードメイン +24、修正 |
 | **v1.2（main、タグなし）** | **セキュリティ＆スレットハンティングスイート** — OS ファイアウォール連携（IP/CIDR/ドメイン/プロセス/ポートのルールを `netsh`/`iptables`/`pf` へ、best-effort）、ロックダウンスイッチ、kill/suspend アクション、オプトイン threat intel（AbuseIPDB/OTX/VirusTotal）、オプトイン webhook（Discord/Slack/Telegram/汎用）、DNS トンネル/平文/国ベースライン逸脱検知、セキュリティ監査、フォレンジックエクスポート（プロセスツリー＋SHA-256、JSON/CSV/STIX）、8 言語 UI |
-| **v1.5.x** | **エンタープライズ/SOC レイヤー** — 宣言的 `snitch.toml`、CEF + RFC 3164 syslog + `format=ecs` NDJSON、Sigma インポート + YARA-L エクスポート、`/remote/fleet` ビュー + Helm チャート、Ansible/Puppet/Salt/GPO デプロイ、強化 systemd ユニット + nfpm `.deb`/`.rpm`、無料 TI フィード、MkDocs + `INTEGRATIONS.md` ×7 言語 |
-| **v1.6.x** | **エージェント＆フリート ID** — ゼロ依存 Rust エージェント（`agent/`、Linux `/proc` ソケット→PID 帰属）、エージェント別エンロール（`sagt_…` ハッシュ済みトークン、`/ingest/revoke`）、`ti_feeds` 自動更新ワーカー、3 OS のエージェント CI、ヘッドレス `snitchd` フォーミュラ、CodeQL アラート全解消、235 backend テスト |
+| **v1.5.x** | **エンタープライズ/SOC レイヤー** — 宣言的 `wiretap.toml`、CEF + RFC 3164 syslog + `format=ecs` NDJSON、Sigma インポート + YARA-L エクスポート、`/remote/fleet` ビュー + Helm チャート、Ansible/Puppet/Salt/GPO デプロイ、強化 systemd ユニット + nfpm `.deb`/`.rpm`、無料 TI フィード、MkDocs + `INTEGRATIONS.md` ×7 言語 |
+| **v1.6.x** | **エージェント＆フリート ID** — ゼロ依存 Rust エージェント（`agent/`、Linux `/proc` ソケット→PID 帰属）、エージェント別エンロール（`sagt_…` ハッシュ済みトークン、`/ingest/revoke`）、`ti_feeds` 自動更新ワーカー、3 OS のエージェント CI、ヘッドレス `wiretapd` フォーミュラ、CodeQL アラート全解消、235 backend テスト |
 
-その他稼働中： GHCR の Docker イメージ、Homebrew tap（`brew install --cask aixisstudio/tap/snitch` + ヘッドレス `snitchd` フォーミュラ）、winget パッケージ[提出済み](https://github.com/microsoft/winget-pkgs/pull/455520)、8 言語 README、GitHub Discussions。
+その他稼働中： GHCR の Docker イメージ、Homebrew tap（`brew install --cask aixisstudio/tap/wiretap` + ヘッドレス `wiretapd` フォーミュラ）、winget パッケージ[提出済み](https://github.com/microsoft/winget-pkgs/pull/455520)、8 言語 README、GitHub Discussions。
 
 ## 🚧 v1.x — 進行中
 
 - [x] **署名付き Windows インストーラ** — CI は [SignPath](https://signpath.org) OSS 用に配線済み（承認プロジェクトに無料 Authenticode）；申請受理で有効化 — `docs/SIGNING.md` 参照
 - [ ] **署名＋公証済み macOS ビルド** — Apple Developer アカウント（年 $99）が必要で無料ルートなし。それまでは [tap](https://github.com/aixisstudio/homebrew-tap) が quarantine を除去
-- [ ] **Homebrew 本家**（`brew install --cask snitch`）— ブロック中：`snitch` 名は別プロジェクトが使用中；Developer ID 署名後に再検討
+- [ ] **Homebrew 本家**（`brew install --cask wiretap`）— ブロック中：`wiretap` 名は別プロジェクトが使用中；Developer ID 署名後に再検討
 - [ ] **winget 公開** — [PR #455520](https://github.com/microsoft/winget-pkgs/pull/455520)（v1.0.8）オープン；パイプラインがタグごとに最新 NSIS を自動提出
 - [ ] **Chocolatey** — パッケージ済み；`CHOCO_API_KEY` シークレット待ち
 - [ ] **Windows/macOS のエージェント帰属** — `GetExtendedTcpTable`/`libproc` バックエンド
@@ -42,7 +42,7 @@
 
 ## 🔬 研究 — 記録のみ、未実装
 
-Snitch をデスクトップ EDR/XDR へ向かわせるアイデア群。正直に記載 —
+Wiretap をデスクトップ EDR/XDR へ向かわせるアイデア群。正直に記載 —
 **いずれも未実装**；それぞれ固有の設計・ネイティブコンポーネント・
 多くは第二のバイナリ成果物が必要：
 
@@ -63,7 +63,7 @@ Snitch をデスクトップ EDR/XDR へ向かわせるアイデア群。正直�
 意図的に、設計上：
 
 - **テレメトリ、アナリティクス、アカウント、クラウド同期** — 決して。
-- **ネットワーク全体のパッシブ IDS** — Snitch は*この*マシンを見る。ネットワーク全体ではない。
+- **ネットワーク全体のパッシブ IDS** — Wiretap は*この*マシンを見る。ネットワーク全体ではない。
 - **ユーザースペースのパケットフィルタ** — ブロックは OS ネイティブファイアウォール（または将来のカーネルコンポーネント）へ委譲。再実装しない。
 
 ## 🤝 貢献

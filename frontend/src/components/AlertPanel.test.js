@@ -1,5 +1,5 @@
 /**
- * Snitch — alert timestamp tests (Vitest).
+ * Wiretap — alert timestamp tests (Vitest).
  *
  * EN: Backend alerts carry ISO 8601 timestamps WITH an offset ("+00:00");
  *     the relative time must never render as "NaNh ago".

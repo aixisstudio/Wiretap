@@ -214,7 +214,7 @@ def test_import_blocklist_text_threatfox_integration():
 def test_api_firewall_presets_endpoint():
     """EN: GET /firewall/presets returns available presets list."""
     client = TestClient(app)
-    resp = client.get("/firewall/presets", headers={"X-Snitch-Token": API_TOKEN})
+    resp = client.get("/firewall/presets", headers={"X-Wiretap-Token": API_TOKEN})
     assert resp.status_code == 200
     data = resp.json()
     assert data["ok"] is True
@@ -232,7 +232,7 @@ def test_api_firewall_blocklist_preset_resolution(monkeypatch):
 
     resp = client.post(
         "/firewall/blocklist",
-        headers={"X-Snitch-Token": API_TOKEN},
+        headers={"X-Wiretap-Token": API_TOKEN},
         json={"preset": "threatfox", "action": "block", "max_entries": 100},
     )
     assert resp.status_code == 200

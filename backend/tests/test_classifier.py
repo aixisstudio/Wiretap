@@ -1,5 +1,5 @@
 """
-Snitch — classifier tests.
+Wiretap — classifier tests.
 
 EN: Covers the classification priority: tracker domains > CDN > well-known
     ports > unknown fallback.

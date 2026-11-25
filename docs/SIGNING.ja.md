@@ -4,7 +4,7 @@
 
 ## 現状
 
-Snitch のビルドは Windows/macOS とも**未署名**。これは正直かつ意図的:
+Wiretap のビルドは Windows/macOS とも**未署名**。これは正直かつ意図的:
 署名の意味を損なう自己署名証明書は出さず、オープンソース向けの合法
 かつ無料の道がある限り証明書も購入しない。
 
@@ -18,11 +18,11 @@ Snitch のビルドは Windows/macOS とも**未署名**。これは正直かつ
 ### セットアップ（一度のみ、メンテナ向け）
 
 1. <https://signpath.org/apply> で申請 — 名前、メール、プロジェクト名、
-   リポジトリ URL、説明を問うフォーム。承認は手動（数日）。Snitch は
+   リポジトリ URL、説明を問うフォーム。承認は手動（数日）。Wiretap は
    公開条件を全て満たす: AGPL-3.0（OSI 承認、デュアルライセンス無）、
    全ソース公開、活発に保守、GitHub Releases で公開済、文書化済。
    **申請送信済 — 審査待ち。**
-2. SignPath 組織を作成し、**プロジェクト**（slug、例 `Snitch`）に
+2. SignPath 組織を作成し、**プロジェクト**（slug、例 `Wiretap`）に
    trusted build system *GitHub.com* をリンク、SignPath GitHub App を
    このリポジトリにインストール（origin 検証に必須）。
 3. **release-signing ポリシー**をタグビルド限定で作成、ZIP 内 `*.exe`
@@ -41,7 +41,7 @@ Apple は Developer ID 証明書＋公証に有料の **Developer Program**
 （$99/年）を要求。合法な無料代替は存在しない。それまでは:
 
 - `.zip`/`.dmg` は未署名のまま — 初回起動は**右クリック → 開く**、
-  または `xattr -d com.apple.quarantine Snitch.app`
+  または `xattr -d com.apple.quarantine Wiretap.app`
 - 各リリースの SHA256 チェックサムで完全性を検証可能
 - 公開 CI ビルドログが出処を保証（再現可能パイプライン）
 

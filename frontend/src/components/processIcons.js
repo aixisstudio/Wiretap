@@ -1,5 +1,5 @@
 /**
- * Snitch — per-process icon picker.
+ * Wiretap — per-process icon picker.
  *
  * EN: The apps table (AppsView) shows the raw process name in a monospace cell.
  *     Unknown processes used to render with no visual affordance at all.

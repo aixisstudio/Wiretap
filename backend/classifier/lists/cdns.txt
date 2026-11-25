@@ -1,4 +1,4 @@
-# Snitch — CDN / edge-infrastructure domain list.
+# Wiretap — CDN / edge-infrastructure domain list.
 #
 # EN: One registrable domain per line, suffix-matched. These are delivery
 #     networks, not threats — flagging them as "cdn" keeps the graph honest
