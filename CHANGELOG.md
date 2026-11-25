@@ -35,7 +35,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 - Killchain families extended: `persistence`, `metabolism` — a supply-chain
   install + persistence + metabolism drift now correlates as one incident.
 
-### Added — deep signals, round 2 (unreleased on main)
+## [1.9.0] — "deep signals" release
+
+### Added — deep signals, round 2
 - **Flow DNA** (`flowdna.py`): per-process network metabolism profiles — flow
   density, burst sizes, rhythm, out:in ratio, destination entropy — learned
   silently for 30 flows, then scored in non-overlapping windows. Multi-feature
