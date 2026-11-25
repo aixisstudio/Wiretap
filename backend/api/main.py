@@ -124,6 +124,7 @@ from detection import nlquery
 from detection.canary import CanaryWatch, HoneyPorts
 from detection.autorespond import AutoResponder
 from detection.killchain import KillChain
+from detection.dnssystem import SystemDns
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -176,6 +177,7 @@ canary = CanaryWatch()               # EN: ransomware tripwires / FR: pièges ra
 honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scans LAN
 autoresponder = AutoResponder(fw)    # EN: act on critical alerts / FR: agir sur les critiques
 killchain = KillChain()              # EN: cross-signal correlator / FR: corrélateur inter-signaux
+systemdns = SystemDns(_platform.system())  # EN: system DNS integration / FR: intégration DNS système
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -3545,6 +3547,30 @@ async def killchain_status() -> dict:
     """EN: Correlator state — entities tracked, chains fired.
     FR: état du corrélateur — entités suivies, chaînes tirées."""
     return killchain.status()
+
+
+
+@app.get("/dnsfw/system", dependencies=_AUTH)
+async def dnsfw_system_status() -> dict:
+    """EN: System DNS integration state. / FR: état de l'intégration système."""
+    return systemdns.status()
+
+
+@app.post("/dnsfw/system/apply", dependencies=_AUTH)
+async def dnsfw_system_apply() -> dict:
+    """EN: Point the system DNS at the local proxy — snapshots the previous
+        servers first, reports failures honestly (privileges needed).
+    FR: pointer le DNS système vers le proxy local — snapshot préalable,
+        échecs rapportés honnêtement."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, systemdns.apply)
+
+
+@app.post("/dnsfw/system/revert", dependencies=_AUTH)
+async def dnsfw_system_revert() -> dict:
+    """EN: Restore the snapshotted DNS configuration. / FR: restaurer."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, systemdns.revert)
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)
