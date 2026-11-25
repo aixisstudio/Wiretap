@@ -42,6 +42,33 @@ def collect_listeners() -> dict[str, dict]:
         lsof fallback elsewhere — best-effort, zero privileges.
     FR: ports en écoute avec processus propriétaire. Best-effort."""
     listeners: dict[str, dict] = {}
+    import platform as _plat
+    if _plat.system() == "Windows":
+        # EN: netstat -ano exists on every Windows since XP — pid per socket,
+        #     process names resolved through tasklist.
+        # FR: netstat -ano existe partout — pid par socket, noms via tasklist.
+        try:
+            import subprocess
+            tl = subprocess.run(["tasklist", "/fo", "csv", "/nh"],
+                                capture_output=True, text=True, timeout=10).stdout
+            names = {}
+            for row in tl.splitlines():
+                cells = row.strip('"').split('","')
+                if len(cells) >= 2 and cells[1].isdigit():
+                    names[int(cells[1])] = cells[0]
+            out = subprocess.run(["netstat", "-ano", "-p", "tcp"],
+                                 capture_output=True, text=True, timeout=10).stdout
+            for line in out.splitlines():
+                parts = line.split()
+                if len(parts) >= 5 and parts[0].upper() == "TCP" and "LISTEN" in parts[3].upper():
+                    local = parts[1].rsplit(":", 1)[-1]
+                    pid = int(parts[4]) if parts[4].isdigit() else 0
+                    if local.isdigit():
+                        listeners[local] = {"port": int(local),
+                                            "process": names.get(pid, ""), "pid": pid}
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+        return listeners
     try:
         import subprocess
         out = subprocess.run(["lsof", "-iTCP", "-sTCP:LISTEN", "-P", "-n", "-Fpcn"],
@@ -65,6 +92,21 @@ def collect_processes() -> dict[str, dict]:
     """EN: Running process shapes (name -> count + sample paths).
     FR: formes des processus en cours (nom -> compte + chemins)."""
     procs: dict[str, dict] = {}
+    import platform as _plat
+    if _plat.system() == "Windows":
+        try:
+            import subprocess
+            out = subprocess.run(["tasklist", "/fo", "csv", "/nh"],
+                                 capture_output=True, text=True, timeout=10).stdout
+            for row in out.splitlines():
+                cells = row.strip('"').split('","')
+                if len(cells) >= 1 and cells[0]:
+                    name = cells[0].replace(".exe", "")
+                    agg = procs.setdefault(name, {"name": name, "count": 0, "path": cells[0]})
+                    agg["count"] += 1
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+        return procs
     try:
         import subprocess
         out = subprocess.run(["ps", "-axo", "comm="], capture_output=True,

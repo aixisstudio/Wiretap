@@ -58,6 +58,35 @@ def _ps_table() -> dict[int, tuple[int, str]]:
     """EN: pid -> (ppid, comm-name) for the whole table, best effort.
     FR: pid -> (ppid, nom) pour toute la table, au mieux."""
     table: dict[int, tuple[int, str]] = {}
+    import platform as _plat
+    if _plat.system() == "Windows":
+        # EN: Windows has no ps — the process table comes from CIM via
+        #     PowerShell (present since Win7), wmic as legacy fallback.
+        # FR: pas de ps sous Windows — table via CIM PowerShell, wmic en repli.
+        for cmd, parser in (
+            (["powershell", "-NoProfile", "-Command",
+              "Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name "
+              "| ForEach-Object { \"$($_.ProcessId) $($_.ParentProcessId) $($_.Name)\" }"], "cim"),
+            (["wmic", "process", "get", "processid,parentprocessid,name", "/format:csv"], "wmic"),
+        ):
+            try:
+                out = subprocess.run(cmd, capture_output=True, text=True, timeout=10).stdout
+            except (OSError, subprocess.TimeoutExpired):
+                continue
+            for line in out.splitlines():
+                parts = line.strip().split()
+                nums = [p for p in parts if p.isdigit()]
+                if parser == "cim" and len(parts) >= 3 and parts[0].isdigit() and parts[1].isdigit():
+                    name = parts[2].lower().replace(".exe", "")
+                    table[int(parts[0])] = (int(parts[1]), name)
+                elif parser == "wmic" and "," in line and len(nums) >= 2:
+                    cells = line.split(",")
+                    if len(cells) >= 4 and cells[-2].isdigit() and cells[-1].isdigit():
+                        name = cells[-3].lower().replace(".exe", "")
+                        table[int(cells[-1])] = (int(cells[-2]), name)
+            if table:
+                break
+        return table
     try:
         out = subprocess.run(["ps", "-eo", "pid,ppid,comm"],
                              capture_output=True, text=True, timeout=4).stdout

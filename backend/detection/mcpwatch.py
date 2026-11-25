@@ -38,13 +38,35 @@ import json
 import re
 from pathlib import Path
 
+import os as _os
+import platform as _platform
+
+# EN: Config locations per platform — the same app stores its MCP config in
+#     different roots on macOS / Windows / Linux. Paths are home-relative
+#     unless they start with a %VAR% (Windows env expansion).
+# FR: chemins par plateforme — la même app stocke sa config MCP dans des
+#     racines différentes selon l'OS.
+def _appdata(rel: str) -> str:
+    base = _os.environ.get("APPDATA", "")
+    return str(_os.path.join(base, rel)) if base else rel
+
+if _platform.system() == "Darwin":
+    _claude_desktop = "Library/Application Support/Claude/claude_desktop_config.json"
+    _vscode = "Library/Application Support/Code/User/settings.json"
+elif _platform.system() == "Windows":
+    _claude_desktop = _appdata("Claude/claude_desktop_config.json")
+    _vscode = _appdata("Code/User/settings.json")
+else:
+    _claude_desktop = ".config/Claude/claude_desktop_config.json"
+    _vscode = ".config/Code/User/settings.json"
+
 CONFIG_LOCATIONS = [
     ("Cursor", ".cursor/mcp.json"),
-    ("Claude Desktop", "Library/Application Support/Claude/claude_desktop_config.json"),
+    ("Claude Desktop", _claude_desktop),
     ("Claude Code", ".claude.json"),
     ("Windsurf", ".codeium/windsurf/mcp_config.json"),
     ("Zed", ".config/zed/settings.json"),
-    ("VS Code", ".config/Code/User/settings.json"),
+    ("VS Code", _vscode),
     ("Devin CLI", ".config/devin/mcp_config.json"),
 ]
 
