@@ -16,6 +16,9 @@
 
 Também no ar: imagem Docker no GHCR, tap do Homebrew (`brew install --cask aixisstudio/tap/wiretap` + fórmula headless `wiretapd`), pacote winget [enviado](https://github.com/microsoft/winget-pkgs/pull/455520), README em 8 idiomas, GitHub Discussions.
 
+| **v1.8.0** | **Os sinais profundos** — exfiltração correlacionada a presença (`UNATTENDED_EXFIL`), log forense inviolavel hash-encadeado (`/forensic/verify`), vereditos por linhagem, correlação kill-chain (3 familias de detectores / 15 min = um incidente), DNS de sistema em um clique, governanca do trafego IA (21 provedores, shadow-AI), DLP local de segredos, vigilancia supply-chain (`POSTINSTALL_NET`), consultas `/ask` em linguagem natural, canarios anti-ransomware, honeyports LAN, resposta automática opt-in, firewall DNS com upstream DoH, perfis por rede Wi-Fi, digest de privacidade compartilhavel |
+| **v1.9.0** | **Flow DNA + ciclo de intrusão fechado** — metabolismo de rede por processo (`FLOW_DRIFT` explicavel), auditoria de governanca MCP (Cursor/Claude/Windsurf/Zed/VS Code/Devin), vigilancia de persistencia (`PERSISTENCE_NEW/MOD/DEL`), raio de blast em todo alerta critico, diff temporal (snapshots por hora, 48 h), endurecimento cross-plataforma (sensores Windows imunes ao `netstat` localizado, fallback `/proc/net/tcp` no Linux), 423 testes verdes nos 3 SO |
+
 ## 🚧 v1.x — em andamento
 
 - [x] **Instalador Windows assinado** — CI preparada para [SignPath](https://signpath.org) OSS (Authenticode gratuito para projetos aprovados); ativa quando o pedido for aceito — ver `docs/SIGNING.md`

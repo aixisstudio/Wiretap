@@ -16,6 +16,9 @@
 
 Außerdem live: Docker-Image auf GHCR, Homebrew-Tap (`brew install --cask aixisstudio/tap/wiretap` + headless `wiretapd`-Formel), winget-Paket [eingereicht](https://github.com/microsoft/winget-pkgs/pull/455520), README in 8 Sprachen, GitHub Discussions.
 
+| **v1.8.0** | **Die tiefen Signale** — anwesenheitskorrelierte Exfiltration (`UNATTENDED_EXFIL`), hash-verkettetes manipulationssicheres Forensik-Log (`/forensic/verify`), Herkunfts-Verdikte, Kill-Chain-Korrelation (3 Detektor-Familien / 15 Min = ein Vorfall), System-DNS per Klick, KI-Traffic-Governance (21 Anbieter, Shadow-AI), lokale Secret-DLP, Supply-Chain-Watch (`POSTINSTALL_NET`), `/ask`-Naturlichsprachenabfragen, Ransomware-Canaries, LAN-Honeyports, opt-in Auto-Response, DNS-Firewall mit DoH-Upstream, WLAN-basierte Profile, teilbarer Privacy-Digest |
+| **v1.9.0** | **Flow DNA + geschlossener Intrusion-Zyklus** — Netzwerk-Metabolismus pro Prozess (`FLOW_DRIFT` erklarbar), MCP-Governance-Audit (Cursor/Claude/Windsurf/Zed/VS Code/Devin), Persistenz-Überwachung (`PERSISTENCE_NEW/MOD/DEL`), Blast-Radius in jedem kritischen Alarm, Zeitreise-Diff (stündliche Snapshots, 48 h), Cross-Plattform-Härtung (Windows-Sensoren immun gegen lokalisiertes `netstat`, `/proc/net/tcp`-Fallback für Linux), 423 Tests grün auf allen 3 OS |
+
 ## 🚧 v1.x — in Arbeit
 
 - [x] **Signierter Windows-Installer** — CI auf [SignPath](https://signpath.org) OSS vorbereitet (kostenloses Authenticode für genehmigte Projekte); aktiv sobald der Antrag angenommen wird — siehe `docs/SIGNING.md`

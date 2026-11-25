@@ -19,6 +19,9 @@ Also live / également en place : Docker image on GHCR, Homebrew tap (`brew inst
 | **v1.5.x** | **Enterprise / SOC layer** — declarative `wiretap.toml` (`$WIRETAP_CONFIG`), CEF + RFC 3164 syslog + `format=ecs` NDJSON export, Sigma rule import + YARA-L export, `/remote/fleet` collector view + Helm chart (`deploy/helm/wiretap`), Ansible / Puppet / Salt / GPO deploys (`deploy/`), hardened systemd unit + nfpm `.deb`/`.rpm`, free threat-intel feeds (StevenBlack, Blocklist.de, URLhaus/Feodo), MkDocs site + `INTEGRATIONS.md` in 7 languages / **couche entreprise / SOC** — `wiretap.toml` déclaratif, syslog CEF/RFC 3164 + export ECS, import Sigma + export YARA-L, vue de flotte `/remote/fleet` + chart Helm, déploiements Ansible/Puppet/Salt/GPO, unité systemd durcie + `.deb`/`.rpm` nfpm, flux TI gratuits, site MkDocs + intégrations en 7 langues |
 | **v1.6.x** | **Agent & fleet identity** — zero-dependency Rust agent (`agent/`, Linux `/proc` socket→PID attribution, `POST /ingest/events`), per-agent enrollment (`POST /ingest/enroll` → one-shot `sagt_…` tokens, hashed at rest, `/ingest/revoke`), automatic TI-feed refresh worker (`ti_feeds` setting, per-feed interval, hot firewall reload), cross-platform agent CI (Linux/macOS/Windows), headless Homebrew formula `wiretapd` (CLI name de-conflicted, #51), end-to-end green release pipeline (nfpm + tap + winget/choco-ready), all CodeQL alerts closed, 235-test backend suite / **agent & identité de flotte** — agent Rust zéro-dépendance (attribution socket→PID Linux via `/proc`), enrôlement par agent (jetons `sagt_…` hashés, révocation), worker de rafraîchissement TI automatique (`ti_feeds`), CI agent sur 3 OS, formule Homebrew headless `wiretapd`, pipeline release vert de bout en bout, alertes CodeQL fermées, 235 tests backend |
 
+| **v1.8.0** | **The deep signals** — presence-correlated exfiltration (`UNATTENDED_EXFIL`: OS input-idle crossed with sensitive flows, zero privileges), tamper-evident hash-chained forensic log (`/forensic/verify`), process-lineage verdicts, kill-chain correlator (3 detector families / 15 min = one incident), system-DNS apply/revert, AI traffic governance (21 providers, shadow-AI, mass-export), secrets egress watch (local DLP), supply-chain install watch (`POSTINSTALL_NET`), natural-language `/ask` queries, ransomware canaries, LAN honeyports, opt-in auto-response (lockdown/suspend), DNS firewall with DoH upstream, network-aware firewall profiles, shareable privacy digest / **les signaux profonds** — exfiltration corrélée à la présence, journal forensique hash-chainé inviolable, verdicts par lignée, corrélateur kill-chain, DNS système en un clic, gouvernance du trafic IA (21 providers), DLP local des secrets, veille supply-chain, requêtes en langage naturel, canaris anti-ransomware, honeyports LAN, réponse automatique opt-in, pare-feu DNS avec upstream DoH, profils pare-feu par réseau Wi-Fi, digest de confidentialité partageable |
+| **v1.9.0** | **Flow DNA + intrusion cycle closed** — per-process network metabolism profiling (burst sizes, rhythm, out:in ratio, destination entropy; `FLOW_DRIFT` explainable alerts), MCP governance audit (Cursor/Claude/Windsurf/Zed/VS Code/Devin — download-and-run launchers, unscoped access), persistence surface watch (LaunchAgents/Run keys/systemd/cron fingerprinted, 5-min diff, `PERSISTENCE_NEW/MOD/DEL`), blast radius attached to every critical alert (destinations, AI exposure, secrets in reach, survives-reboot — confidence-labeled), time-travel state diff (hourly snapshots, 48 h, appeared/vanished/mutated), cross-platform parity hardening (PowerShell-structured Windows sensors immune to localized `netstat`, `/proc/net/tcp` fallback for lsof-less Linux), 423-test suite green on all 3 OS / **Flow DNA + cycle d'intrusion fermé** — profilage métabolisme par processus, audit de gouvernance MCP, surveillance de la surface de persistance, rayon de blast dans chaque alerte critique, diff temporel, durcissement de parité cross-plateforme, 423 tests verts sur les 3 OS |
+
 ## 🚧 v1.x — in progress / en cours
 
 - [x] **Signed Windows installer** — CI wired for [SignPath](https://signpath.org) OSS (free Authenticode for approved projects); activates once the application is accepted — see `docs/SIGNING.md` / CI branchée sur SignPath OSS (signature Authenticode gratuite pour projets acceptés) ; s'active dès l'acceptation — voir `docs/SIGNING.md`
@@ -33,8 +36,7 @@ Also live / également en place : Docker image on GHCR, Homebrew tap (`brew inst
 - [x] **Linux packages** — .deb / AppImage / **snap** alongside Docker (no Flatpak: the sandbox cannot expose packet capture) / paquets Linux en plus de Docker — deb / AppImage / **snap** (pas de Flatpak : la sandbox ne peut pas exposer la capture)
 - [x] **Auto-update** — electron-updater on the published `latest-*.yml` feeds, opt-out in Settings / auto-mise à jour — electron-updater sur les flux `latest-*.yml`, désactivable dans Réglages
 - [x] **Export formats** — graph + alerts to JSON/CSV in the UI / export graphe + alertes en JSON/CSV dans l'UI
-- [ ] **Deeper tracker coverage** — community-editable lists live in `backend/classifier/lists/` / couverture trackers élargie — listes éditables par la communauté
-- [ ] **PCAP export** — capture slices per host/session / export PCAP par hôte ou session
+- [x] **Deeper tracker coverage** — community lists in `backend/classifier/lists/` + curated DNS-firewall blocklists (ads/trackers/malware/phishing) in v1.8 / listes communautaires + blocklists DNS curées en v1.8
 
 ## 💭 Under consideration / à l'étude
 
@@ -44,8 +46,14 @@ Also live / également en place : Docker image on GHCR, Homebrew tap (`brew inst
 - ~~More languages~~ — 8 locales shipped in `frontend/src/locales/`; more welcome via a single-file PR / 8 locales livrées dans `frontend/src/locales/` ; d'autres bienvenues via une PR d'un seul fichier
 - Optional remote pairing for headless hosts — consent-gated, token-protected / appairage optionnel d'hôtes sans écran — avec consentement et jeton
 - Map layers: ASN / organisation view / couches de carte : vue ASN / organisation
-- Blocklist imports (StevenBlack hosts, EasyList) — needs a privacy/licensing review first / import de blocklists — revue vie privée/licence requise
-- Firewall profiles (strict/travel vs developer/permissive) / profils pare-feu (strict/voyage vs dev/permissif)
+- ~~Blocklist imports~~ — shipped v1.5 (`POST /firewall/blocklist`) + DNS-firewall curated lists v1.8 / livré en v1.5 + listes DNS curées v1.8
+- ~~Firewall profiles~~ — shipped v1.8 (`netprofile`: auto-switch per Wi-Fi SSID/BSSID or gateway fingerprint) / livré en v1.8 (commutation auto par SSID/BSSID)
+
+## 💭 Next frontiers / prochaines frontières
+
+- **Beacon jitter analysis** — statistical C2 periodicity even with jitter / analyse statistique de périodicité C2 même avec jitter
+- **Continuous presence attestation** — couple lockscreen events to close the "user afk but session open" window / attestation de présence continue via événements de verrouillage
+- **Windows services + scheduled tasks in perswatch** / services + tâches planifiées Windows dans perswatch
 
 ## 🔬 Research — shipped vs remaining / livré vs restant
 

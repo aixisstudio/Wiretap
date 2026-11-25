@@ -2,7 +2,7 @@
 
 # Wiretap
 
-**Rastrea cada conexión oculta.**
+**El firewall que sabe si TU estabas ahi cuando los datos salieron.**
 
 [English](README.md#english) | [Français](README.md#français) | **Español** | [Deutsch](README.de.md) | [Русский](README.ru.md) | [日本語](README.ja.md) | [Português](README.pt-BR.md) | [中文](README.zh-CN.md)
 
@@ -33,6 +33,28 @@ Toda la interfaz está disponible en **English, Français, Español, Deutsch, Р
 - **vs GlassWire** — Wiretap es gratuito, open-source (AGPL), sin cuenta y con **cero llamadas salientes** por defecto; incluso la geolocalización es offline.
 - **vs Wireshark** — Wiretap ofrece una vista de alto nivel en vivo que cualquiera puede leer, en lugar de disección cruda de paquetes.
 - **vs monitores en la nube** — todo corre en `127.0.0.1` tras un token; tus datos de tráfico nunca salen de la máquina.
+
+### Las señales profundas — v1.9
+
+Todo lo que ve una herramienta de red clásica, mas todo lo que no puede ver. El ciclo de intrusión cerrado de punta a punta:
+
+| Señal | Que hace |
+|---|---|
+| **Exfiltracion correlacionada con presencia** | 5 MB hacia un proveedor de IA mientras escribes eres tu con tu IDE; los mismos 5 MB mientras estas ausente son otra cosa actuando en tu nombre. Tiempo de inactividad del teclado leido sin privilegios — `UNATTENDED_EXFIL`. Nadie mas cruza los flujos con la presencia humana |
+| **Flow DNA** | Metabolismo de red por proceso — ráfagas, ritmo, ratio saliente:entrante, entropía de destinos — aprendido en silencio y luego puntuado. Una app comprometida conserva su nombre pero cambia de metabolismo. Las alertas `FLOW_DRIFT` se explican solas |
+| **Veredictos por linaje** | `navegador -> sh -> curl -> evil.bin` cuenta la historia que un nombre de proceso oculta — puntuacion de ascendencia con frases de evidencia |
+| **Vigilancia de persistencia** | LaunchAgents, claves Run, systemd, cron — cada mecanismo de autoarranque huellado y comparado cada 5 min. Sobrevivir al reinicio es lo que el malware mas necesita; `PERSISTENCE_NEW/MOD/DEL` |
+| **Radio de impacto** | Cada alerta critica lleva una evaluación de impacto calculada — destinos, exposición IA, secretos al alcance, supervivencia al reinicio. Triage en una frase en vez de una investigación |
+| **Diff temporal** | «Que cambio en esta máquina desde el martes?» — snapshots horarios, retención 48 h, aparecido/desaparecido/mutado en milisegundos |
+| **Registro forense inviolable** | Cada alerta encadenada por hash a la anterior — un atacante que borra alertas rompe la cadena: el borrado mismo se vuelve evidencia. Verificacion offline en `/forensic/verify` |
+| **Correlacion kill-chain** | 3 familias de detectores distintas sobre la misma entidad en 15 min no es ruido — es un incidente único, narrado como timeline, que puede disparar el lockdown automático |
+| **Gobernanza del trafico IA** | Conteo de bytes por (proveedor, proceso) en 21 proveedores de IA, alertas shadow-AI al primer contacto, detección de exportación masiva — solo metadatos, nunca el contenido |
+| **Vigilancia de secretos** | DLP local — tus claves API cosechadas de env/dotfiles (los valores nunca salen de la RAM), alertadas cuando cruzan la red en claro o fluyen a un proveedor de IA |
+| **Gobernanza MCP** | Auditoria de riesgo de cada servidor MCP declarado en Cursor / Claude / Windsurf / Zed / VS Code / Devin — lanzadores download-and-run, acceso filesystem sin scope: la nueva superficie de ataque de los agentes IA |
+| **Vigilancia supply-chain** | `POSTINSTALL_NET` — un proceso nunca visto que se conecta minutos despues de una instalación es la firma del compromiso supply-chain |
+| **Canarios + honeyports + respuesta auto** | Archivos trampa anti-ransomware, listeners pasivos LAN en telnet/SMB/RDP/VNC, lockdown o suspensión opt-in en alertas críticas — detección que actua |
+| **Firewall DNS + perfiles de red** | Proxy DNS filtrante con upstream DoH cifrado y blocklists curadas; perfiles de firewall conmutados automaticamente por SSID/BSSID Wi-Fi |
+| **Consultas en lenguaje natural** | `/ask` — «algo hablo con Rusia esta semana?» respondido deterministicamente desde SQLite, nunca alucinado |
 
 ### Funciones
 

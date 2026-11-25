@@ -2,7 +2,7 @@
 
 # Wiretap
 
-**Track every hidden flow. / Traquez chaque flux masqué.**
+**The firewall that knows whether YOU were there when data left. / Le pare-feu qui sait si VOUS étiez là quand les données sont parties.**
 
 [English](#english) | [Français](#français) | [Español](README.es.md) | [Deutsch](README.de.md) | [Русский](README.ru.md) | [日本語](README.ja.md) | [Português](README.pt-BR.md) | [中文](README.zh-CN.md)
 
@@ -12,7 +12,7 @@
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-blue.svg)]()
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)]()
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20(Docker)-blue.svg)]()
-[![Version](https://img.shields.io/badge/Version-1.0.5-green.svg)]()
+[![Version](https://img.shields.io/badge/Version-1.9.0-green.svg)]()
 [![GitHub release](https://img.shields.io/github/v/release/aixisstudio/Wiretap?include_prereleases&label=release)](https://github.com/aixisstudio/Wiretap/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/aixisstudio/Wiretap/total?color=brightgreen&style=flat)](https://github.com/aixisstudio/Wiretap/releases/latest)
 [![GitHub stars](https://img.shields.io/github/stars/aixisstudio/Wiretap?style=flat-square&logo=github)](https://github.com/aixisstudio/Wiretap/stargazers)
@@ -29,8 +29,8 @@
 
 ## English
 
-**Wiretap** is an open-source application firewall and real-time network monitor.
-See every connection your computer makes — who it talks to, where they are, and which app is responsible.
+**Wiretap** is an open-source application firewall and real-time network monitor that asks the question no other security tool asks: **were you there when the data left?**
+See every connection your computer makes — who it talks to, where they are, which app is responsible — and whether a human was behind it.
 
 The entire interface is available in **English, Français, Español, Deutsch, Русский, 日本語, Português (BR) and 简体中文**: use the language picker in the top-right toolbar.
 
@@ -40,6 +40,28 @@ The entire interface is available in **English, Français, Español, Deutsch, Р
 - **vs GlassWire** — Wiretap is free, open-source (AGPL), requires no account and makes **no outbound calls without opt-in**; even geolocation is offline.
 - **vs Wireshark** — Wiretap gives a live, high-level overview anyone can read, instead of raw packet dissection.
 - **vs cloud-based monitors** — everything runs on `127.0.0.1` behind a token; your traffic data never leaves the machine.
+
+### The deep signals — v1.9
+
+Everything a network-first tool can see, plus everything it can't. The intrusion cycle, closed end to end:
+
+| Signal | What it does |
+|---|---|
+| **Presence-correlated exfiltration** | 5 MB to an AI provider while you type is you using your IDE; the same 5 MB while you're away is something else acting in your name. OS input-idle time read with zero privileges, sensitive outbound flows graded — `UNATTENDED_EXFIL`. Nobody else correlates flows with human presence |
+| **Flow DNA** | Per-process network metabolism — burst sizes, rhythm, out:in ratio, destination entropy — learned silently, then scored. A compromised app keeps its name but changes its metabolism. `FLOW_DRIFT` alerts explain themselves ("rhythm collapsed 4.2x, destinations tunneled") |
+| **Process-lineage verdicts** | `browser -> sh -> curl -> evil.bin` tells the story a bare process name hides — ancestry scoring with plain evidence sentences |
+| **Persistence watch** | LaunchAgents, Run keys, systemd, cron — every auto-start mechanism fingerprinted and diffed every 5 min. Surviving reboot is what malware needs most; `PERSISTENCE_NEW/MOD/DEL` |
+| **Blast radius** | Every critical alert carries a computed impact assessment — destinations reached, AI exposure, secrets in reach, survives-reboot, open files. Triage in one sentence instead of an investigation |
+| **Time-travel state diff** | "What changed on this machine since Tuesday?" — hourly snapshots, 48 h retention, appeared/vanished/mutated in milliseconds |
+| **Tamper-evident forensic log** | Every alert hash-chained to the previous one — an attacker wiping alerts breaks the chain, so deletion itself becomes evidence. Offline verification at `/forensic/verify` |
+| **Kill-chain correlation** | 3 distinct detector families on the same entity within 15 min is not noise — it's one incident, narrated as a timeline, and it can trigger automatic lockdown |
+| **AI traffic governance** | Per-(provider, process) byte accounting across 21 AI providers, shadow-AI first-contact alerts, mass-export detection — metadata only, never payload content |
+| **Secrets egress watch** | Local DLP — API keys harvested from env vars and dotfiles (values never leave RAM, alerts carry salted shapes), flagged when they cross the wire in cleartext or flow to an AI provider |
+| **MCP governance** | Risk audit of every MCP server declared in Cursor / Claude / Windsurf / Zed / VS Code / Devin configs — download-and-run launchers, unscoped filesystem access, the new AI-agent attack surface |
+| **Supply-chain install watch** | `POSTINSTALL_NET` — a never-before-seen process networking within minutes of install activity is the supply-chain compromise signature |
+| **Canaries + honeyports + auto-response** | Ransomware tripwire files, passive LAN listeners on telnet/SMB/RDP/VNC, opt-in lockdown or process suspension on critical alerts — detection that acts, not a camera filming a burglary |
+| **DNS firewall + network profiles** | Filtering DNS proxy with encrypted DoH upstream and curated blocklists; firewall profiles auto-switch per Wi-Fi SSID/BSSID |
+| **Natural-language queries** | `/ask` — "did anything talk to Russia this week?" answered deterministically from SQLite, never hallucinated |
 
 ### Features
 
@@ -296,8 +318,8 @@ follow the same per-language file pattern.
 
 ## Français
 
-**Wiretap** est un visualiseur de trafic réseau en temps réel.
-Voyez chaque connexion que votre ordinateur établit — à qui il parle, où se trouvent les serveurs, et quelle application est responsable.
+**Wiretap** est un pare-feu applicatif open-source et un moniteur réseau temps réel qui pose la question qu'aucun autre outil de sécurité ne pose : **étiez-vous là quand les données sont parties ?**
+Voyez chaque connexion que votre ordinateur établit — à qui il parle, où se trouvent les serveurs, quelle application est responsable — et si un humain était derrière.
 
 Toute l'interface est disponible en **English, Français, Español, Deutsch, Русский, 日本語, Português (BR) et 简体中文** : utilisez le sélecteur de langue dans la barre d'outils en haut à droite.
 
@@ -307,6 +329,28 @@ Toute l'interface est disponible en **English, Français, Español, Deutsch, Р�
 - **vs GlassWire** — Wiretap est gratuit, open-source (AGPL), sans compte et n'effectue **aucun appel sortant sans opt-in** ; même la géolocalisation est hors ligne.
 - **vs Wireshark** — Wiretap offre une vue d'ensemble en direct lisible par tous, plutôt qu'une dissection brute de paquets.
 - **vs les moniteurs cloud** — tout tourne sur `127.0.0.1` derrière un jeton ; vos données de trafic ne quittent jamais la machine.
+
+### Les signaux profonds — v1.9
+
+Tout ce qu'un outil réseau classique peut voir, plus tout ce qu'il ne peut pas voir. Le cycle d'intrusion fermé de bout en bout :
+
+| Signal | Ce que ça fait |
+|---|---|
+| **Exfiltration corrélée à la présence** | 5 Mo vers un provider IA pendant que vous tapez, c'est vous avec votre IDE ; les mêmes 5 Mo pendant votre absence, c'est autre chose qui agit en votre nom. Temps d'inactivité clavier lu sans privilèges, flux sensibles notés — `UNATTENDED_EXFIL`. Personne d'autre ne croise les flux avec la présence humaine |
+| **Flow DNA** | Métabolisme réseau par processus — tailles de rafales, rythme, ratio sortant:entrant, entropie des destinations — appris silencieusement puis scoré. Une app compromise garde son nom mais change de métabolisme. Les alertes `FLOW_DRIFT` s'expliquent (« rythme effondré 4,2x, destinations tunnelisées ») |
+| **Verdicts par lignée** | `navigateur -> sh -> curl -> evil.bin` raconte l'histoire qu'un nom de processus cache — scoring d'ascendance avec phrases de preuve |
+| **Surveillance de persistance** | LaunchAgents, clés Run, systemd, cron — chaque mécanisme d'auto-démarrage empreinté et comparé toutes les 5 min. Survivre au reboot est ce dont le malware a le plus besoin ; `PERSISTENCE_NEW/MOD/DEL` |
+| **Rayon de blast** | Chaque alerte critique porte une évaluation d'impact calculée — destinations atteintes, exposition IA, secrets à portée, survie au reboot, fichiers ouverts. Le triage en une phrase au lieu d'une enquête |
+| **Diff temporel** | « Qu'est-ce qui a changé sur cette machine depuis mardi ? » — snapshots horaires, rétention 48 h, apparu/disparu/muté en millisecondes |
+| **Journal forensique inviolable** | Chaque alerte hash-chainée à la précédente — un attaquant qui efface des alertes casse la chaîne : la suppression elle-même devient la preuve. Vérification offline sur `/forensic/verify` |
+| **Corrélation kill-chain** | 3 familles de détecteurs distinctes sur la même entité en 15 min, ce n'est pas du bruit — c'est un incident unique, narré en timeline, qui peut déclencher le lockdown automatique |
+| **Gouvernance du trafic IA** | Comptage d'octets par (provider, processus) sur 21 providers IA, alertes shadow-AI au premier contact, détection d'export massif — métadonnées uniquement, jamais le contenu |
+| **Veille d'exfiltration de secrets** | DLP local — vos clés API récoltées depuis env/dotfiles (les valeurs ne quittent jamais la RAM), alertées quand elles traversent le réseau en clair ou partent vers un provider IA |
+| **Gouvernance MCP** | Audit de risque de chaque serveur MCP déclaré dans Cursor / Claude / Windsurf / Zed / VS Code / Devin — lanceurs download-and-run, accès filesystem non scopé : la nouvelle surface d'attaque des agents IA |
+| **Veille supply-chain** | `POSTINSTALL_NET` — un processus jamais vu qui se connecte dans les minutes suivant une installation, c'est la signature de la compromission supply-chain |
+| **Canaris + honeyports + réponse auto** | Fichiers pièges anti-ransomware, listeners passifs LAN sur telnet/SMB/RDP/VNC, lockdown ou suspension de processus opt-in sur alerte critique — une détection qui agit |
+| **Pare-feu DNS + profils réseau** | Proxy DNS filtrant avec upstream DoH chiffré et blocklists curées ; profils pare-feu commutés automatiquement par SSID/BSSID Wi-Fi |
+| **Requêtes en langage naturel** | `/ask` — « est-ce que quelque chose a parlé à la Russie cette semaine ? » répondu de façon déterministe depuis SQLite, jamais halluciné |
 
 ### Fonctionnalités
 

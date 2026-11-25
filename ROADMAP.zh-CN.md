@@ -16,6 +16,9 @@
 
 已上线：GHCR 的 Docker 镜像、Homebrew tap（`brew install --cask aixisstudio/tap/wiretap` + 无头 `wiretapd` 配方）、winget 包[已提交](https://github.com/microsoft/winget-pkgs/pull/455520)、8 语言 README、GitHub Discussions。
 
+| **v1.8.0** | **深层信号** — 在场关联外泄检测(`UNATTENDED_EXFIL`)、哈希链接防篡改取证日志(`/forensic/verify`)、血统判定、杀伤链关联(3个检测器家族/15分钟=单一事件)、一键系统DNS、AI流量治理(21家提供商、shadow-AI)、机密本地DLP、供应链监视(`POSTINSTALL_NET`)、自然语言`/ask`查询、勒索软件金丝雀、LAN蜜罐端口、可选自动响应、带DoH上游的DNS防火墙、按Wi-Fi网络的配置文件、可分享的隐私摘要 |
+| **v1.9.0** | **Flow DNA + 入侵周期闭环** — 每进程网络代谢(`FLOW_DRIFT`可解释)、MCP治理审计(Cursor/Claude/Windsurf/Zed/VS Code/Devin)、持久化监视(`PERSISTENCE_NEW/MOD/DEL`)、每个关键告警附带爆炸半径、时间穿越差分(每小时快照、48小时)、跨平台加固(Windows传感器免疫本地化`netstat`、Linux `/proc/net/tcp`回退)、3个操作系统上423项测试全绿 |
+
 ## 🚧 v1.x — 进行中
 
 - [x] **签名的 Windows 安装器** —— CI 已接入 [SignPath](https://signpath.org) OSS（获批项目可免费使用 Authenticode）；申请通过后自动生效——见 `docs/SIGNING.md`

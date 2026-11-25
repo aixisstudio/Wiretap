@@ -16,6 +16,9 @@
 
 その他稼働中： GHCR の Docker イメージ、Homebrew tap（`brew install --cask aixisstudio/tap/wiretap` + ヘッドレス `wiretapd` フォーミュラ）、winget パッケージ[提出済み](https://github.com/microsoft/winget-pkgs/pull/455520)、8 言語 README、GitHub Discussions。
 
+| **v1.8.0** | **ディープシグナル** — プレゼンス相関エクスフィルトレーション(`UNATTENDED_EXFIL`)、ハッシュチェーン改ざん検知フォレンジックログ(`/forensic/verify`)、系譜判定、キルチェーン相関(3検出器ファミリー/15分=1インシデント)、ワンクリックシステムDNS、AIトラフィックガバナンス(21プロバイダ、shadow-AI)、ローカルDLP、サプライチェーン監視(`POSTINSTALL_NET`)、自然言語`/ask`クエリ、ランサムウェアカナリア、LANハニーポート、opt-in自動対応、DoHアップストリーム付きDNSファイアウォール、Wi-Fiごとのプロファイル、共有可能なプライバシーダイジェスト |
+| **v1.9.0** | **Flow DNA + 侵入サイクル閉環** — プロセスごとのネットワーク代謝(`FLOW_DRIFT`説明可能)、MCPガバナンス監査(Cursor/Claude/Windsurf/Zed/VS Code/Devin)、永続化監視(`PERSISTENCE_NEW/MOD/DEL`)、全クリティカルアラートにブラスト半径、タイムトラベル差分(毎時スナップショット、48時間)、クロスプラットフォーム強化(ローカライズされた`netstat`に免疫のWindowsセンサ、Linux向け`/proc/net/tcp`フォールバック)、3 OSで423テスト全緑 |
+
 ## 🚧 v1.x — 進行中
 
 - [x] **署名付き Windows インストーラ** — CI は [SignPath](https://signpath.org) OSS 用に配線済み（承認プロジェクトに無料 Authenticode）；申請受理で有効化 — `docs/SIGNING.md` 参照

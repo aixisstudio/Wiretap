@@ -2,7 +2,7 @@
 
 # Wiretap
 
-**Verfolge jeden versteckten Netzwerkfluss.**
+**Die Firewall, die weiss, ob DU da warst, als die Daten rausgingen.**
 
 [English](README.md#english) | [Français](README.md#français) | [Español](README.es.md) | **Deutsch** | [Русский](README.ru.md) | [日本語](README.ja.md) | [Português](README.pt-BR.md) | [中文](README.zh-CN.md)
 
@@ -33,6 +33,28 @@ Die gesamte Oberfläche ist in **English, Français, Español, Deutsch, Русс
 - **vs GlassWire** — Wiretap ist kostenlos, Open Source (AGPL), ohne Konto und macht **keinerlei ausgehende Aufrufe** ohne Opt-in; selbst die Geolokalisierung läuft offline.
 - **vs Wireshark** — Wiretap liefert eine lesbare Live-Übersicht statt roher Paketdissektion.
 - **vs Cloud-Monitore** — alles läuft auf `127.0.0.1` hinter einem Token; deine Verkehrsdaten verlassen den Rechner nie.
+
+### Die tiefen Signale — v1.9
+
+Alles, was ein klassisches Netzwerk-Tool sehen kann, plus alles, was es nicht sehen kann. Der Intrusion-Zyklus, Ende-zu-Ende geschlossen:
+
+| Signal | Was es tut |
+|---|---|
+| **Anwesenheitskorrelierte Exfiltration** | 5 MB zu einem KI-Anbieter während du tippst bist du mit deiner IDE; dieselben 5 MB während deiner Abwesenheit sind etwas anderes, das in deinem Namen handelt. OS-Input-Idle-Zeit ohne Privilegien gelesen — `UNATTENDED_EXFIL`. Niemand sonst korreliert Flows mit menschlicher Anwesenheit |
+| **Flow DNA** | Netzwerk-Metabolismus pro Prozess — Burst-Grossen, Rhythmus, Out:In-Ratio, Ziel-Entropie — still gelernt, dann bewertet. Eine kompromittierte App behalt ihren Namen, aber andert ihren Metabolismus. `FLOW_DRIFT`-Alarme erklären sich selbst |
+| **Herkunfts-Verdikte** | `browser -> sh -> curl -> evil.bin` erzahlt die Geschichte, die ein blosser Prozessname verbirgt — Abstammungs-Scoring mit Beweissatzen |
+| **Persistenz-Überwachung** | LaunchAgents, Run-Keys, systemd, cron — jeder Autostart-Mechanismus gefingerabdruckt und alle 5 Minuten verglichen. Den Neustart zu uberleben ist, was Malware am meisten braucht; `PERSISTENCE_NEW/MOD/DEL` |
+| **Blast-Radius** | Jeder kritische Alarm tragt eine berechnete Impact-Bewertung — erreichte Ziele, KI-Exposition, erreichbare Secrets, Neustart-Überleben. Triage in einem Satz statt einer Untersuchung |
+| **Zeitreise-Diff** | „Was hat sich auf diesem Rechner seit Dienstag geändert?" — Stündliche Snapshots, 48 h Aufbewahrung, erschienen/verschwunden/verandert in Millisekunden |
+| **Manipulationssicheres Forensik-Log** | Jeder Alarm per Hash an den vorherigen verkettet — ein Angreifer, der Alarme löscht, bricht die Kette: Die Löschung selbst wird zum Beweis. Offline-Verifikation unter `/forensic/verify` |
+| **Kill-Chain-Korrelation** | 3 verschiedene Detektor-Familien auf derselben Entitat in 15 Min sind kein Rauschen — es ist ein einziger Vorfall, als Timeline erzahlt, der den automatischen Lockdown auslosen kann |
+| **KI-Traffic-Governance** | Byte-Abrechnung pro (Anbieter, Prozess) uber 21 KI-Anbieter, Shadow-AI-Erstkontakt-Alarme, Massenexport-Erkennung — nur Metadaten, niemals Inhalte |
+| **Secret-Egress-Watch** | Lokale DLP — API-Keys aus Env/Dotfiles geerntet (Werte verlassen nie den RAM), alarmiert wenn sie im Klartext die Leitung uberqueren oder zu einem KI-Anbieter fliessen |
+| **MCP-Governance** | Risiko-Audit jedes MCP-Servers aus Cursor / Claude / Windsurf / Zed / VS Code / Devin — Download-and-run-Launcher, unbegrenzter Dateizugriff: die neue Angriffsflache der KI-Agenten |
+| **Supply-Chain-Watch** | `POSTINSTALL_NET` — ein nie gesehener Prozess, der Minuten nach einer Installation ins Netz geht, ist die Supply-Chain-Kompromittierungs-Signatur |
+| **Canaries + Honeyports + Auto-Response** | Ransomware-Köderdateien, passive LAN-Listener auf telnet/SMB/RDP/VNC, opt-in Lockdown oder Prozess-Suspension bei kritischen Alarmen — Erkennung, die handelt |
+| **DNS-Firewall + Netzwerkprofile** | Filtern der DNS-Proxy mit verschlüsseltem DoH-Upstream und kuratierten Blocklists; Firewall-Profile wechseln automatisch pro WLAN-SSID/BSSID |
+| **Natürlichsprachliche Abfragen** | `/ask` — „hat etwas diese Woche mit Russland gesprochen?" — deterministisch aus SQLite beantwortet, nie halluziniert |
 
 ### Funktionen
 
