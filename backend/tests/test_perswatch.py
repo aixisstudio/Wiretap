@@ -64,12 +64,17 @@ def test_deleted_entry_alert():
     assert any(a["type"] == "PERSISTENCE_DEL" for a in alerts)
 
 
-def test_scoring():
+def test_scoring(monkeypatch):
     r, f = score_entry({"target": "/var/folders/x/malware", "run_at_load": True, "keep_alive": True})
     assert r >= 4
     r2, _ = score_entry({"target": "/bin/bash", "run_at_load": False, "keep_alive": False})
     assert r2 >= 2                         # interpreter
-    r3, _ = score_entry({"target": "/Applications/Safari.app/Contents/MacOS/Safari",
+    # EN: benign case must not depend on the host filesystem — a path that
+    #     exists on macOS does not exist on the Ubuntu CI runner. Control
+    #     existence explicitly. / FR: le cas bénin ne doit pas dépendre de
+    #     l'hôte — existence contrôlée explicitement.
+    monkeypatch.setattr(Path, "exists", lambda self: True)
+    r3, _ = score_entry({"target": "/opt/vendor/agent",
                          "run_at_load": True, "keep_alive": False})
     assert r3 == 0
 
