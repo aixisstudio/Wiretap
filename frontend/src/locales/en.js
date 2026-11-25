@@ -488,4 +488,9 @@ export default {  // Navigation
   dg_open: 'Open digest card',
   dg_copy: 'Copy text summary',
   dg_copied: 'Copied!',
+  aw_title: 'AI traffic watch',
+  aw_hint: 'Which tools ship data to which AI providers — volume per service and process, shadow-AI alerts on first contact. Metadata only, never payload content.',
+  aw_enable: 'Track AI traffic',
+  aw_uploaded: 'uploaded',
+  aw_noact: 'No AI traffic observed yet',
 }

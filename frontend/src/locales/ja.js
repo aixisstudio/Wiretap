@@ -484,4 +484,9 @@ export default {
   dg_open: 'ー',
   dg_copy: '',
   dg_copied: 'ー',
+  aw_title: 'AIー',
+  aw_hint: 'AIー。。',
+  aw_enable: 'AIー',
+  aw_uploaded: '',
+  aw_noact: 'AIー',
 }

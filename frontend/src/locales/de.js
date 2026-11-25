@@ -484,4 +484,9 @@ export default {
   dg_open: 'Karte öffnen',
   dg_copy: 'Zusammenfassung kopieren',
   dg_copied: 'Kopiert!',
+  aw_title: 'KI-Traffic-Watch',
+  aw_hint: 'Welche Tools Daten an welche KI-Anbieter senden. Nur Metadaten.',
+  aw_enable: 'KI-Traffic verfolgen',
+  aw_uploaded: 'hochgeladen',
+  aw_noact: 'Noch kein KI-Traffic',
 }

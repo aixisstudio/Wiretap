@@ -117,6 +117,7 @@ from detection.threatintel import ThreatIntel
 from detection.dnsfw import DnsFirewall
 from detection.netprofile import NetworkProfiler
 from detection import digest as digestmod
+from detection.aiwatch import AiWatch
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -162,6 +163,7 @@ custom_rules = CustomRules()      # EN: user-defined alert rules / FR: règles d
 dnsfw = DnsFirewall(data_dir())   # EN: filtering DNS proxy (opt-in) / FR: proxy DNS filtrant (opt-in)
 import platform as _platform
 netprofiler = NetworkProfiler(fw, _platform.system())  # EN: network-aware auto profiles / FR: profils auto selon le réseau
+aiwatch = AiWatch()                  # EN: AI traffic governance / FR: gouvernance du trafic IA
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -1152,6 +1154,16 @@ def _process_batch(packets: list[Packet]) -> None:
         #     lock-guarded internally, no executor hop needed.
         # FR: La détection tourne dans la boucle — analyze_packet est
         #     protégée par verrou, pas besoin de saut d'executor.
+        for aw_alert in aiwatch.observe(pkt.process_name or "",
+                                        (geo or {}).get("hostname") or "",
+                                        pkt.direction, pkt.size):
+            aw = Alert(type=aw_alert["type"], severity=aw_alert["severity"],
+                       message=aw_alert["message"],
+                       node_id=remote_ip, details=aw_alert["details"])
+            _flag_alert(aw, nodes)
+            awd = aw.to_dict()
+            db.log_alert(awd)
+            out_alerts.append(awd)
         for alert in detector.analyze_packet(pkt, geo):
             _flag_alert(alert, nodes)
             alert_dict = alert.to_dict()
@@ -1858,6 +1870,7 @@ def _flush_loop() -> None:
             # FR: Sauvegarder les baselines de processus apprises — elles
             #     alimentent les alertes de déviation entre redémarrages.
             db.set_setting("app_baselines", detector.dump_baselines())
+            db.set_setting("aiwatch_known", aiwatch.dump_known())
             db.set_setting("integrity_baselines", integrity.dump_baselines())
         except Exception as exc:
             logger.error("db flush failed: %s", exc)
@@ -2120,6 +2133,12 @@ def _load_settings() -> None:
                     bind_port=int(db.get_setting("dnsfw_bind_port", 5353) or 5353))
     for _d in (db.get_setting("dnsfw_whitelist", []) or []):
         dnsfw.filter.whitelist_add(_d)
+    # EN: AI traffic watch — ON by default (metadata-only, local); the
+    #     known-clients set survives restarts so SHADOW_AI fires once ever.
+    # FR: veille IA — ON par défaut (métadonnées locales) ; les clients
+    #     connus persistent pour que SHADOW_AI ne tire qu'une fois.
+    aiwatch.enabled = bool(db.get_setting("aiwatch_enabled", True))
+    aiwatch.load_known(db.get_setting("aiwatch_known", []) or [])
     # EN: Network-aware profiles — opt-in; mappings restored, watcher
     #     started when enabled. / FR: Profils selon le réseau — opt-in.
     netprofiler.mappings = {str(k): str(v) for k, v in
@@ -3268,6 +3287,28 @@ async def privacy_digest_txt(hours: int = 24):
     data = digestmod.collect(db.get_conn(), minutes=hours * 60,
                              dnsfw_stats=dnsfw.stats)
     return PlainTextResponse(digestmod.render_text(data))
+
+
+
+@app.get("/aiwatch", dependencies=_AUTH)
+async def aiwatch_activity() -> dict:
+    """EN: AI traffic governance — per (service, process) byte accounting,
+        shadow-AI surface, MCP processes. Metadata only.
+    FR: Gouvernance du trafic IA — comptage par (service, processus),
+        surface shadow-AI, processus MCP. Métadonnées uniquement."""
+    return aiwatch.activity()
+
+
+@app.post("/aiwatch/config", dependencies=_AUTH)
+async def aiwatch_config(body: dict) -> dict:
+    """EN: Toggle the observer or reset its accounting rows (privacy).
+    FR: activer/désactiver l'observateur ou purger les compteurs."""
+    if "enabled" in body:
+        aiwatch.enabled = bool(body["enabled"])
+        db.set_setting("aiwatch_enabled", aiwatch.enabled)
+    if body.get("reset"):
+        aiwatch.reset_rows()
+    return aiwatch.activity()
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)

@@ -41,6 +41,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
   const [dnsfw, setDnsfw] = useState(null)
   const [netprof, setNetprof] = useState(null)
   const [dgCopied, setDgCopied] = useState(false)
+  const [aiw, setAiw] = useState(null)
   const [saved, setSaved] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(false)
   const [ifaces, setIfaces] = useState(null)
@@ -116,6 +117,18 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
     const j = await r.json()
     setDnsfw(prev => ({ ...prev, ...j }))
     return j
+  }
+  async function aiwLoad() {
+    const base = await apiBase()
+    const h = await authHeaders()
+    const r = await fetch(base + '/aiwatch', { headers: h })
+    if (r.ok) setAiw(await r.json())
+  }
+  async function aiwToggle(enabled) {
+    const base = await apiBase()
+    const h = await authHeaders({ 'Content-Type': 'application/json' })
+    const r = await fetch(base + '/aiwatch/config', { method: 'POST', headers: h, body: JSON.stringify({ enabled }) })
+    if (r.ok) setAiw(await r.json())
   }
   async function npCall(path, body) {
     const base = await apiBase()
@@ -593,6 +606,54 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
                 color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
               }}>{dgCopied ? t('dg_copied') : t('dg_copy')}</button>
           </div>
+        </div>
+
+
+        {/* AI traffic watch / Veille du trafic IA */}
+        <div style={{ ...row, display: 'block' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={label}>{t('aw_title')}</div>
+            {aiw?.services_tracked > 0 && (
+              <span style={{ fontSize: 10, color: '#7f9dc9' }}>{aiw.services_tracked} services</span>
+            )}
+          </div>
+          <div style={hint}>{t('aw_hint')}</div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
+            <button
+              onClick={() => aiwToggle(!(aiw?.enabled))}
+              role="switch" aria-checked={!!aiw?.enabled}
+              style={{
+                width: 36, height: 20, borderRadius: 10, border: '1px solid var(--border)',
+                background: aiw?.enabled ? '#3b82f6' : 'var(--bg)', cursor: 'pointer', position: 'relative',
+              }}>
+              <span style={{
+                position: 'absolute', top: 3, left: aiw?.enabled ? 19 : 3,
+                width: 12, height: 12, borderRadius: 6, background: 'var(--text)',
+              }} />
+            </button>
+            <span style={{ fontSize: 11, color: 'var(--text)' }}>{t('aw_enable')}</span>
+          </div>
+          {aiw?.by_service && Object.keys(aiw.by_service).length > 0 ? (
+            <div style={{ marginTop: 8, fontSize: 11 }}>
+              {Object.entries(aiw.by_service).map(([key, s]) => {
+                const mb = (s.bytes_out / (1024 * 1024))
+                const txt = mb >= 0.1 ? mb.toFixed(1) + ' MB' : Math.round(s.bytes_out / 1024) + ' KB'
+                return (
+                  <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ color: 'var(--text)' }}>{s.service_name}
+                      <span style={{ color: 'var(--text-dim)', fontSize: 10 }}> · {s.processes.slice(0, 3).join(', ')}</span>
+                    </span>
+                    <span style={{ color: mb > 100 ? '#f59e0b' : 'var(--text-dim)' }}>{txt} {t('aw_uploaded')}</span>
+                  </div>
+                )
+              })}
+              {aiw.mcp_processes?.length > 0 && (
+                <div style={{ ...hint, marginTop: 4 }}>MCP: {aiw.mcp_processes.join(', ')}</div>
+              )}
+            </div>
+          ) : (
+            <div style={{ ...hint, marginTop: 6 }}>{t('aw_noact')}</div>
+          )}
         </div>
 
         {/* External webhook / Webhook externe */}

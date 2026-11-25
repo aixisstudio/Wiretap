@@ -484,4 +484,9 @@ export default {
   dg_open: '',
   dg_copy: '',
   dg_copied: '!',
+  aw_title: 'AI ',
+  aw_hint: 'AI — 。',
+  aw_enable: ' AI ',
+  aw_uploaded: '',
+  aw_noact: ' AI ',
 }

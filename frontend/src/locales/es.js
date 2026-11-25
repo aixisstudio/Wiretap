@@ -482,4 +482,9 @@ export default {  // Navegación
   dg_open: 'Abrir tarjeta',
   dg_copy: 'Copiar resumen',
   dg_copied: '¡Copiado!',
+  aw_title: 'Vigilancia de tráfico IA',
+  aw_hint: 'Qué herramientas envían datos a qué proveedores de IA. Solo metadatos.',
+  aw_enable: 'Seguir tráfico IA',
+  aw_uploaded: 'enviados',
+  aw_noact: 'Sin tráfico IA observado',
 }

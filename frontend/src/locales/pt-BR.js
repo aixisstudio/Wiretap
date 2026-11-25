@@ -484,4 +484,9 @@ export default {
   dg_open: 'Abrir cartão',
   dg_copy: 'Copiar resumo',
   dg_copied: 'Copiado!',
+  aw_title: 'Monitoramento de tráfego IA',
+  aw_hint: 'Quais ferramentas enviam dados para quais provedores de IA. Apenas metadados.',
+  aw_enable: 'Rastrear tráfego IA',
+  aw_uploaded: 'enviados',
+  aw_noact: 'Nenhum tráfego IA observado',
 }

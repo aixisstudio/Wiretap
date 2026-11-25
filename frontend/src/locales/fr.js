@@ -484,4 +484,9 @@ export default {  // Navigation
   dg_open: 'Ouvrir la carte digest',
   dg_copy: 'Copier le résumé',
   dg_copied: 'Copié !',
+  aw_title: 'Veille du trafic IA',
+  aw_hint: 'Quels outils envoient des données vers quels fournisseurs IA — volume par service et processus, alertes shadow-AI au premier contact. Métadonnées uniquement.',
+  aw_enable: 'Suivre le trafic IA',
+  aw_uploaded: 'envoyés',
+  aw_noact: 'Aucun trafic IA observé',
 }
