@@ -122,6 +122,7 @@ from detection.secretwatch import SecretWatch
 from detection.supplychain import SupplyChainWatch
 from detection import nlquery
 from detection.canary import CanaryWatch, HoneyPorts
+from detection.autorespond import AutoResponder
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -172,6 +173,7 @@ secretwatch = SecretWatch()          # EN: local DLP / FR: DLP local
 scwatch = SupplyChainWatch()         # EN: install-time governance / FR: gouvernance des installs
 canary = CanaryWatch()               # EN: ransomware tripwires / FR: pièges ransomware
 honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scans LAN
+autoresponder = AutoResponder(fw)    # EN: act on critical alerts / FR: agir sur les critiques
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -194,6 +196,16 @@ def _security_alert(alert: dict) -> None:
         db.log_alert(ad)
         detector.history.append(ad)
         asyncio.ensure_future(broadcast({"type": "alert", "alert": ad}))
+        for rec in autoresponder.observe(alert["type"], alert["severity"],
+                                         (alert.get("details") or {}).get("pid")):
+            act = Alert(type="AUTORESPOND",
+                        severity="critical" if rec["ok"] else "warning",
+                        message=(f"Auto-response: {rec['action']} for {rec['alert_type']} — "
+                                 f"{rec['detail']}"),
+                        details=rec)
+            actd = act.to_dict()
+            db.log_alert(actd)
+            asyncio.ensure_future(broadcast({"type": "alert", "alert": actd}))
     _loop.call_soon_threadsafe(_go)
 
 
@@ -1540,6 +1552,19 @@ def _process_batch(packets: list[Packet]) -> None:
         asyncio.get_running_loop().create_task(
             _integrity_scan(list(seen_pids.items())))
 
+    for _ad in list(out_alerts):
+        for rec in autoresponder.observe(
+                _ad.get("type", ""), _ad.get("severity", ""),
+                (_ad.get("details") or {}).get("pid")):
+            act_alert = Alert(
+                type="AUTORESPOND",
+                severity="critical" if rec["ok"] else "warning",
+                message=(f"Auto-response: {rec['action']} for {rec['alert_type']} — "
+                         f"{rec['detail']}"),
+                details=rec)
+            ad2 = act_alert.to_dict()
+            db.log_alert(ad2)
+            out_alerts.append(ad2)
     return {
         "type": "batch",
         "nodes": list(touched_nodes.values()),
@@ -2205,6 +2230,8 @@ def _load_settings() -> None:
     # EN: Canary + honeyport wiring — canary ON by default (read-only),
     #     honeyports opt-in (binding 445/3389 can conflict on some hosts).
     # FR: câblage canaris + honeyports — canaris ON par défaut, honeyports opt-in.
+    autoresponder.configure(enabled=bool(db.get_setting("autorespond_enabled", False)),
+                            actions=db.get_setting("autorespond_actions", {}) or {})
     canary.on_alert = _security_alert
     honeyports.on_alert = _security_alert
     if db.get_setting("canary_enabled", True):
@@ -3470,6 +3497,25 @@ async def honeyports_config(body: dict) -> dict:
         await honeyports.stop()
         db.set_setting("honeyports_enabled", False)
     return honeyports.status()
+
+
+
+@app.get("/autorespond", dependencies=_AUTH)
+async def autorespond_status() -> dict:
+    """EN: Auto-response engine state + audit log. / FR: état + journal."""
+    return autoresponder.status()
+
+
+@app.post("/autorespond/config", dependencies=_AUTH)
+async def autorespond_config(body: dict) -> dict:
+    """EN: OPT-IN auto actions on critical alerts — e.g.
+        {"enabled": true, "actions": {"RANSOMWARE_CANARY": ["lockdown"]}}.
+    FR: actions auto OPT-IN sur alertes critiques."""
+    st = autoresponder.configure(enabled=body.get("enabled"),
+                                 actions=body.get("actions"))
+    db.set_setting("autorespond_enabled", autoresponder.enabled)
+    db.set_setting("autorespond_actions", autoresponder.actions)
+    return st
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)
