@@ -6,6 +6,28 @@ All notable changes to Wiretap. / Toutes les modifications notables de Wiretap.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
+## [Unreleased] — "full-spectrum" security update
+
+### Added — the post-AI security stack nobody else has
+
+- **AI traffic governance** (`aiwatch`): per-(service, process) byte accounting for 21 AI providers, SHADOW_AI first-contact alerts, AI_UPLOAD_SPIKE mass-export detection, MCP server watch. Metadata only, never payload content.
+- **Secrets egress watch** (`secretwatch`): local DLP — harvests your API keys/tokens from env vars and dotfiles (values stay in RAM, alerts carry salted shapes only). SECRET_PLAINTEXT_LEAK when a key crosses the wire in cleartext; AI_SECRET_EXPOSURE when a process holding your secrets talks to an AI provider.
+- **Supply-chain install watch** (`supplychain`): registry allowlist enforcement for npm/pip/cargo/etc + POSTINSTALL_NET critical alert when a never-before-seen process networks within minutes of install activity.
+- **Natural-language queries** (`/ask`): "did anything talk to Russia this week?" — deterministic answers from SQLite, never hallucinated.
+- **Ransomware canaries** (`canary`): planted tripwire files in user dirs, hash-polled — modification/deletion = mass encryption in progress.
+- **LAN honeyports** (`honeyports`): passive listeners on 23/445/3389/5900 — any connection is scanning or lateral movement by construction.
+- **Automatic response** (`autorespond`): opt-in actions on critical alerts — firewall lockdown and/or process suspension. Detection that acts, not a camera filming a burglary.
+
+### Added — mainstream prevention (catching up with Portmaster/Little Snitch)
+
+- **DNS firewall** (`dnsfw`): filtering DNS proxy with encrypted DoH upstream, curated blocklists (ads/trackers/malware/phishing), whitelist escape hatch.
+- **Network-aware profiles** (`netprofile`): automatic firewall profile switching per Wi-Fi SSID/BSSID or gateway fingerprint.
+- **Shareable privacy digest** (`digest`): self-contained HTML card of what your computer actually did — now with AI provider attribution.
+
+### Changed
+
+- Plaintext HTTP capture head widened to 256B for the secrets egress watch (still transient, never stored).
+
 ## [Unreleased]
 
 ### Changed / Modifié

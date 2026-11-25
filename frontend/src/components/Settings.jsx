@@ -42,6 +42,9 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
   const [netprof, setNetprof] = useState(null)
   const [dgCopied, setDgCopied] = useState(false)
   const [aiw, setAiw] = useState(null)
+  const [sec, setSec] = useState({ canary: null, honey: null, auto: null })
+  const [askQ, setAskQ] = useState('')
+  const [askA, setAskA] = useState('')
   const [saved, setSaved] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(false)
   const [ifaces, setIfaces] = useState(null)
@@ -117,6 +120,31 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
     const j = await r.json()
     setDnsfw(prev => ({ ...prev, ...j }))
     return j
+  }
+  async function secLoad() {
+    const base = await apiBase()
+    const h = await authHeaders()
+    const out = {}
+    for (const [key, path] of [['canary', '/canary'], ['honey', '/honeyports'], ['auto', '/autorespond']]) {
+      try {
+        const r = await fetch(base + path, { headers: h })
+        if (r.ok) out[key] = await r.json()
+      } catch { /* offline */ }
+    }
+    setSec(prev => ({ ...prev, ...out }))
+  }
+  async function secPost(path, body) {
+    const base = await apiBase()
+    const h = await authHeaders({ 'Content-Type': 'application/json' })
+    await fetch(base + path, { method: 'POST', headers: h, body: JSON.stringify(body) })
+    secLoad()
+  }
+  async function askNet() {
+    if (!askQ.trim()) return
+    const base = await apiBase()
+    const h = await authHeaders({ 'Content-Type': 'application/json' })
+    const r = await fetch(base + '/ask', { method: 'POST', headers: h, body: JSON.stringify({ question: askQ }) })
+    if (r.ok) setAskA((await r.json()).answer || '')
   }
   async function aiwLoad() {
     const base = await apiBase()
@@ -654,6 +682,73 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
           ) : (
             <div style={{ ...hint, marginTop: 6 }}>{t('aw_noact')}</div>
           )}
+        </div>
+
+
+        {/* Active defense / Défense active */}
+        <div style={{ ...row, display: 'block' }}>
+          <div style={label}>{t('sec_title')}</div>
+          <div style={hint}>{t('sec_hint')}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button onClick={() => secPost('/canary/config', { enabled: !(sec.canary?.running) })}
+                role="switch" aria-checked={!!sec.canary?.running}
+                style={{
+                  width: 36, height: 20, borderRadius: 10, border: '1px solid var(--border)',
+                  background: sec.canary?.running ? '#3b82f6' : 'var(--bg)', cursor: 'pointer', position: 'relative',
+                }}>
+                <span style={{
+                  position: 'absolute', top: 3, left: sec.canary?.running ? 19 : 3,
+                  width: 12, height: 12, borderRadius: 6, background: 'var(--text)',
+                }} />
+              </button>
+              <span style={{ fontSize: 11, color: 'var(--text)' }}>{t('sec_canary')}</span>
+              {sec.canary?.canaries > 0 && <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{sec.canary.canaries} files</span>}
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button onClick={() => secPost('/honeyports/config', { enabled: !(sec.honey?.bound?.length > 0) })}
+                role="switch" aria-checked={!!(sec.honey?.bound?.length > 0)}
+                style={{
+                  width: 36, height: 20, borderRadius: 10, border: '1px solid var(--border)',
+                  background: (sec.honey?.bound?.length > 0) ? '#3b82f6' : 'var(--bg)', cursor: 'pointer', position: 'relative',
+                }}>
+                <span style={{
+                  position: 'absolute', top: 3, left: (sec.honey?.bound?.length > 0) ? 19 : 3,
+                  width: 12, height: 12, borderRadius: 6, background: 'var(--text)',
+                }} />
+              </button>
+              <span style={{ fontSize: 11, color: 'var(--text)' }}>{t('sec_honey')}</span>
+              {sec.honey?.bound?.length > 0 && <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{sec.honey.bound.join(', ')}</span>}
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button onClick={() => secPost('/autorespond/config', {
+                enabled: !(sec.auto?.enabled),
+                actions: { RANSOMWARE_CANARY: ['lockdown'], POSTINSTALL_NET: ['lockdown'], SECRET_PLAINTEXT_LEAK: ['lockdown'], HONEYPORT_TOUCH: ['lockdown'] },
+              })}
+                role="switch" aria-checked={!!sec.auto?.enabled}
+                style={{
+                  width: 36, height: 20, borderRadius: 10, border: '1px solid var(--border)',
+                  background: sec.auto?.enabled ? '#3b82f6' : 'var(--bg)', cursor: 'pointer', position: 'relative',
+                }}>
+                <span style={{
+                  position: 'absolute', top: 3, left: sec.auto?.enabled ? 19 : 3,
+                  width: 12, height: 12, borderRadius: 6, background: 'var(--text)',
+                }} />
+              </button>
+              <span style={{ fontSize: 11, color: 'var(--text)' }}>{t('sec_auto')}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+            <input value={askQ} onChange={e => setAskQ(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && askNet()}
+              placeholder={t('sec_ask_ph')} aria-label={t('sec_ask')}
+              style={{ flex: 1, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', padding: '4px 8px', fontSize: 11, outline: 'none' }} />
+            <button onClick={askNet} style={{
+              background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+              color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
+            }}>{t('sec_ask_btn')}</button>
+          </div>
+          {askA && <div style={{ ...hint, marginTop: 6, color: 'var(--text)' }}>{askA}</div>}
         </div>
 
         {/* External webhook / Webhook externe */}

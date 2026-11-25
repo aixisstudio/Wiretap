@@ -489,4 +489,12 @@ export default {  // Navigation
   aw_enable: 'Suivre le trafic IA',
   aw_uploaded: 'envoyés',
   aw_noact: 'Aucun trafic IA observé',
+  sec_title: 'Défense active',
+  sec_hint: 'Pièges et réponse automatique. Les fichiers canaris détectent le chiffrement ransomware ; les honeyports capturent les scans LAN ; la réponse auto peut verrouiller le pare-feu sur alerte critique.',
+  sec_canary: 'Canaris ransomware',
+  sec_honey: 'Honeyports (pièges à scans)',
+  sec_auto: 'Lockdown auto sur alerte critique',
+  sec_ask: 'Interrogez votre réseau',
+  sec_ask_ph: 'quelque chose a-t-il parlé à la Russie cette semaine ?',
+  sec_ask_btn: 'Demander',
 }

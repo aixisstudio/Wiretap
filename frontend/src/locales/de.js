@@ -489,4 +489,12 @@ export default {
   aw_enable: 'KI-Traffic verfolgen',
   aw_uploaded: 'hochgeladen',
   aw_noact: 'Noch kein KI-Traffic',
+  sec_title: 'Active defense',
+  sec_hint: 'Tripwires and automatic response. Canary files detect ransomware encryption; honeyports catch LAN scans; auto-response can lock down the firewall when a critical alert fires.',
+  sec_canary: 'Ransomware canaries',
+  sec_honey: 'Honeyports (LAN scan traps)',
+  sec_auto: 'Auto lockdown on critical alerts',
+  sec_ask: 'Ask your network',
+  sec_ask_ph: 'did anything talk to Russia this week?',
+  sec_ask_btn: 'Ask',
 }
