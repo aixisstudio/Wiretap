@@ -70,7 +70,10 @@ def _ps_table() -> dict[int, tuple[int, str]]:
             (["wmic", "process", "get", "processid,parentprocessid,name", "/format:csv"], "wmic"),
         ):
             try:
-                out = subprocess.run(cmd, capture_output=True, text=True, timeout=10).stdout
+                # EN: bytes + lenient decode — Windows console encoding varies
+                #     by locale and text=True can crash or mangle.
+                # FR: bytes + décodage tolérant — l'encodage console varie.
+                out = subprocess.run(cmd, capture_output=True, timeout=10).stdout.decode(errors="replace")
             except (OSError, subprocess.TimeoutExpired):
                 continue
             for line in out.splitlines():

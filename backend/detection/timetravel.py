@@ -37,6 +37,137 @@ SNAPSHOT_INTERVAL = 3600.0       # EN: hourly snapshots / FR: snapshots horaires
 MAX_SNAPSHOTS = 48               # EN: 48h retention / FR: rétention 48h
 
 
+def _proc_socket_inodes() -> dict[str, tuple[int, str]]:
+    """EN: socket-inode -> (pid, comm) resolved by scanning /proc/[pid]/fd
+        plus /proc/[pid]/comm — the zero-dependency Linux way, no lsof
+        needed (lsof is absent on minimal/server installs).
+    FR: inode-socket -> (pid, comm) en scannant /proc/[pid]/fd — voie
+        zéro-dépendance, lsof étant souvent absent des installs minimales."""
+    import os
+    inode_map: dict[str, tuple[int, str]] = {}
+    proc_root = Path("/proc")
+    try:
+        pids = [int(p.name) for p in proc_root.iterdir() if p.name.isdigit()]
+    except OSError:
+        return inode_map
+    for pid in pids[:4000]:                              # EN: bounded scan / FR: scan borné
+        fd_dir = proc_root / str(pid) / "fd"
+        try:
+            comm = (proc_root / str(pid) / "comm").read_text(errors="replace").strip()
+        except OSError:
+            comm = ""
+        try:
+            for fd in os.listdir(fd_dir):
+                try:
+                    target = os.readlink(fd_dir / fd)
+                except OSError:
+                    continue
+                if target.startswith("socket:["):
+                    inode_map[target[8:-1]] = (pid, comm)
+        except OSError:                                  # EN: permission or gone / FR: permission ou parti
+            continue
+    return inode_map
+
+
+def _collect_listeners_linux() -> dict[str, dict]:
+    """EN: Listening TCP sockets from /proc/net/tcp{,6} — state 0A means
+        LISTEN, no parsing of localized text possible because it is hex.
+        Process resolution best-effort via fd scan; ports appear even when
+        the owner is another user's process (honest empty process field).
+    FR: sockets en écoute depuis /proc/net/tcp{,6} — l'état 0A = LISTEN en
+        hexa, aucune localisation possible. Résolution des processus au
+        mieux ; les ports apparaissent même sans propriétaire lisible."""
+    listeners: dict[str, dict] = {}
+    inodes = _proc_socket_inodes()
+    for proc_file in ("/proc/net/tcp", "/proc/net/tcp6"):
+        try:
+            lines = Path(proc_file).read_text(errors="replace").splitlines()[1:]
+        except OSError:
+            continue
+        for line in lines:
+            parts = line.split()
+            if len(parts) < 10 or parts[3] != "0A":     # EN: 0A = LISTEN / FR: 0A = LISTEN
+                continue
+            local = parts[1].rsplit(":", 1)[-1]
+            try:
+                port = int(local, 16)
+            except ValueError:
+                continue
+            inode = parts[9] if len(parts) > 9 else ""
+            pid, comm = inodes.get(inode, (0, ""))
+            listeners[str(port)] = {"port": port, "process": comm, "pid": pid}
+    return listeners
+
+
+def _run_capture(cmd: list[str], timeout: int = 10) -> str:
+    """EN: Run a command capturing bytes and decoding leniently — Windows
+        console output encoding varies by locale (cp850/cp1252/utf-8), and
+        text=True would either crash or silently mangle. Bytes + replace
+        never fails. / FR: capture en bytes, décodage tolérant."""
+    import subprocess
+    try:
+        out = subprocess.run(cmd, capture_output=True, timeout=timeout)
+        return out.stdout.decode(errors="replace")
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+
+
+def _windows_tasklist_names() -> dict[int, str]:
+    """EN: pid -> process name from tasklist CSV. The /fo csv format is
+        positional, not word-parsed, so it survives localization.
+    FR: pid -> nom depuis tasklist CSV. Positionnel, survit à la locale."""
+    names: dict[int, str] = {}
+    out = _run_capture(["tasklist", "/fo", "csv", "/nh"], timeout=10)
+    for row in out.splitlines():
+        cells = row.strip('"').split('","')
+        if len(cells) >= 2 and cells[1].isdigit():
+            names[int(cells[1])] = cells[0]
+    return names
+
+
+def _collect_listeners_windows() -> dict[str, dict]:
+    """EN: Listening TCP sockets on Windows, localization-proof.
+        Primary: PowerShell Get-NetTCPConnection — structured objects, no
+        text parsing, immune to locale. Fallback: netstat -ano with a
+        locale-independent heuristic — a LISTENING socket is identifiable
+        by its foreign address 0.0.0.0:0 / [::]:0, NOT by the state word
+        which is localized ('LISTENING', 'ABHÖREN', 'ÉCOUTE'...).
+    FR: sockets TCP en écoute, à l'épreuve de la localisation. PowerShell
+        structuré en primaire ; netstat en repli avec heuristique
+        positionnelle — l'adresse distante 0.0.0.0:0 identifie un listener
+        sans dépendre du mot d'état localisé."""
+    listeners: dict[str, dict] = {}
+    names = _windows_tasklist_names()
+    ps_out = _run_capture(
+        ["powershell", "-NoProfile", "-Command",
+         "Get-NetTCPConnection -State Listen | "
+         "Select-Object LocalPort,OwningProcess | "
+         "ForEach-Object { \"$($_.LocalPort) $($_.OwningProcess)\" }"], timeout=15)
+    for line in ps_out.splitlines():
+        parts = line.split()
+        if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+            port, pid = int(parts[0]), int(parts[1])
+            listeners[str(port)] = {"port": port, "process": names.get(pid, ""), "pid": pid}
+    if listeners:
+        return listeners
+    # EN: fallback netstat — foreign-address heuristic / FR: repli netstat
+    out = _run_capture(["netstat", "-ano", "-p", "tcp"], timeout=10)
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) < 5 or parts[0].upper() != "TCP" or not parts[-1].isdigit():
+            continue
+        foreign = parts[2].rsplit(":", 1)
+        is_listener = (len(foreign) == 2 and foreign[1] == "0"
+                       and foreign[0] in ("0.0.0.0", "[::]", "::", "[0:0:0:0:0:0:0:0]"))
+        if not is_listener:
+            continue
+        local = parts[1].rsplit(":", 1)[-1]
+        pid = int(parts[-1])
+        if local.isdigit():
+            listeners[local] = {"port": int(local), "process": names.get(pid, ""), "pid": pid}
+    return listeners
+
+
 def collect_listeners() -> dict[str, dict]:
     """EN: Listening ports with owning process. Pure /proc parse on Linux,
         lsof fallback elsewhere — best-effort, zero privileges.
@@ -44,31 +175,9 @@ def collect_listeners() -> dict[str, dict]:
     listeners: dict[str, dict] = {}
     import platform as _plat
     if _plat.system() == "Windows":
-        # EN: netstat -ano exists on every Windows since XP — pid per socket,
-        #     process names resolved through tasklist.
-        # FR: netstat -ano existe partout — pid par socket, noms via tasklist.
-        try:
-            import subprocess
-            tl = subprocess.run(["tasklist", "/fo", "csv", "/nh"],
-                                capture_output=True, text=True, timeout=10).stdout
-            names = {}
-            for row in tl.splitlines():
-                cells = row.strip('"').split('","')
-                if len(cells) >= 2 and cells[1].isdigit():
-                    names[int(cells[1])] = cells[0]
-            out = subprocess.run(["netstat", "-ano", "-p", "tcp"],
-                                 capture_output=True, text=True, timeout=10).stdout
-            for line in out.splitlines():
-                parts = line.split()
-                if len(parts) >= 5 and parts[0].upper() == "TCP" and "LISTEN" in parts[3].upper():
-                    local = parts[1].rsplit(":", 1)[-1]
-                    pid = int(parts[4]) if parts[4].isdigit() else 0
-                    if local.isdigit():
-                        listeners[local] = {"port": int(local),
-                                            "process": names.get(pid, ""), "pid": pid}
-        except (OSError, subprocess.TimeoutExpired):
-            pass
-        return listeners
+        return _collect_listeners_windows()
+    if _plat.system() == "Linux":
+        return _collect_listeners_linux()
     try:
         import subprocess
         out = subprocess.run(["lsof", "-iTCP", "-sTCP:LISTEN", "-P", "-n", "-Fpcn"],
@@ -94,18 +203,13 @@ def collect_processes() -> dict[str, dict]:
     procs: dict[str, dict] = {}
     import platform as _plat
     if _plat.system() == "Windows":
-        try:
-            import subprocess
-            out = subprocess.run(["tasklist", "/fo", "csv", "/nh"],
-                                 capture_output=True, text=True, timeout=10).stdout
-            for row in out.splitlines():
-                cells = row.strip('"').split('","')
-                if len(cells) >= 1 and cells[0]:
-                    name = cells[0].replace(".exe", "")
-                    agg = procs.setdefault(name, {"name": name, "count": 0, "path": cells[0]})
-                    agg["count"] += 1
-        except (OSError, subprocess.TimeoutExpired):
-            pass
+        out = _run_capture(["tasklist", "/fo", "csv", "/nh"], timeout=10)
+        for row in out.splitlines():
+            cells = row.strip('"').split('","')
+            if len(cells) >= 1 and cells[0]:
+                name = cells[0].replace(".exe", "")
+                agg = procs.setdefault(name, {"name": name, "count": 0, "path": cells[0]})
+                agg["count"] += 1
         return procs
     try:
         import subprocess
