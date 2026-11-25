@@ -501,4 +501,19 @@ export default {
   dnsfw_sys_apply: 'Apply system DNS',
   dnsfw_sys_revert: 'Revert',
   dnsfw_sys_on: 'applied',
+
+  // Deep signals panel / Panneau signaux profonds
+  ds_title: '深度信号',
+  ds_hint: '代谢漂移、MCP 服务器风险和自启动持久化 — 可验证的证据,无云端。',
+  ds_refresh: '刷新',
+  ds_loading: '加载中…',
+  ds_flow: '流量 DNA — 按进程代谢',
+  ds_flow_stats: '{b} 基线 · {l} 学习中 · {t} 跟踪中',
+  ds_mcp: 'MCP 服务器审计',
+  ds_mcp_stats: '{c} 个客户端中共 {n} 个服务器',
+  ds_mcp_clean: '无高风险服务器',
+  ds_persist: '自启动持久化',
+  ds_persist_stats: '正在监视 {n} 个自启动条目',
+  ds_persist_clean: '无风险条目',
+  alert_blast: '最坏情况:',
 }

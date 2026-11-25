@@ -335,9 +335,18 @@ function AlertRow({ alert, onIgnore }) {
               </span>
             </div>
             <div style={{ fontSize: 11, color: 'var(--text)', lineHeight: 1.4 }}>{alertMessage(t, alert)}</div>
+            {alert.details?.blast_worst_case && (
+              <div style={{
+                marginTop: 4, padding: '5px 8px', fontSize: 10, lineHeight: 1.5,
+                background: '#f59e0b11', border: '1px solid #f59e0b33',
+                borderRadius: 6, color: '#f59e0b',
+              }}>
+                <span style={{ fontWeight: 700 }}>{t('alert_blast')}</span> {alert.details.blast_worst_case}
+              </div>
+            )}
             {alert.details && Object.keys(alert.details).length > 0 && (
               <div style={{ marginTop: 3, fontSize: 9, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                {Object.entries(alert.details).filter(([, v]) => v).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' · ')}
+                {Object.entries(alert.details).filter(([k, v]) => v && k !== 'blast_worst_case').map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' · ')}
               </div>
             )}
             {showWhy && expl && (

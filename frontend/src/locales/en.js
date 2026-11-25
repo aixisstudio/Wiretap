@@ -505,4 +505,19 @@ export default {  // Navigation
   dnsfw_sys_apply: 'Apply system DNS',
   dnsfw_sys_revert: 'Revert',
   dnsfw_sys_on: 'applied',
+
+  // Deep signals panel / Panneau signaux profonds
+  ds_title: 'Deep signals',
+  ds_hint: 'Metabolism drift, MCP server risk and auto-start persistence — verified evidence, no cloud.',
+  ds_refresh: 'Refresh',
+  ds_loading: 'loading…',
+  ds_flow: 'Flow DNA — metabolism per process',
+  ds_flow_stats: '{b} baselined · {l} learning · {t} tracked',
+  ds_mcp: 'MCP servers audit',
+  ds_mcp_stats: '{n} servers across {c} clients',
+  ds_mcp_clean: 'no high-risk server',
+  ds_persist: 'Auto-start persistence',
+  ds_persist_stats: '{n} auto-start entries watched',
+  ds_persist_clean: 'no risky entry',
+  alert_blast: 'Worst case:',
 }

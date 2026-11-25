@@ -501,4 +501,19 @@ export default {
   dnsfw_sys_apply: 'Apply system DNS',
   dnsfw_sys_revert: 'Revert',
   dnsfw_sys_on: 'applied',
+
+  // Deep signals panel / Panneau signaux profonds
+  ds_title: 'Sinais profundos',
+  ds_hint: 'Deriva do metabolismo, risco de servidores MCP e persistência de inicialização — evidências verificadas, sem nuvem.',
+  ds_refresh: 'Atualizar',
+  ds_loading: 'carregando…',
+  ds_flow: 'DNA de fluxo — metabolismo por processo',
+  ds_flow_stats: '{b} baselines · {l} aprendendo · {t} rastreados',
+  ds_mcp: 'Auditoria de servidores MCP',
+  ds_mcp_stats: '{n} servidores em {c} clientes',
+  ds_mcp_clean: 'nenhum servidor de risco',
+  ds_persist: 'Persistência de inicialização',
+  ds_persist_stats: '{n} entradas monitoradas',
+  ds_persist_clean: 'nenhuma entrada de risco',
+  alert_blast: 'Pior caso:',
 }

@@ -42,6 +42,9 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
   const [netprof, setNetprof] = useState(null)
   const [dgCopied, setDgCopied] = useState(false)
   const [aiw, setAiw] = useState(null)
+  const [mcp, setMcp] = useState(null)
+  const [pers, setPers] = useState(null)
+  const [fdna, setFdna] = useState(null)
   const [sec, setSec] = useState({ canary: null, honey: null, auto: null })
   const [askQ, setAskQ] = useState('')
   const [askA, setAskA] = useState('')
@@ -77,6 +80,8 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
         setPairing(p)
         setAskStatus(a)
       } catch { setSettings({}) }
+      aiwLoad()
+      dsLoad()
       if (window.wiretap?.getAutoLaunch) {
         setAutoLaunch(await window.wiretap.getAutoLaunch())
       }
@@ -145,6 +150,24 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
     const h = await authHeaders({ 'Content-Type': 'application/json' })
     const r = await fetch(base + '/ask', { method: 'POST', headers: h, body: JSON.stringify({ question: askQ }) })
     if (r.ok) setAskA((await r.json()).answer || '')
+  }
+  async function dsLoad() {
+    const base = await apiBase()
+    const h = await authHeaders()
+    const [rm, rp, rf] = await Promise.all([
+      fetch(base + '/mcp/audit', { headers: h }),
+      fetch(base + '/persistence', { headers: h }),
+      fetch(base + '/flowdna', { headers: h }),
+    ])
+    if (rm.ok) setMcp(await rm.json())
+    if (rp.ok) setPers(await rp.json())
+    if (rf.ok) setFdna(await rf.json())
+  }
+  async function fdRebaseline(process) {
+    const base = await apiBase()
+    const h = await authHeaders({ 'Content-Type': 'application/json' })
+    await fetch(base + '/flowdna/rebaseline', { method: 'POST', headers: h, body: JSON.stringify({ process }) })
+    dsLoad()
   }
   async function aiwLoad() {
     const base = await apiBase()
@@ -700,6 +723,78 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
           ) : (
             <div style={{ ...hint, marginTop: 6 }}>{t('aw_noact')}</div>
           )}
+        </div>
+
+
+        {/* Deep signals — flow DNA, MCP audit, persistence / Signaux profonds */}
+        <div style={{ ...row, display: 'block' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={label}>{t('ds_title')}</div>
+            <button onClick={dsLoad} style={{
+              background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+              color: 'var(--text-dim)', padding: '3px 10px', fontSize: 10, cursor: 'pointer',
+            }}>{t('ds_refresh')}</button>
+          </div>
+          <div style={hint}>{t('ds_hint')}</div>
+
+          {/* Flow DNA / ADN de flux */}
+          <div style={{ marginTop: 10, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+            <div style={{ fontSize: 11, color: 'var(--text)', fontWeight: 600 }}>{t('ds_flow')}</div>
+            {fdna ? (
+              <div style={{ fontSize: 11, marginTop: 4, color: 'var(--text-dim)' }}>
+                {t('ds_flow_stats')
+                  .replace('{b}', fdna.baselined ?? 0)
+                  .replace('{l}', fdna.learning ?? 0)
+                  .replace('{t}', fdna.tracking ?? 0)}
+              </div>
+            ) : <div style={{ ...hint, marginTop: 4 }}>{t('ds_loading')}</div>}
+          </div>
+
+          {/* MCP audit / Audit MCP */}
+          <div style={{ marginTop: 10, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+            <div style={{ fontSize: 11, color: 'var(--text)', fontWeight: 600 }}>{t('ds_mcp')}</div>
+            {mcp ? (
+              <div style={{ marginTop: 4, fontSize: 11 }}>
+                <div style={{ color: 'var(--text-dim)' }}>
+                  {t('ds_mcp_stats')
+                    .replace('{n}', mcp.servers_total ?? 0)
+                    .replace('{c}', Object.keys(mcp.clients || {}).length)}
+                </div>
+                {(mcp.high_risk || []).length > 0 ? (
+                  <div style={{ marginTop: 4 }}>
+                    {mcp.high_risk.slice(0, 5).map((s, i) => (
+                      <div key={i} style={{ padding: '3px 0', borderBottom: '1px solid var(--border)' }}>
+                        <span style={{ color: '#f59e0b' }}>{s.name}</span>
+                        <span style={{ color: 'var(--text-dim)', fontSize: 10 }}> — {(s.findings || [])[0] || ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : <div style={{ ...hint, marginTop: 4 }}>{t('ds_mcp_clean')}</div>}
+              </div>
+            ) : <div style={{ ...hint, marginTop: 4 }}>{t('ds_loading')}</div>}
+          </div>
+
+          {/* Persistence / Persistance */}
+          <div style={{ marginTop: 10, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+            <div style={{ fontSize: 11, color: 'var(--text)', fontWeight: 600 }}>{t('ds_persist')}</div>
+            {pers ? (
+              <div style={{ marginTop: 4, fontSize: 11 }}>
+                <div style={{ color: 'var(--text-dim)' }}>
+                  {t('ds_persist_stats').replace('{n}', pers.entries_total ?? 0)}
+                </div>
+                {(pers.risky || []).length > 0 ? (
+                  <div style={{ marginTop: 4 }}>
+                    {pers.risky.slice(0, 5).map((r, i) => (
+                      <div key={i} style={{ padding: '3px 0', borderBottom: '1px solid var(--border)' }}>
+                        <span style={{ color: '#f59e0b' }}>{(r.entry || '').split(':').pop()}</span>
+                        <span style={{ color: 'var(--text-dim)', fontSize: 10 }}> — {(r.findings || [])[0] || r.target}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : <div style={{ ...hint, marginTop: 4 }}>{t('ds_persist_clean')}</div>}
+              </div>
+            ) : <div style={{ ...hint, marginTop: 4 }}>{t('ds_loading')}</div>}
+          </div>
         </div>
 
 

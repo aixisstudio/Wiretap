@@ -501,4 +501,19 @@ export default {
   dnsfw_sys_apply: 'Apply system DNS',
   dnsfw_sys_revert: 'Revert',
   dnsfw_sys_on: 'applied',
+
+  // Deep signals panel / Panneau signaux profonds
+  ds_title: 'ディープシグナル',
+  ds_hint: 'メタボリズムのドリフト、MCPサーバーのリスク、自動起動の永続化 — 検証可能な証拠、クラウドなし。',
+  ds_refresh: '更新',
+  ds_loading: '読み込み中…',
+  ds_flow: 'フローDNA — プロセスごとのメタボリズム',
+  ds_flow_stats: 'ベースライン {b} · 学習中 {l} · 追跡中 {t}',
+  ds_mcp: 'MCPサーバー監査',
+  ds_mcp_stats: '{c}クライアントに{n}サーバー',
+  ds_mcp_clean: '高リスクサーバーなし',
+  ds_persist: '自動起動の永続化',
+  ds_persist_stats: '{n}件の自動起動エントリを監視中',
+  ds_persist_clean: 'リスクのあるエントリなし',
+  alert_blast: '最悪の場合:',
 }
