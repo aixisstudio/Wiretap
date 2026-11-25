@@ -61,6 +61,7 @@ _pending_lock = threading.Lock()
 #     Le débordement jette les plus anciennes et est compté, jamais muet.
 _MAX_PENDING_ALERTS = 10_000
 _alerts_dropped = 0
+_chain_head = "0" * 64                        # EN: forensic genesis / FR: genèse forensique
 
 
 def _utcnow_minute() -> str:
@@ -163,6 +164,13 @@ def _init_schema(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_devices_mac ON devices(mac);
     """)
+    # EN: Forensic hash-chain columns — ALTER guarded for existing DBs.
+    # FR: colonnes de chaîne forensique — ALTER protégé pour DB existantes.
+    for col in ("hash TEXT", "prev_hash TEXT"):
+        try:
+            conn.execute(f"ALTER TABLE alerts_log ADD COLUMN {col}")
+        except sqlite3.OperationalError:
+            pass                                     # EN: already there / FR: déjà là
     conn.commit()
 
 
@@ -359,8 +367,8 @@ def flush() -> None:
             if alert_rows:
                 conn.executemany("""
                     INSERT OR IGNORE INTO alerts_log
-                        (id, ts, type, severity, message, node_id, details)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+            (id, ts, type, severity, message, node_id, details, hash, prev_hash)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, alert_rows)
             conn.commit()
     except sqlite3.Error as exc:
@@ -386,6 +394,19 @@ def log_alert(alert: dict) -> None:
         alert["severity"], alert["message"],
         alert.get("node_id"), json.dumps(alert.get("details", {})),
     )
+    # EN: Forensic chaining — the row tuple grows with (hash, prev_hash)
+    #     computed against the in-memory chain head. Deletion/modification
+    #     of any past row breaks verification (detection/forensic.py).
+    # FR: chaînage forensique — la ligne grandit de (hash, prev_hash)
+    #     calculés contre la tête en mémoire.
+    global _chain_head
+    try:
+        from detection.forensic import chain_hash
+        h = chain_hash(_chain_head, alert)
+        row = row + (h, _chain_head)
+        _chain_head = h
+    except Exception:                                # noqa: BLE001
+        row = row + (None, None)
     global _alerts_dropped
     with _pending_lock:
         if len(_pending_alerts) >= _MAX_PENDING_ALERTS:
@@ -398,6 +419,46 @@ def log_alert(alert: dict) -> None:
             logger.warning("alert buffer overflow — %d dropped total",
                            _alerts_dropped)
         _pending_alerts.append(row)
+
+
+def init_forensic_chain() -> None:
+    """EN: Resume the chain head from the last stored alert at startup —
+        continuity across restarts is the whole point.
+    FR: reprendre la tête de chaîne depuis la dernière alerte — la
+        continuité entre redémarrages est tout l'intérêt."""
+    global _chain_head
+    try:
+        with _conn_lock:
+            row = get_conn().execute(
+                "SELECT hash FROM alerts_log WHERE hash IS NOT NULL"
+                " ORDER BY rowid DESC LIMIT 1").fetchone()
+        if row and row[0]:
+            _chain_head = row[0]
+    except sqlite3.Error:
+        pass
+
+
+def forensic_verify(limit: int = 5000) -> dict:
+    """EN: Verify the hash chain over the most recent rows.
+    FR: vérifier la chaîne sur les lignes les plus récentes."""
+    from detection.forensic import verify_chain, GENESIS
+    with _conn_lock:
+        rows = get_conn().execute("""
+            SELECT type, severity, message, node_id, details, ts, hash, prev_hash
+            FROM alerts_log WHERE hash IS NOT NULL ORDER BY rowid ASC LIMIT ?
+        """, (limit,)).fetchall()
+    chain = []
+    for r in rows:
+        try:
+            details = json.loads(r[4] or "{}")
+        except json.JSONDecodeError:
+            details = {}
+        chain.append({"type": r[0], "severity": r[1], "message": r[2],
+                      "node_id": r[3], "details": details, "timestamp": r[5],
+                      "hash": r[6], "prev_hash": r[7]})
+    out = verify_chain(chain)
+    out["chain_head"] = out["head"]
+    return out
 
 
 def alerts_dropped() -> int:

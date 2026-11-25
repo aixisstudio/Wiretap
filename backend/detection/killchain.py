@@ -49,6 +49,8 @@ FAMILIES = {
     "ransomware":  {"RANSOMWARE_CANARY"},
     "lan":         {"HONEYPORT_TOUCH", "NEW_DEVICE"},
     "integrity":   {"INTEGRITY_HOLLOWING", "INTEGRITY_TAMPER", "HOLLOWING"},
+    "presence":    {"UNATTENDED_EXFIL"},
+    "lineage":     {"LINEAGE_SUSPECT"},
     "mining":      {"MINER_STRATUM", "MINER_CPU", "MINING"},
     "dns":         {"DNS_TUNNEL", "DNSFW_POLICY"},
 }

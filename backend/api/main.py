@@ -125,6 +125,8 @@ from detection.canary import CanaryWatch, HoneyPorts
 from detection.autorespond import AutoResponder
 from detection.killchain import KillChain
 from detection.dnssystem import SystemDns
+from detection.presence import PresenceWatch
+from detection.lineage import LineageWatch
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -178,6 +180,8 @@ honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scan
 autoresponder = AutoResponder(fw)    # EN: act on critical alerts / FR: agir sur les critiques
 killchain = KillChain()              # EN: cross-signal correlator / FR: corrélateur inter-signaux
 systemdns = SystemDns(_platform.system())  # EN: system DNS integration / FR: intégration DNS système
+presencew = PresenceWatch(_platform.system())  # EN: was a human there? / FR: un humain était-il là ?
+lineagew = LineageWatch()            # EN: ancestry verdicts / FR: verdicts d'ascendance
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -1238,6 +1242,17 @@ def _process_batch(packets: list[Packet]) -> None:
         if pkt.direction == "out":
             from detection.aiwatch import match_service as _msvc, AI_SERVICES as _AISVC
             _svc = _msvc(_hostname_lc)
+            if _svc:
+                pa = presencew.grade(pkt.process_name or "", _AISVC[_svc]["name"], pkt.size)
+                if pa:
+                    pal = Alert(type=pa["type"], severity=pa["severity"],
+                                message=pa["message"],
+                                node_id=remote_ip, details=pa["details"])
+                    _flag_alert(pal, nodes)
+                    pad = pal.to_dict()
+                    db.log_alert(pad)
+                    out_alerts.append(pad)
+                    asyncio.get_running_loop().create_task(_notify(pad))
             if _svc and pkt.pid:
                 corr = secretwatch.correlate_ai(pkt.process_name or "", pkt.pid,
                                                 _AISVC[_svc]["name"])
@@ -1565,6 +1580,18 @@ def _process_batch(packets: list[Packet]) -> None:
         asyncio.get_running_loop().create_task(
             _integrity_scan(list(seen_pids.items())))
 
+    for _ad in list(out_alerts):
+        if _ad.get("severity") == "critical":
+            _pid = (_ad.get("details") or {}).get("pid")
+            _proc = (_ad.get("details") or {}).get("process", "")
+            if _pid and _proc:
+                lv = lineagew.verdict(_pid, _proc, context=_ad.get("type", ""))
+                if lv:
+                    la = Alert(type=lv["type"], severity=lv["severity"],
+                               message=lv["message"], details=lv["details"])
+                    lad = la.to_dict()
+                    db.log_alert(lad)
+                    out_alerts.append(lad)
     for _ad in list(out_alerts):
         kc = killchain.observe(_ad.get("type", ""), _ad.get("severity", ""),
                                _ad.get("details") or {}, _ad.get("node_id"),
@@ -2194,6 +2221,7 @@ def _load_settings() -> None:
         configfile.apply(data_dir(), db.set_setting)
     except Exception as e:                              # noqa: BLE001
         logger.warning("config file apply failed: %s", e)
+    db.init_forensic_chain()          # EN: resume tamper-evident chain / FR: reprendre la chaîne inviolable
     _port_filter = db.get_setting("ports", []) or []
     _excluded_processes = set(db.get_setting("excluded_processes", []) or [])
     _whitelisted_ips = set(db.get_setting("whitelisted_ips", []) or [])
@@ -3571,6 +3599,33 @@ async def dnsfw_system_revert() -> dict:
     """EN: Restore the snapshotted DNS configuration. / FR: restaurer."""
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, systemdns.revert)
+
+
+
+@app.get("/forensic/verify", dependencies=_AUTH)
+async def forensic_verify_endpoint() -> dict:
+    """EN: Verify the tamper-evident alert chain — offline proof that no
+        alert was edited or deleted. Pin the head externally for
+        mathematical finality. / FR: vérifier la chaîne inviolable —
+        preuve offline qu'aucune alerte n'a été modifiée/effacée."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, db.forensic_verify)
+
+
+
+@app.get("/presence", dependencies=_AUTH)
+async def presence_status() -> dict:
+    """EN: Presence correlation state — current idle, flow class counters.
+    FR: état de la corrélation de présence — idle actuel, compteurs."""
+    return presencew.status()
+
+
+@app.get("/lineage", dependencies=_AUTH)
+async def lineage_status() -> dict:
+    """EN: Lineage watch state. / FR: état de la veille de lignée."""
+    return {"enabled": lineagew.enabled,
+            "chains_deduped": len(lineagew._alerted),
+            "cache_size": len(lineagew._cache)}
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)
