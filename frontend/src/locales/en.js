@@ -483,4 +483,9 @@ export default {  // Navigation
   np_assign: 'Assign current network to',
   np_none: '(none)',
   np_applied: 'last applied',
+  dg_title: 'Privacy digest',
+  dg_hint: 'A shareable summary of what your computer actually did — servers contacted, alerts, blocked trackers. Generated locally, nothing uploaded.',
+  dg_open: 'Open digest card',
+  dg_copy: 'Copy text summary',
+  dg_copied: 'Copied!',
 }

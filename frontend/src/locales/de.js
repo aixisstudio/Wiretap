@@ -479,4 +479,9 @@ export default {
   np_assign: 'Aktuelles Netzwerk zuweisen zu',
   np_none: '(keines)',
   np_applied: 'zuletzt angewendet',
+  dg_title: 'Privacy-Digest',
+  dg_hint: 'Eine teilbare Zusammenfassung dessen, was Ihr Rechner tat. Lokal erzeugt.',
+  dg_open: 'Karte öffnen',
+  dg_copy: 'Zusammenfassung kopieren',
+  dg_copied: 'Kopiert!',
 }

@@ -479,4 +479,9 @@ export default {
   np_assign: '将当前网络分配给',
   np_none: '（无）',
   np_applied: '上次应用',
+  dg_title: '',
+  dg_hint: '——。，。',
+  dg_open: '',
+  dg_copy: '',
+  dg_copied: '!',
 }

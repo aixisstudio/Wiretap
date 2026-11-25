@@ -479,4 +479,9 @@ export default {
   np_assign: 'Назначить текущую сеть',
   np_none: '(нет)',
   np_applied: 'последнее применение',
+  dg_title: ' -',
+  dg_hint: '    .  .',
+  dg_open: ' ',
+  dg_copy: ' ',
+  dg_copied: '!',
 }

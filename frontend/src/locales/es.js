@@ -477,4 +477,9 @@ export default {  // Navegación
   np_assign: 'Asignar red actual a',
   np_none: '(ninguno)',
   np_applied: 'última aplicación',
+  dg_title: 'Resumen de privacidad',
+  dg_hint: 'Un resumen compartible de lo que hizo tu equipo. Generado localmente.',
+  dg_open: 'Abrir tarjeta',
+  dg_copy: 'Copiar resumen',
+  dg_copied: '¡Copiado!',
 }

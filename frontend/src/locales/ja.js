@@ -479,4 +479,9 @@ export default {
   np_assign: '現在のネットワークを割り当て',
   np_none: '（なし）',
   np_applied: '最終適用',
+  dg_title: 'ー',
+  dg_hint: 'ー。ー。',
+  dg_open: 'ー',
+  dg_copy: '',
+  dg_copied: 'ー',
 }

@@ -40,6 +40,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
   const [geoMsg, setGeoMsg] = useState('')
   const [dnsfw, setDnsfw] = useState(null)
   const [netprof, setNetprof] = useState(null)
+  const [dgCopied, setDgCopied] = useState(false)
   const [saved, setSaved] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(false)
   const [ifaces, setIfaces] = useState(null)
@@ -556,6 +557,42 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
               {netprof.last_applied && <div>{t('np_applied')}: {netprof.last_applied}</div>}
             </div>
           )}
+        </div>
+
+
+        {/* Privacy digest / Digest de confidentialité */}
+        <div style={{ ...row, display: 'block' }}>
+          <div style={label}>{t('dg_title')}</div>
+          <div style={hint}>{t('dg_hint')}</div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <button
+              onClick={async () => {
+                const base = await apiBase()
+                const h = await authHeaders()
+                const r = await fetch(base + '/digest.html?hours=168', { headers: h })
+                const htmlText = await r.text()
+                const blob = new Blob([htmlText], { type: 'text/html' })
+                window.open(URL.createObjectURL(blob), '_blank')
+              }}
+              style={{
+                background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+                color: 'var(--text)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
+              }}>{t('dg_open')}</button>
+            <button
+              onClick={async () => {
+                const base = await apiBase()
+                const h = await authHeaders()
+                const r = await fetch(base + '/digest.txt?hours=168', { headers: h })
+                const txt = await r.text()
+                try { await navigator.clipboard.writeText(txt) } catch { /* clipboard denied */ }
+                setDgCopied(true)
+                setTimeout(() => setDgCopied(false), 2000)
+              }}
+              style={{
+                background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+                color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
+              }}>{dgCopied ? t('dg_copied') : t('dg_copy')}</button>
+          </div>
         </div>
 
         {/* External webhook / Webhook externe */}

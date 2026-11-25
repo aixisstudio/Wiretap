@@ -479,4 +479,9 @@ export default {  // Navigation
   np_assign: 'Assigner le réseau courant à',
   np_none: '(aucun)',
   np_applied: 'dernière application',
+  dg_title: 'Digest de confidentialité',
+  dg_hint: 'Un résumé partageable de ce que votre ordinateur a vraiment fait — serveurs contactés, alertes, trackers bloqués. Généré localement, rien n\'est envoyé.',
+  dg_open: 'Ouvrir la carte digest',
+  dg_copy: 'Copier le résumé',
+  dg_copied: 'Copié !',
 }

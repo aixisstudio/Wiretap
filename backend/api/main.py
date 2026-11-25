@@ -116,6 +116,7 @@ from detection.sinkresponder import SinkholeResponder
 from detection.threatintel import ThreatIntel
 from detection.dnsfw import DnsFirewall
 from detection.netprofile import NetworkProfiler
+from detection import digest as digestmod
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -3231,6 +3232,42 @@ async def netprofile_assign(body: NetprofileAssignBody) -> dict:
     r = netprofiler.assign_current(body.profile)
     db.set_setting("netprofile_mappings", netprofiler.mappings)
     return r
+
+
+
+@app.get("/digest", dependencies=_AUTH)
+async def privacy_digest(hours: int = 24) -> dict:
+    """EN: Shareable privacy digest as JSON — window capped at the data
+        retention actually holds (the report says what it covers).
+    FR: Digest de confidentialité en JSON — fenêtre plafonnée à la
+        rétention réelle (le rapport dit ce qu'il couvre)."""
+    hours = max(1, min(int(hours), 24 * 30))
+    data = digestmod.collect(db.get_conn(), minutes=hours * 60,
+                             dnsfw_stats=dnsfw.stats)
+    data["window_hours"] = hours
+    return data
+
+
+@app.get("/digest.html", dependencies=_AUTH)
+async def privacy_digest_html(hours: int = 24):
+    """EN: The digest as a self-contained shareable HTML card — no external
+        resources, safe to export or screenshot. / FR: Le digest en carte
+        HTML autonome partageable — aucune ressource externe."""
+    from fastapi.responses import HTMLResponse
+    hours = max(1, min(int(hours), 24 * 30))
+    data = digestmod.collect(db.get_conn(), minutes=hours * 60,
+                             dnsfw_stats=dnsfw.stats)
+    return HTMLResponse(digestmod.render_html(data, __version__))
+
+
+@app.get("/digest.txt", dependencies=_AUTH)
+async def privacy_digest_txt(hours: int = 24):
+    """EN: Plain-text digest for clipboard sharing. / FR: Digest texte brut."""
+    from fastapi.responses import PlainTextResponse
+    hours = max(1, min(int(hours), 24 * 30))
+    data = digestmod.collect(db.get_conn(), minutes=hours * 60,
+                             dnsfw_stats=dnsfw.stats)
+    return PlainTextResponse(digestmod.render_text(data))
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)

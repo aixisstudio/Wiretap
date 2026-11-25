@@ -479,4 +479,9 @@ export default {
   np_assign: 'Atribuir rede atual a',
   np_none: '(nenhum)',
   np_applied: 'última aplicação',
+  dg_title: 'Resumo de privacidade',
+  dg_hint: 'Um resumo compartilhável do que seu computador fez. Gerado localmente.',
+  dg_open: 'Abrir cartão',
+  dg_copy: 'Copiar resumo',
+  dg_copied: 'Copiado!',
 }
