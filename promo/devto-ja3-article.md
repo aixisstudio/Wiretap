@@ -51,7 +51,7 @@ One thing we got bitten by during review: the first version of that JSON contain
 ## Try it
 
 ```
-pip install wiretap  # or scoop install extras/wiretap on Windows
+pipx install git+https://github.com/aixisstudio/Wiretap  # or: scoop install extras/wiretap on Windows
 wiretap --demo       # synthetic traffic, no root needed
 ```
 
