@@ -5,13 +5,14 @@
 # FR: Servir localement : `pip install mkdocs-material && mkdocs serve`.
 #     Nav anglaise — chaque doc a 6 traductions à côté.
 site_name: Wiretap
-site_description: Local-first application firewall & network monitor
+site_description: The firewall that knows whether you were there when data left — local-first deep-signal detection
 repo_url: https://github.com/aixisstudio/Wiretap
 docs_dir: docs
 theme:
   name: readthedocs
 nav:
   - Home: ../README.md
+  - Deep signals: deep-signals.md
   - Architecture: architecture.md
   - Firewall & blocking: FIREWALL.md
   - Integrations (SIEM/deploy): INTEGRATIONS.md
