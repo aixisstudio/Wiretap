@@ -35,7 +35,6 @@ import hashlib
 import os
 import platform
 from pathlib import Path
-from typing import Optional
 
 _MAX_BYTES = 64 << 20
 _MAX_DIFFS = 4096
@@ -73,7 +72,7 @@ def _exe_regions(pid: int, exe: str) -> list[tuple[int, int]]:
     return regions
 
 
-def _read_mem(pid: int, start: int, length: int) -> Optional[bytes]:
+def _read_mem(pid: int, start: int, length: int) -> bytes | None:
     try:
         with open(f"/proc/{pid}/mem", "rb", buffering=0) as m:
             m.seek(start)
@@ -82,7 +81,7 @@ def _read_mem(pid: int, start: int, length: int) -> Optional[bytes]:
         return None
 
 
-def _read_file_range(path: str, off: int, length: int) -> Optional[bytes]:
+def _read_file_range(path: str, off: int, length: int) -> bytes | None:
     try:
         with open(path, "rb") as f:
             f.seek(off)

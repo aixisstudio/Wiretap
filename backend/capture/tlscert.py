@@ -36,7 +36,6 @@ FR: Lit le message TLS Certificate du SERVEUR directement sur le fil —
 from __future__ import annotations
 
 import time
-from typing import Optional
 
 # EN: Server ports whose replies are worth reassembling — common TLS
 #     services. The ClientHello SNI path stays single-segment elsewhere.
@@ -54,7 +53,7 @@ _FLOWS: dict[tuple, list] = {}
 
 
 def feed_tls_stream(src: str, sport: int, dst: str, dport: int,
-                    payload: bytes) -> Optional[dict]:
+                    payload: bytes) -> dict | None:
     """EN: Feed one TCP segment of a possible TLS stream; returns the leaf
     certificate dict when a complete Certificate handshake has been
     reassembled and parsed, else None. Call for EVERY segment of the flow —
@@ -94,7 +93,7 @@ def feed_tls_stream(src: str, sport: int, dst: str, dport: int,
     return cert
 
 
-def _extract_certificate(buf: bytes) -> Optional[dict]:
+def _extract_certificate(buf: bytes) -> dict | None:
     """EN: Walk TLS records; find handshake type 11 (Certificate), parse the
     first DER cert → leaf metadata. Returns None while incomplete.
     FR: Parcourt les enregistrements TLS ; trouve le handshake type 11
@@ -126,7 +125,7 @@ def _extract_certificate(buf: bytes) -> Optional[dict]:
     return None
 
 
-def _parse_certificate_msg(body: bytes) -> Optional[dict]:
+def _parse_certificate_msg(body: bytes) -> dict | None:
     """EN: TLS Certificate message body = 3-byte total len + list of
     3-byte-len DER certs. Parse the FIRST (leaf).
     FR: Corps du message Certificate = longueur totale 3 octets + liste de
@@ -280,7 +279,7 @@ def _parse_x509_leaf(der: bytes) -> dict:
     }
 
 
-def san_mismatch(sni: Optional[str], sans: list[str]) -> bool:
+def san_mismatch(sni: str | None, sans: list[str]) -> bool:
     """EN: True when the ClientHello SNI is not covered by any SAN —
     wildcard-aware (*.example.com covers a.example.com only).
     FR: Vrai si le SNI du ClientHello n'est couvert par aucun SAN —

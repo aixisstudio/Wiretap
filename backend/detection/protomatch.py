@@ -35,7 +35,6 @@ FR: Détection de « protocole déguisé » sur les ports bien connus — quand
 from __future__ import annotations
 
 import struct
-from typing import Optional
 
 _HTTP_METHODS = (b"GET ", b"POST", b"HEAD", b"PUT ", b"DELE", b"OPTI",
                  b"PATC", b"TRAC", b"CONN")
@@ -71,7 +70,7 @@ def _looks_dns(payload: bytes) -> bool:
     return False
 
 
-def check(port: int, proto: str, app_head: bytes) -> Optional[str]:
+def check(port: int, proto: str, app_head: bytes) -> str | None:
     """EN: Mismatch reason when app_head doesn't fit `port`'s protocol,
     else None. Caller owns the cooldown/dedup policy.
     FR: Raison du mismatch quand app_head ne colle pas au port, sinon

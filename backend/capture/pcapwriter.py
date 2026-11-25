@@ -23,7 +23,8 @@ from __future__ import annotations
 
 import io
 import struct
-from typing import BinaryIO, Iterable
+from collections.abc import Iterable
+from typing import BinaryIO
 
 # EN: Classic magic — little-endian variant (microsecond timestamps).
 # FR: Magic classique — variante little-endian (timestamps microseconde).

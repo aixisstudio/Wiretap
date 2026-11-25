@@ -29,7 +29,6 @@ import ipaddress
 import math
 import time
 from collections import deque
-from typing import Optional
 
 from .iforest import IsolationForest
 
@@ -64,8 +63,8 @@ class FlowAnomaly:
         self._fanout: dict[str, set[str]] = {}
 
     def observe(self, proc: str, remote_ip: str, remote_port: int,
-                direction: str, size: int, ts: Optional[float] = None) \
-            -> Optional[dict]:
+                direction: str, size: int, ts: float | None = None) \
+            -> dict | None:
         """EN: Record one packet's contribution to a flow and score when
         warranted. Returns an alert context dict or None.
         FR: Enregistre la contribution d'un paquet et score le cas échéant.

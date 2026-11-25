@@ -59,10 +59,10 @@ FR: Cœur du backend. Détenir l'état du graphe en mémoire (nœuds / arêtes /
 
 import asyncio
 import hashlib
-import math
 import ipaddress
 import json
 import logging
+import math
 import os
 import queue
 import secrets
@@ -72,66 +72,80 @@ import sys
 import threading
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import (
+    Depends,
+    FastAPI,
+    HTTPException,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from api.security import ALLOWED_ORIGIN_REGEX, get_token, require_token, ws_authorized
-from capture.sniffer import Packet, PacketSniffer, get_local_ips
 import demo
-from capture.media_monitor import MediaMonitor, MediaState
-from classifier.traffic import classify
-from resolver.dns_geo import (enrich_ip, is_private, learn_dns_answers,
-                              learn_sni, lookup_domain)
-from scanner.arp_scanner import ARPScanner, Device, default_gateway as _default_gateway
-from scanner.arp_scanner import READ_STATS as _arp_stats
-from detection.anomaly import AnomalyDetector, Alert
-from detection.customrules import CustomRules
+from api.notify import notifier
+from api.security import ALLOWED_ORIGIN_REGEX, get_token, require_token, ws_authorized
 from capture.ebpf_probe import EbpfProbe
+from capture.media_monitor import MediaMonitor, MediaState
+from capture.sniffer import Packet, PacketSniffer, get_local_ips
 from capture.tlscert import san_mismatch as _san_mismatch
-from detection.deepinspect import DeepInspector, suspicious_module_paths
-from detection.firewall import FirewallManager
-from detection.integrity import IntegrityWatcher
-from detection import blocklist
-from detection import c2_fingerprints
+from classifier.traffic import classify
+from detection import (
+    askmode,
+    blocklist,
+    c2_fingerprints,
+    dga,
+    ebpf_enforce,
+    iocshare,
+    nlquery,
+    perfprobe,
+    protomatch,
+)
+from detection import digest as digestmod
 from detection import explain as alert_explain
-from detection import iocshare
+from detection import hollow as hollowmod
+from detection.aiwatch import AiWatch
+from detection.anomaly import Alert, AnomalyDetector
+from detection.autorespond import AutoResponder
+from detection.canary import CanaryWatch, HoneyPorts
+from detection.customrules import CustomRules
+from detection.deepinspect import DeepInspector, suspicious_module_paths
+from detection.dnsfw import DnsFirewall
+from detection.dnssystem import SystemDns
+from detection.firewall import FirewallManager
+from detection.gossip import PeerSync
+from detection.integrity import IntegrityWatcher
+from detection.killchain import KillChain
+from detection.lineage import LineageWatch
 from detection.llm_local import LocalSlm
 from detection.miner import MinerDetector
 from detection.mlflow import FlowAnomaly
-from detection import askmode
-from detection import dga
-from detection import ebpf_enforce
-from detection import hollow as hollowmod
-from detection.gossip import PeerSync
-from detection import perfprobe
-from detection import protomatch
-from detection.sinkresponder import SinkholeResponder
-from detection.threatintel import ThreatIntel
-from detection.dnsfw import DnsFirewall
 from detection.netprofile import NetworkProfiler
-from detection import digest as digestmod
-from detection.aiwatch import AiWatch
-from detection.secretwatch import SecretWatch
-from detection.supplychain import SupplyChainWatch
-from detection import nlquery
-from detection.canary import CanaryWatch, HoneyPorts
-from detection.autorespond import AutoResponder
-from detection.killchain import KillChain
-from detection.dnssystem import SystemDns
 from detection.presence import PresenceWatch
-from detection.lineage import LineageWatch
-from api.notify import notifier
-from paths import data_dir, chown_tree
-import storage.db as db
-from version import __version__
+from detection.secretwatch import SecretWatch
+from detection.sinkresponder import SinkholeResponder
+from detection.supplychain import SupplyChainWatch
+from detection.threatintel import ThreatIntel
+from paths import chown_tree, data_dir
 from procutils import spawn_kwargs
+from resolver.dns_geo import (
+    enrich_ip,
+    is_private,
+    learn_dns_answers,
+    learn_sni,
+    lookup_domain,
+)
+from scanner.arp_scanner import READ_STATS as _arp_stats
+from scanner.arp_scanner import ARPScanner, Device
+from scanner.arp_scanner import default_gateway as _default_gateway
+from storage import db
+from version import __version__
 
 logger = logging.getLogger("wiretap.api")
 
@@ -171,6 +185,7 @@ slm = LocalSlm()                  # EN: optional localhost LLM enrichment / FR: 
 custom_rules = CustomRules()      # EN: user-defined alert rules / FR: règles d'alerte utilisateur
 dnsfw = DnsFirewall(data_dir())   # EN: filtering DNS proxy (opt-in) / FR: proxy DNS filtrant (opt-in)
 import platform as _platform
+
 netprofiler = NetworkProfiler(fw, _platform.system())  # EN: network-aware auto profiles / FR: profils auto selon le réseau
 aiwatch = AiWatch()                  # EN: AI traffic governance / FR: gouvernance du trafic IA
 secretwatch = SecretWatch()          # EN: local DLP / FR: DLP local
@@ -349,8 +364,8 @@ class SettingsBody(BaseModel):
 class IgnoreBody(BaseModel):
     """EN: /alerts/ignore payload — suppress a host, a type, or both.
     FR: Charge utile de /alerts/ignore — supprimer un hôte, un type, ou les deux."""
-    type: Optional[str] = None
-    ip: Optional[str] = None
+    type: str | None = None
+    ip: str | None = None
 
 
 class FirewallRuleBody(BaseModel):
@@ -450,9 +465,9 @@ class BlocklistBody(BaseModel):
     # EN: "domain", "ip", "threatfox", "threatfox_ip", "threatfox_domain".
     # FR: « domain », « ip », « threatfox », « threatfox_ip », « threatfox_domain ».
     kind: str = "domain"
-    malware: Optional[str] = None
+    malware: str | None = None
     min_confidence: int = 0
-    threat_type: Optional[str] = None
+    threat_type: str | None = None
     # EN: Optional abuse.ch-style Auth-Key sent as a header on remote fetches.
     # FR: Clé Auth-Key optionnelle style abuse.ch envoyée en en-tête.
     auth_key: str = ""
@@ -511,7 +526,7 @@ class GeoDownloadBody(BaseModel):
 class InterfaceBody(BaseModel):
     """EN: /capture/interface payload — None/empty means "auto-pick".
     FR: Charge utile de /capture/interface — None/vide = choix automatique."""
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class WatchlistBody(BaseModel):
@@ -533,7 +548,7 @@ async def broadcast(message: dict) -> None:
         return
     payload = json.dumps(message)
 
-    async def _send(ws: WebSocket) -> Optional[WebSocket]:
+    async def _send(ws: WebSocket) -> WebSocket | None:
         try:
             # EN: Per-client timeout — one stalled client must not hold the
             #     whole broadcast hostage (slow reader, flaky LAN UI).
@@ -713,7 +728,7 @@ def _local_hostname() -> str:
         return ""
 
 
-def _gateway() -> Optional[str]:
+def _gateway() -> str | None:
     """EN: Cached default_gateway() (5 min TTL).
     FR: default_gateway() mis en cache (TTL 5 min)."""
     now = time.time()
@@ -749,7 +764,7 @@ def _learn_lan_hostname(ip: str, name: str,
     db.upsert_device(ip=ip, mac=dev.get("mac"), hostname=name)
 
 
-def _devname(dns_name: str) -> Optional[str]:
+def _devname(dns_name: str) -> str | None:
     """
     EN: Extract a device display name from a DNS-style name:
           "iPhone-de-Lisa._device-info._tcp.local" → "iPhone-de-Lisa"
@@ -777,7 +792,7 @@ def _devname(dns_name: str) -> Optional[str]:
 _pending_mac_names: dict[str, str] = {}
 
 
-def _learn_dhcp_name(hostname: str, req_ip: Optional[str], mac: str,
+def _learn_dhcp_name(hostname: str, req_ip: str | None, mac: str,
                      touched_devices: dict) -> None:
     """
     EN: A client DHCP message revealed "this MAC is called <hostname>".
@@ -995,7 +1010,7 @@ def _process_batch(packets: list[Packet]) -> None:
         if notify:
             asyncio.get_running_loop().create_task(_notify(ad))
 
-    def _dga_check(name: str) -> Optional[dict]:
+    def _dga_check(name: str) -> dict | None:
         """EN: DGA lexical score + 1 h per-name cooldown — finding or None.
         FR: Score lexical DGA + cooldown 1 h par nom — finding ou None."""
         hit = dga.score(name)
@@ -1196,7 +1211,7 @@ def _process_batch(packets: list[Packet]) -> None:
         edge["bytes"] += pkt.size
         edge["packets"] += 1
 
-        minute = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M")
+        minute = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M")
         db.accumulate(minute, category.category, pkt.size)
         # EN: Per-entity history — feeds the per-host and per-app views.
         # FR: Historique par entité — alimente les vues par hôte et par app.
@@ -1240,7 +1255,8 @@ def _process_batch(packets: list[Packet]) -> None:
             db.log_alert(awd)
             out_alerts.append(awd)
         if pkt.direction == "out":
-            from detection.aiwatch import match_service as _msvc, AI_SERVICES as _AISVC
+            from detection.aiwatch import AI_SERVICES as _AISVC
+            from detection.aiwatch import match_service as _msvc
             _svc = _msvc(_hostname_lc)
             if _svc:
                 pa = presencew.grade(pkt.process_name or "", _AISVC[_svc]["name"], pkt.size)
@@ -3032,6 +3048,7 @@ async def get_diagnostics() -> dict:
         restent locaux — servi uniquement à l'utilisateur local authentifié.
     """
     import platform
+
     from paths import data_dir
 
     log_tail = []
@@ -3092,10 +3109,11 @@ def _download_dbip() -> dict:
     """
     import gzip
     import urllib.request
-    from paths import data_dir
-    import resolver.dns_geo as dg
 
-    month = datetime.now(timezone.utc).strftime("%Y-%m")
+    import resolver.dns_geo as dg
+    from paths import data_dir
+
+    month = datetime.now(UTC).strftime("%Y-%m")
     files = {
         f"dbip-city-lite-{month}.mmdb.gz": "dbip-city-lite.mmdb",
         f"dbip-asn-lite-{month}.mmdb.gz":  "dbip-asn-lite.mmdb",
@@ -3856,7 +3874,7 @@ async def alert_rules_yaral() -> PlainTextResponse:
         capteur-paquet → UDM ; les règles sans clause traduisible
         sortent en // SKIPPED. Avec l'import Sigma, chemin Sigma→YARA-L.
     """
-    import detection.yaral as yaral
+    from detection import yaral
     return PlainTextResponse(yaral.export(custom_rules.serialized()),
                              media_type="text/plain")
 
@@ -3989,7 +4007,7 @@ async def integrity_check(body: PidBody) -> dict:
     def _do() -> list[dict]:
         # EN: Drop the dedup key so a manual check always re-inspects.
         # FR: Retirer la clé de dédup pour qu'un contrôle manuel ré-inspecte.
-        with integrity._lock:                        # noqa: SLF001 — same service
+        with integrity._lock:
             for k in [k for k in integrity._checked if k[0] == body.pid]:
                 integrity._checked.pop(k, None)
         try:
@@ -4053,6 +4071,7 @@ async def sandbox_run(body: SandboxBody) -> dict:
         le binaire tourne non privilégié, égress zéro. Action utilisateur
         explicite uniquement — Wiretap ne détone jamais seul."""
     import os
+
     from detection.contain import run_sandboxed
     if not os.path.isabs(body.path):
         raise HTTPException(400, "path must be absolute")
@@ -4170,7 +4189,7 @@ def _agent_store() -> dict:
     return db.get_setting("agent_tokens", {}) or {}
 
 
-def _agent_lookup(token: str) -> Optional[str]:
+def _agent_lookup(token: str) -> str | None:
     if not token:
         return None
     h = hashlib.sha256(token.encode()).hexdigest()
@@ -4186,7 +4205,7 @@ async def agent_or_master(request: Request) -> str:
     FR: Auth ingest — le jeton maître marche toujours ; `X-Wiretap-Agent`
     résout le nom de l'agent enrôlé, qui fait foi pour le tagging
     (le `host` du corps reste un indice). 401 sinon."""
-    from api.security import _extract_token, API_TOKEN
+    from api.security import API_TOKEN, _extract_token
     master = _extract_token(request)
     if master and secrets.compare_digest(master, API_TOKEN):
         return ""
@@ -4678,8 +4697,8 @@ def _audit_recommendations(counts: dict, risky: list, unlabeled: list,
 
 
 @app.get("/forensics/export", dependencies=_AUTH)
-async def forensics_export(process: Optional[str] = None,
-                           ip: Optional[str] = None,
+async def forensics_export(process: str | None = None,
+                           ip: str | None = None,
                            format: str = "json"):
     """EN: One-click investigation bundle — process tree + SHA-256 of the
         executable, matching alerts and traffic history. format=json (default)
@@ -4692,10 +4711,11 @@ async def forensics_export(process: Optional[str] = None,
         bundle STIX 2.1 minimal (indicateurs + observed-data) pour SIEM.
         Données locales uniquement ; rien n'est envoyé nulle part."""
     import hashlib
+
     import psutil
     loop = asyncio.get_running_loop()
     bundle: dict = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "version": __version__,
         "host": socket.gethostname(),
         "processes": [],
@@ -4703,7 +4723,7 @@ async def forensics_export(process: Optional[str] = None,
         "history": {},
     }
 
-    def _sha256(path: str) -> Optional[str]:
+    def _sha256(path: str) -> str | None:
         try:
             h = hashlib.sha256()
             with open(path, "rb") as f:
@@ -4866,7 +4886,7 @@ def _forensics_csv(bundle: dict) -> PlainTextResponse:
                  'attachment; filename="wiretap-forensics.csv"'})
 
 
-def _forensics_stix(bundle: dict, ip: Optional[str] = None) -> dict:
+def _forensics_stix(bundle: dict, ip: str | None = None) -> dict:
     """EN: Minimal STIX 2.1 bundle — an identity for Wiretap, indicators for
         the flagged IPs/hashes and observed-data sightings. Enough for a
         SIEM to ingest; deliberately not a full graph.
@@ -4946,8 +4966,8 @@ def _forensics_stix(bundle: dict, ip: Optional[str] = None) -> dict:
 
 
 @app.get("/forensics/pcap", dependencies=_AUTH)
-async def forensics_pcap(ip: Optional[str] = None,
-                         process: Optional[str] = None,
+async def forensics_pcap(ip: str | None = None,
+                         process: str | None = None,
                          seconds: int = 300):
     """EN: Export the forensic ring as a real .pcap — wireshark/tcpdump
         open it directly. Filters: remote `ip`, attributed `process`
@@ -4960,6 +4980,7 @@ async def forensics_pcap(ip: Optional[str] = None,
         ~4 Mo de trames récentes). Vide en mode démo — la démo synthétise
         des paquets, elle n'a pas de trames fil."""
     from fastapi.responses import Response
+
     from capture.pcapwriter import pcap_bytes
     if _sniffer is None or not hasattr(_sniffer, "pcap_frames"):
         return Response(status_code=204)

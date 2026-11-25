@@ -10,15 +10,15 @@ FR: Utilise un WIRETAP_DATA_DIR isolé (posé dans conftest.py) pour ne jamais
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-import storage.db as db
+from storage import db
 
 
 def test_accumulate_flush_timeline_roundtrip():
     # EN: get_timeline filters on a sliding window — use the CURRENT minute.
     # FR: get_timeline filtre sur une fenêtre glissante — utiliser la minute COURANTE.
-    minute = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M")
+    minute = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M")
     db.accumulate(minute, "safe", 500)
     db.accumulate(minute, "safe", 700)
     db.accumulate(minute, "tracking", 100)
@@ -83,7 +83,7 @@ def test_get_alerts_reads_persisted():
     doit revenir via get_alerts."""
     alert = {
         "id": str(uuid.uuid4()),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "type": "PORT_SCAN",
         "severity": "warning",
         "message": "test scan",

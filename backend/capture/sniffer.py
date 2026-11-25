@@ -32,15 +32,16 @@ import socket
 import threading
 import time
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Callable, Optional
+from datetime import UTC, datetime
 
 import psutil
-from .procinfo import ProcEnricher
 
-from capture.pcap import PcapError, PcapSession, is_available, list_devices
 from capture.parser import parse_frame
+from capture.pcap import PcapError, PcapSession, is_available, list_devices
+
+from .procinfo import ProcEnricher
 
 logger = logging.getLogger("wiretap.capture.sniffer")
 
@@ -49,7 +50,7 @@ logger = logging.getLogger("wiretap.capture.sniffer")
 PCAP_AVAILABLE = is_available()
 
 
-def _default_route_ip() -> Optional[str]:
+def _default_route_ip() -> str | None:
     """
     EN: Local IP the OS would use for outbound traffic. A UDP connect() only
         asks the routing table — no packet is ever sent (zero outbound
@@ -85,30 +86,30 @@ class Packet:
     """
     src_ip: str
     dst_ip: str
-    src_port: Optional[int]
-    dst_port: Optional[int]
-    remote_port: Optional[int]
+    src_port: int | None
+    dst_port: int | None
+    remote_port: int | None
     protocol: str
     size: int
     timestamp: str
     direction: str                       # "out" | "in"
-    pid: Optional[int] = None
-    process_name: Optional[str] = None
+    pid: int | None = None
+    process_name: str | None = None
     # EN: Enriched attribution — full cmdline + parent identity, so rules
     #     can distinguish "node mcp-server" from bare "node".
     # FR: Attribution enrichie — cmdline complet + identité parente, pour
     #     distinguer « node mcp-server » de « node » nu dans les règles.
-    cmdline: Optional[str] = None
-    ppid: Optional[int] = None
-    parent_name: Optional[str] = None
+    cmdline: str | None = None
+    ppid: int | None = None
+    parent_name: str | None = None
     tcp_flags: int = 0
-    sni: Optional[str] = None
+    sni: str | None = None
     dns: list = field(default_factory=list)
     # EN: (hostname, requested_ip|None, mac) learned from a client DHCP
     #     message — names the device before mDNS/LLMNR ever do.
     # FR: (nom d'hôte, ip demandée|None, mac) appris d'un message DHCP
     #     client — nomme l'appareil avant même mDNS/LLMNR.
-    dhcp: Optional[tuple] = None
+    dhcp: tuple | None = None
     # EN: ≤64B of cleartext payload for in-process protocol fingerprinting
     #     (stratum miner detection). Internal only — never broadcast.
     # FR: ≤64 o. de payload en clair pour la signature de protocole en
@@ -118,11 +119,11 @@ class Packet:
     #     anomaly checks, never persisted raw. None when not observed.
     # FR: Métadonnées du cert feuille TLS (veille passive) — usage interne
     #     (contrôles d'anomalies), jamais persistées. None sinon.
-    tls_cert: Optional[dict] = None
+    tls_cert: dict | None = None
     # EN: TLS ClientHello fingerprints (JA3 MD5 & JA4 hashes) when seen.
     # FR: Empreintes ClientHello TLS (hachages JA3 MD5 et JA4) quand observées.
-    ja3: Optional[str] = None
-    ja4: Optional[str] = None
+    ja3: str | None = None
+    ja4: str | None = None
 
 
 def get_local_ips() -> set[str]:
@@ -159,7 +160,7 @@ class ConnectionTable:
         self._map = {"tcp": {}, "udp": {}}
         self._lock = threading.Lock()
         self._running = False
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
 
     def _refresh(self) -> None:
         """EN: Rebuild the whole snapshot. / FR: Reconstruire tout l'instantané."""
@@ -196,7 +197,7 @@ class ConnectionTable:
     def stop(self) -> None:
         self._running = False
 
-    def lookup(self, port: int, proto: str) -> tuple[Optional[int], Optional[str]]:
+    def lookup(self, port: int, proto: str) -> tuple[int | None, str | None]:
         """
         EN: Hot-path lookup — O(1), no syscalls. A miss means the socket
             appeared/disappeared between refreshes; returned as (None, None).
@@ -227,7 +228,7 @@ class PacketSniffer:
         self.ports = ports or []
         self.iface = iface or os.environ.get("WIRETAP_IFACE") or self._default_iface()
         self.local_ips = get_local_ips()
-        self._session: Optional[PcapSession] = None
+        self._session: PcapSession | None = None
         self._conn_table = ConnectionTable()
         self._procinfo = ProcEnricher()
         # EN: Optional kernel-level attribution probe (eBPF) — consulted when
@@ -236,7 +237,7 @@ class PacketSniffer:
         #     la table des sockets rate. Réglée via set_attribution_probe().
         self._attribution_probe = None
         self._running = False
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         # EN: Forensic ring — the last ~4 MB of "for us" frames with wire
         #     timestamp + process attribution, kept for /forensics/pcap
         #     exports. Byte-accounted: evict oldest until under budget.
@@ -267,8 +268,8 @@ class PacketSniffer:
         #     d'appareils : « appareils mais pas de trafic » sans explication.
         #     `on_error` est appelé depuis le thread de capture, comme
         #     `callback`.
-        self.last_error: Optional[str] = None
-        self.on_error: Optional[Callable[[str], None]] = None
+        self.last_error: str | None = None
+        self.on_error: Callable[[str], None] | None = None
 
     def _fail(self, msg: str) -> None:
         """EN: Record a fatal capture failure and notify the API layer.
@@ -278,7 +279,7 @@ class PacketSniffer:
         if self.on_error:
             try:
                 self.on_error(msg)
-            except Exception:                      # noqa: BLE001
+            except Exception:
                 logger.debug("capture error callback failed", exc_info=True)
 
     @property
@@ -299,7 +300,7 @@ class PacketSniffer:
         self._attribution_probe = probe
 
     @staticmethod
-    def _default_iface() -> Optional[str]:
+    def _default_iface() -> str | None:
         """
         EN: The interface that actually carries OUR traffic — the one owning
             a non-loopback local IP (macOS's "ap1" AWDL device is listed
@@ -433,7 +434,7 @@ class PacketSniffer:
             remote_port=remote_port,
             protocol=parsed.protocol,
             size=parsed.size or wire_len,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             direction=direction,
             pid=pid,
             process_name=process_name,

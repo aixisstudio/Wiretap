@@ -23,9 +23,8 @@ FR: Digest de confidentialité partageable — « qu'a fait mon ordinateur
 from __future__ import annotations
 
 import html
-import json
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 # EN: Wiretap dark palette — same family as the UI.
 # FR: palette sombre Wiretap — même famille que l'UI.
@@ -53,7 +52,7 @@ td.num{text-align:right;color:#8a93a5;font-variant-numeric:tabular-nums}
 
 
 def _since_iso(minutes: int) -> str:
-    return (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M:%S")
+    return (datetime.now(UTC) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M:%S")
 
 
 def collect(conn: sqlite3.Connection, minutes: int,

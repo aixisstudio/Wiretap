@@ -47,7 +47,7 @@ class AutoResponder:
     actions executed at most once per cooldown. / FR: moteur de règles —
     observe() appelé depuis le pipeline, actions bornées par cooldown."""
 
-    def __init__(self, fw=None) -> None:  # noqa: ANN001
+    def __init__(self, fw=None) -> None:
         self.fw = fw
         self.enabled = False                    # EN: master opt-in / FR: opt-in maître
         self.actions: dict[str, list[str]] = {} # EN: alert_type -> ["lockdown","suspend"] / FR: type -> actions

@@ -15,8 +15,16 @@ FR: Chaque trame ci-dessous est construite octet par octet dans le test — pas
 import struct
 
 from capture.parser import (
-    DLT_EN10MB, DLT_LINUX_SLL, DLT_LINUX_SLL2, DLT_NULL, DLT_RAW,
-    parse_frame, parse_dns, parse_mdns, parse_nbns, parse_dhcp,
+    DLT_EN10MB,
+    DLT_LINUX_SLL,
+    DLT_LINUX_SLL2,
+    DLT_NULL,
+    DLT_RAW,
+    parse_dhcp,
+    parse_dns,
+    parse_frame,
+    parse_mdns,
+    parse_nbns,
     parse_tls_sni,
 )
 

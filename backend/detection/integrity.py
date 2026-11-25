@@ -89,7 +89,6 @@ import threading
 import time
 from collections import OrderedDict
 from pathlib import Path
-from typing import Optional
 
 # EN: Bounded containers — a long-running session must not grow these
 #     forever. / FR: Conteneurs bornés — une longue session ne doit pas
@@ -147,7 +146,7 @@ def _merkle_root(leaves: list[str]) -> str:
     return level[0]
 
 
-def _sha256_file(path: str, _bufsize: int = 1 << 20) -> Optional[str]:
+def _sha256_file(path: str, _bufsize: int = 1 << 20) -> str | None:
     """EN: Streaming SHA-256 of a file — None on any failure.
     FR: SHA-256 en flux d'un fichier — None en cas d'échec."""
     try:
@@ -167,8 +166,7 @@ def _names_match(name: str, exe_basename: str) -> bool:
     de version (« python3 » vs « python3.11 »)."""
     def _norm(s: str) -> str:
         s = s.lower()
-        if s.endswith(".exe"):
-            s = s[:-4]
+        s = s.removesuffix(".exe")
         return _VERSION_SUFFIX.sub("", s)
     return _norm(name) == _norm(exe_basename)
 
@@ -193,7 +191,7 @@ class IntegrityWatcher:
         #     changed; hashing a 200 MB binary every packet would be silly.
         # FR: chemin → (mtime, sha256) — re-hash seulement si le mtime a
         #     changé ; hasher 200 Mo à chaque paquet serait absurde.
-        self._hash_cache: OrderedDict[str, tuple[float, Optional[str]]] = OrderedDict()
+        self._hash_cache: OrderedDict[str, tuple[float, str | None]] = OrderedDict()
         # EN: exe path → {"root": merkle, "n": module count} — module-set
         #     baseline persisted next to exe baselines.
         # FR: chemin exe → {"root": merkle, "n": nb modules} — baseline de
@@ -322,7 +320,7 @@ class IntegrityWatcher:
 
     # ── Check 2: on-disk hash baseline / Contrôle 2 : hash sur disque ──────
 
-    def _hash_for(self, path: str) -> Optional[str]:
+    def _hash_for(self, path: str) -> str | None:
         try:
             mtime = os.stat(path).st_mtime
         except OSError:

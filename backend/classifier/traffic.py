@@ -16,7 +16,6 @@ import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from paths import data_dir
 
@@ -126,8 +125,8 @@ class TrafficCategory:
 
 
 def classify(
-    hostname: Optional[str],
-    dst_port: Optional[int],
+    hostname: str | None,
+    dst_port: int | None,
     protocol: str,
 ) -> TrafficCategory:
     """

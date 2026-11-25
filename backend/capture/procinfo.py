@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Optional
 
 import psutil
 
@@ -41,10 +40,10 @@ class ProcEnricher:
 
     def __init__(self, ttl: float = _ENRICH_TTL):
         self.ttl = ttl
-        self._cache: dict[int, tuple[float, Optional[str], Optional[int], Optional[str]]] = {}
+        self._cache: dict[int, tuple[float, str | None, int | None, str | None]] = {}
         self._lock = threading.Lock()
 
-    def _resolve(self, pid: int) -> tuple[Optional[str], Optional[int], Optional[str]]:
+    def _resolve(self, pid: int) -> tuple[str | None, int | None, str | None]:
         cmdline = ppid = parent_name = None
         try:
             proc = psutil.Process(pid)
@@ -65,7 +64,7 @@ class ProcEnricher:
             pass
         return cmdline, ppid, parent_name
 
-    def enrich(self, pid: Optional[int]) -> tuple[Optional[str], Optional[int], Optional[str]]:
+    def enrich(self, pid: int | None) -> tuple[str | None, int | None, str | None]:
         """EN: (cmdline, ppid, parent_name) for pid, cached for `ttl`.
         FR: (cmdline, ppid, parent_name) du pid, mis en cache `ttl`."""
         if not pid:
@@ -85,7 +84,7 @@ class ProcEnricher:
             self._cache[pid] = (now, *resolved)
         return resolved
 
-    def parent_chain(self, pid: Optional[int], depth: int = 8) -> list[tuple[int, str]]:
+    def parent_chain(self, pid: int | None, depth: int = 8) -> list[tuple[int, str]]:
         """EN: Walk up the parent chain → [(ppid, name), ...], root-first
             order is NOT guaranteed — listed nearest-parent first. Used
             by agent-audit views, not the packet hot path.

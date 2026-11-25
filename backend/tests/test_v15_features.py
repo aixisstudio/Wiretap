@@ -25,8 +25,8 @@ import struct
 
 import pytest
 
-from capture.parser import DLT_EN10MB, parse_frame
 from capture import tlscert
+from capture.parser import DLT_EN10MB, parse_frame
 
 ETH = DLT_EN10MB
 
@@ -312,7 +312,7 @@ def test_flow_ml_inert_then_scores():
     """EN: The scorer stays inert below the training minimum, then emits
     a dict for an extreme flow once fitted. / FR: Le scoreur reste inerte
     sous le minimum d'entraînement, puis émet pour un flux extrême."""
-    from detection.mlflow import FlowAnomaly, _TRAIN_MIN
+    from detection.mlflow import _TRAIN_MIN, FlowAnomaly
     m = FlowAnomaly()
     # EN: 2024-01-01 12:00 UTC — the learned "hour" feature is 12/23 ≈ 0.52,
     #     matching the hard-coded normal vector below. A live clock made the
@@ -494,6 +494,7 @@ def test_askmode_available_honest_on_nonlinux():
     only (or missing deps) — never pretend. / FR: Sur ce Mac la sonde
     doit honnêtement rapporter Linux-only — jamais prétendre."""
     import platform
+
     from detection.askmode import available
     ok, why = available()
     if platform.system().lower() != "linux":
@@ -569,6 +570,7 @@ def test_hollow_available_honest():
     Linux. / FR: le check hollowing rapporte honnêtement — False hors
     Linux."""
     import platform
+
     from detection.hollow import available, hollow_check
     ok, why = available()
     if platform.system().lower() != "linux":
@@ -664,6 +666,7 @@ def test_nfqueue_packet_message_roundtrip():
     ACK-type message returns None. / FR: Un NFQNL_MSG_PACKET fabriqué se
     reparse en (id, payload) ; un message ACK renvoie None."""
     import struct as st
+
     from detection import nfqueue as n
     ip_pkt = ipv4(b"\x0a\x00\x00\x01", b"\x08\x08\x08\x08", 6,
                   tcp(50000, 443, flags=0x02))
@@ -684,6 +687,7 @@ def test_nfqueue_verdict_wire_format():
     the right id/verdict in network order. / FR: Le message de verdict
     porte la file en res_id et l'en-tête verdict en ordre réseau."""
     import struct as st
+
     from detection import nfqueue as n
     msg = n.build_verdict(99, n.NF_DROP, 7, 5)
     length, mtype, _f, _s, _p = st.unpack_from("IHHII", msg, 0)
@@ -700,6 +704,7 @@ def test_nfqueue_config_params_copy_packet():
     """EN: The bind params ask for whole-packet COPY_PACKET mode.
     FR: Les params du bind demandent le mode COPY_PACKET paquet entier."""
     import struct as st
+
     from detection import nfqueue as n
     msg = n.build_config_params(7, 1)
     attrs = n._parse_attrs(msg[20:])
@@ -807,6 +812,7 @@ def test_protomatch_dns53():
     FR: Une vraie requête DNS passe sur :53 ; un blob déclenche — TCP et
     UDP."""
     import struct as st
+
     from detection.protomatch import check
     qname = b"\x07example\x03com\x00"
     dns = st.pack(">HHHHHH", 0x1234, 0x0100, 1, 0, 0, 0) + qname \
@@ -839,6 +845,7 @@ def test_askmode_exempt_ips_installed_and_removed(monkeypatch):
     FR: exempt_ips deviennent des règles `-d <ip> -j RETURN` insérées
     AVANT le saut NFQUEUE au start, supprimées une à une au stop."""
     import subprocess
+
     from detection import askmode
 
     calls = []
@@ -901,7 +908,7 @@ def test_miner_suspects_bounded():
     FR: Un processus balayant beaucoup d'hôtes pool-port ne peut faire
     croître la map au-delà de la borne — le quart le plus ancien est
     évincé."""
-    from detection.miner import MinerDetector, _MAX_SUSPECTS
+    from detection.miner import _MAX_SUSPECTS, MinerDetector
 
     class P:
         direction, protocol, dst_port = "out", "TCP", 3333

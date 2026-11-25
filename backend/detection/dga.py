@@ -35,7 +35,6 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Optional
 
 _LABEL_RE = re.compile(r"^[a-z0-9-]+$")
 _VOWELS = set("aeiou")
@@ -73,7 +72,7 @@ def _consonant_run(s: str) -> int:
     return best
 
 
-def score(name: str) -> Optional[dict]:
+def score(name: str) -> dict | None:
     """EN: Score one hostname for DGA-ness. Returns a finding dict when
     suspicious enough to flag, None when clean or unscorable.
 

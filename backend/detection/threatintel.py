@@ -30,7 +30,6 @@ import threading
 import time
 import urllib.request
 from collections import OrderedDict
-from typing import Optional
 
 # EN: Cache bounds + verdict TTL (re-check daily at most).
 # FR: Bornes du cache + durée de vie d'un verdict (revérif max 1×/jour).
@@ -103,7 +102,7 @@ class ThreatIntel:
             self._inflight.add(ip)
         return True
 
-    def check(self, ip: str) -> Optional[dict]:
+    def check(self, ip: str) -> dict | None:
         """EN: Synchronous provider call — run inside an executor, never on
         the event loop. Returns the verdict dict (or None on hard failure),
         caches it, clears the inflight mark.
@@ -131,7 +130,7 @@ class ThreatIntel:
                     self._cache.popitem(last=False)
         return verdict
 
-    def _fetch(self, ip: str) -> Optional[dict]:
+    def _fetch(self, ip: str) -> dict | None:
         """EN: One HTTP call to the configured provider. Returns a verdict
         dict: {ip, provider, verdict: malicious|suspicious|clean, score, detail}.
         FR: Un appel HTTP au fournisseur configuré → verdict dict."""

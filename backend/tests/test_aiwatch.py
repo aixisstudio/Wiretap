@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detection.aiwatch import AiWatch, match_service, looks_like_mcp
+from detection.aiwatch import AiWatch, looks_like_mcp, match_service
 
 
 def test_match_service_suffixes():

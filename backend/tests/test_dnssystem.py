@@ -5,8 +5,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detection.dnssystem import (SystemDns, build_apply_cmds,
-                                 build_revert_cmds, macos_services)
+from detection.dnssystem import (
+    SystemDns,
+    build_apply_cmds,
+    build_revert_cmds,
+    macos_services,
+)
 
 
 def test_macos_apply_cmds():

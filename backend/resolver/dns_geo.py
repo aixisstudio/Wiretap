@@ -55,10 +55,9 @@ import os
 import socket
 import sys
 import threading
-from pathlib import Path
 import time
 from functools import lru_cache
-from typing import Optional
+from pathlib import Path
 
 from paths import data_dir
 
@@ -143,7 +142,7 @@ def learn_dns_answers(answers: list[tuple[str, str, int]]) -> None:
             _domain_map[ip] = (name, now + min(ttl, 86400))
 
 
-def learn_sni(ip: str, hostname: Optional[str]) -> None:
+def learn_sni(ip: str, hostname: str | None) -> None:
     """EN: Record a TLS ClientHello hostname for a destination IP.
     FR: Enregistrer le nom d'hôte du ClientHello TLS pour une IP destination."""
     if not hostname:
@@ -156,7 +155,7 @@ def learn_sni(ip: str, hostname: Optional[str]) -> None:
         _domain_map.setdefault(ip, (hostname, time.time() + 86400))
 
 
-def lookup_domain(ip: str) -> Optional[str]:
+def lookup_domain(ip: str) -> str | None:
     """EN: Domain learned from DNS/SNI, or None. / FR: Domaine appris via DNS/SNI, ou None."""
     with _domain_lock:
         hit = _domain_map.get(ip)
@@ -180,7 +179,7 @@ _DISABLE_PTR = os.environ.get("WIRETAP_DISABLE_PTR") == "1"
 
 
 @lru_cache(maxsize=2048)
-def resolve_hostname(ip: str) -> Optional[str]:
+def resolve_hostname(ip: str) -> str | None:
     """
     EN: Reverse DNS — None on NXDOMAIN/timeout, and always None when
         WIRETAP_DISABLE_PTR=1. lru_cache caches negatives too: PTR absence is

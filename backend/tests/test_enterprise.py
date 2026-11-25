@@ -152,6 +152,7 @@ def test_sigma_conds_rule_matches_all_clauses():
 
 def test_sigma_conds_reject_bad_field():
     import pytest
+
     from detection.customrules import CustomRules
     with pytest.raises(ValueError):
         CustomRules().add("bad", None, None, None, conds=[
@@ -166,6 +167,7 @@ def test_regex_rejects_nested_quantifiers():
     FR: Les motifs de forme (a+)+ sont refusés à la validation — le re de
     Python n'a pas de timeout donc la forme est rejetée."""
     import pytest
+
     from detection.customrules import CustomRules
     for pat in ("(a+)+", "(.*)*", "([a-z]+)+", "(a?)+",
                 "(a{1,3})+", "((a+)b)+", "(?:a+)+", "(x{2,})+"):
@@ -200,10 +202,11 @@ def test_askmode_decided_bounded():
     """EN: Verdict memory evicts the oldest entries past _MAX_DECIDED.
     FR: La mémoire des verdicts évinçe les plus anciens au-delà de la borne."""
     import sys
+
     import pytest
     if sys.platform != "linux":
         pytest.skip("NFQUEUE backend is Linux-only")
-    from detection.askmode import AskMode, _MAX_DECIDED
+    from detection.askmode import _MAX_DECIDED, AskMode
     am = AskMode(on_ask=lambda e: None)
     with am._lock:
         for i in range(_MAX_DECIDED + 100):
@@ -217,6 +220,7 @@ def test_askmode_rollback_mirrors_inserts(monkeypatch):
     reverse order. / FR: _rollback_rules transforme chaque insertion -I
     en suppression -D, en ordre inverse."""
     import sys
+
     import pytest
     if sys.platform != "linux":
         pytest.skip("iptables is Linux-only")
@@ -237,9 +241,10 @@ def test_askmode_rollback_mirrors_inserts(monkeypatch):
 # ── fleet merge / fusion de flotte ───────────────────────────────────────────
 
 def test_fleet_audit_merge(monkeypatch):
-    from detection.gossip import PeerSync
-    import urllib.request
     import json
+    import urllib.request
+
+    from detection.gossip import PeerSync
 
     ps = PeerSync(lambda: "tok")
     ps.configure(["peer-a:8000", "peer-b:8000"])
@@ -337,6 +342,7 @@ def test_ingest_events_endpoint():
     import pytest
     pytest.importorskip("httpx")
     from fastapi.testclient import TestClient
+
     from api.main import app
     from api.security import API_TOKEN
     c = TestClient(app)
@@ -354,6 +360,7 @@ def test_ingest_events_auth_required():
     import pytest
     pytest.importorskip("httpx")
     from fastapi.testclient import TestClient
+
     from api.main import app
     c = TestClient(app)
     r = c.post("/ingest/events", json={"events": []})
@@ -364,6 +371,7 @@ def test_ingest_events_bounded_and_validated():
     import pytest
     pytest.importorskip("httpx")
     from fastapi.testclient import TestClient
+
     from api.main import app
     from api.security import API_TOKEN
     c = TestClient(app)
@@ -388,6 +396,7 @@ def test_ingest_enroll_and_agent_token():
     import pytest
     pytest.importorskip("httpx")
     from fastapi.testclient import TestClient
+
     from api.main import app
     from api.security import API_TOKEN
     c = TestClient(app)
@@ -440,9 +449,10 @@ def test_ingest_events_cmdline_enrichment_and_remote_port():
     import pytest
     pytest.importorskip("httpx")
     from fastapi.testclient import TestClient
+
     from api.main import app, custom_rules
     from api.security import API_TOKEN
-    import storage.db as db
+    from storage import db
 
     custom_rules.add("catch mcp", "cmdline", "contains", "mcp-agent")
     c = TestClient(app)

@@ -3,12 +3,11 @@
 import asyncio
 import sys
 import tempfile
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detection.canary import CanaryWatch, HoneyPorts, CANARY_NAME
+from detection.canary import CANARY_NAME, CanaryWatch, HoneyPorts
 
 
 def _canary_home():

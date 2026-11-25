@@ -36,7 +36,6 @@ import ipaddress
 import os
 import platform
 from pathlib import Path
-from typing import Optional
 
 _CGROUP_DIR = Path("/sys/fs/cgroup/wiretap")
 
@@ -61,7 +60,7 @@ int egress_drop(struct __sk_buff *skb) {
 """
 
 
-def _cgroup2_root() -> Optional[Path]:
+def _cgroup2_root() -> Path | None:
     try:
         for line in Path("/proc/mounts").read_text().splitlines():
             parts = line.split()
@@ -97,7 +96,7 @@ class EbpfEnforcer:
         self._b = None
         self._fn = None
         self._blocked: set[str] = set()
-        self._attached_to: Optional[str] = None
+        self._attached_to: str | None = None
         self._isolated: set[int] = set()
 
     def start(self) -> tuple[bool, str]:

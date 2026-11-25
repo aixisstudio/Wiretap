@@ -34,7 +34,6 @@ import logging
 import socket
 import sys
 from dataclasses import dataclass
-from typing import Optional
 
 logger = logging.getLogger("wiretap.capture.pcap")
 
@@ -42,7 +41,6 @@ logger = logging.getLogger("wiretap.capture.pcap")
 class PcapError(Exception):
     """EN: Raised when libpcap is missing or a call fails.
     FR: Levée quand libpcap est absente ou qu'un appel échoue."""
-    pass
 
 
 # ── Structures / Structures ──────────────────────────────────────────────────
@@ -65,7 +63,6 @@ class PcapPkthdr(ctypes.Structure):
 class PcapAddr(ctypes.Structure):
     """EN: struct pcap_addr (linked list of interface addresses).
     FR: struct pcap_addr (liste chaînée des adresses d'interface)."""
-    pass
 
 
 PcapAddr._fields_ = [
@@ -79,7 +76,6 @@ PcapAddr._fields_ = [
 
 class PcapIf(ctypes.Structure):
     """EN: struct pcap_if — device list node. / FR: struct pcap_if — nœud de la liste de périphériques."""
-    pass
 
 
 PcapIf._fields_ = [
@@ -147,7 +143,7 @@ def _load_lib() -> ctypes.CDLL:
         candidates = [found] if found else []
         candidates += ["libpcap.so.0.8", "libpcap.so.1", "libpcap.so"]
 
-    last_err: Optional[Exception] = None
+    last_err: Exception | None = None
     for name in candidates:
         if not name:
             continue
@@ -161,7 +157,7 @@ def _load_lib() -> ctypes.CDLL:
     raise PcapError(_missing_msg(last_err))
 
 
-def _missing_msg(err: Optional[Exception]) -> str:
+def _missing_msg(err: Exception | None) -> str:
     """EN: Human-readable install guidance per platform.
     FR: Conseils d'installation lisibles selon la plateforme."""
     if sys.platform == "win32":
@@ -237,7 +233,7 @@ class PcapDevice:
     addresses: tuple[str, ...] = ()
 
 
-def _sockaddr_ip(ptr: Optional[int]) -> Optional[str]:
+def _sockaddr_ip(ptr: int | None) -> str | None:
     """
     EN: Decode a `struct sockaddr *` into an IP string (IPv4/IPv6 only).
         BSD/macOS start with a 1-byte sa_len then a 1-byte family; Windows
@@ -307,7 +303,7 @@ class PcapSession:
     """
 
     def __init__(self, device: str, snaplen: int = 65535, promisc: bool = True,
-                 timeout_ms: int = 100, bpf_filter: Optional[str] = None):
+                 timeout_ms: int = 100, bpf_filter: str | None = None):
         self._lib = _load_lib()
         errbuf = ctypes.create_string_buffer(256)
         self._handle = self._lib.pcap_open_live(
@@ -343,7 +339,7 @@ class PcapSession:
         raw = self._lib.pcap_geterr(self._handle)
         return raw.decode(errors="replace") if raw else "unknown error"
 
-    def next_packet(self) -> Optional[tuple[bytes, int, float]]:
+    def next_packet(self) -> tuple[bytes, int, float] | None:
         """
         EN: Next packet — (payload, wire_length, wire_ts) or None on
             timeout. `wire_ts` is libpcap's own timestamp (seconds, float)

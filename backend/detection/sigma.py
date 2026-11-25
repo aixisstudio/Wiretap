@@ -40,7 +40,6 @@ FR: Convertit un YAML de détection Sigma en règles custom Wiretap avec
 from __future__ import annotations
 
 import re
-from typing import Optional
 
 _MAX_RULES = 64        # EN: per import / FR: par import
 _MAX_VALUE = 200       # EN: chars per clause value / FR: caractères par valeur
@@ -86,7 +85,7 @@ def _norm(name: str) -> str:
     return re.sub(r"[_.\- ]", "", name.lower())
 
 
-def _clause(key: str, value) -> Optional[dict]:
+def _clause(key: str, value) -> dict | None:
     """EN: One `field|mod: value` pair → {field, op, value} or None when
     the field/modifier is outside the supported subset.
     FR: Une paire `champ|mod: valeur` → clause ou None si hors périmètre."""
@@ -106,7 +105,7 @@ def _clause(key: str, value) -> Optional[dict]:
     return {"field": field, "op": op, "xf": xf}
 
 
-def _selection_to_conds(sel: dict) -> Optional[list[dict]]:
+def _selection_to_conds(sel: dict) -> list[dict] | None:
     """EN: One selection map → AND clause list, or None when any entry
     is unmapped (honest skip — a half-translated selection would widen
     the match). / FR: Une sélection → clauses AND, ou None si une entrée

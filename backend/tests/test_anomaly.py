@@ -13,10 +13,10 @@ FR: Couvre les règles par paquet : exclusion des IP privées, NEW_HOST une
 
 import time
 from collections import deque
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from capture.sniffer import Packet
-from detection.anomaly import AnomalyDetector, BEACON_MIN_SAMPLES
+from detection.anomaly import BEACON_MIN_SAMPLES, AnomalyDetector
 
 PUBLIC_IP = "91.198.174.192"   # EN: real public IP (wikipedia.org)
                                # FR: vraie IP publique (wikipedia.org)
@@ -34,7 +34,7 @@ def pkt(remote=PUBLIC_IP, direction="out", port=443, size=500, process=None, pro
                                        # FR: l'extrémité distante — identique dans les deux sens
         protocol=proto,
         size=size,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         direction=direction,
         process_name=process,
     )

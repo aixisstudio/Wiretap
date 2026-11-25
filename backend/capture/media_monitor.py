@@ -27,8 +27,8 @@ FR: Interroge l'OS pour savoir quels processus utilisent actuellement le
 import logging
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 import psutil
 

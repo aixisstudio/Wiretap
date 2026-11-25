@@ -11,7 +11,6 @@ from api.main import app
 from api.security import API_TOKEN
 from detection import blocklist
 
-
 # EN: Shape of the live feed: one `#` comment line, then one IPv4 per line.
 # FR: Forme du flux réel : une ligne de commentaire `#`, puis une IPv4 par ligne.
 SAMPLE_NETAPI_IPS = """# NetAPI.com - compromised IPs, custom list (2026-11-18 12:37 UTC), 4 addresses. Source: https://netapi.com/compromised-ips/ (CC BY 4.0).

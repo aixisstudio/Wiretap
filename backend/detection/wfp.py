@@ -33,7 +33,6 @@ import ctypes
 import ipaddress
 import os
 import uuid
-from typing import Optional
 
 # ── GUID constants (Windows SDK fwpmk.h — values verified against
 #    winsdk-10 + OpenVPN's wfp_block.c) / Constantes GUID ────────────────────
@@ -355,7 +354,7 @@ class WfpBackend:
 
     @staticmethod
     def tags_for(kind: str, value: str,
-                 resolved: Optional[list[str]] = None) -> list[str]:
+                 resolved: list[str] | None = None) -> list[str]:
         """EN: Inverse of _plan's tag generation — which keys might exist
         for a rule (used for deletes + domain refresh deltas).
         FR: Inverse de la génération de tags — quelles clés peuvent exister

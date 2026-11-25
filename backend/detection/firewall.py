@@ -59,7 +59,7 @@ import threading
 import time
 import uuid
 from pathlib import Path
-from typing import Optional
+
 from procutils import spawn_kwargs
 
 # EN: RFC-1034/1123 hostname — labels of ≤63 alnum/dash chars joined by
@@ -236,7 +236,7 @@ class FirewallManager:
         self._remove(rule)
         return True
 
-    def toggle_rule(self, rule_id: str, enabled: bool) -> Optional[dict]:
+    def toggle_rule(self, rule_id: str, enabled: bool) -> dict | None:
         with self._lock:
             rule = next((r for r in self._rules if r["id"] == rule_id), None)
             if not rule:
@@ -347,7 +347,7 @@ class FirewallManager:
         return {"profile": name, "added": added, "removed": removed,
                 "lockdown": lockdown_res}
 
-    def _find_rule(self, kind: str, value: str, action: str) -> Optional[dict]:
+    def _find_rule(self, kind: str, value: str, action: str) -> dict | None:
         """EN: First rule with the same kind/normalized value/action —
         profile dedup helper. / FR: Première règle de même
         kind/valeur/action — dédup des profils."""
@@ -360,7 +360,7 @@ class FirewallManager:
 
     # ── Packet matching / Correspondance paquets ─────────────────────────────
 
-    def check_packet(self, pkt) -> Optional[dict]:
+    def check_packet(self, pkt) -> dict | None:
         """EN: First enabled rule matching this packet (remote IP/CIDR, port,
         process name). Used to emit BLOCKED_ATTEMPT alerts — the OS firewall
         already drops the traffic, this is only visibility.
@@ -413,7 +413,7 @@ class FirewallManager:
                 return r
         return None
 
-    def note_blocked(self, rule_id: str) -> Optional[dict]:
+    def note_blocked(self, rule_id: str) -> dict | None:
         """EN: Increment the seen-blocked counter; returns alert context when
         the cooldown allows a new BLOCKED_ATTEMPT notification.
         FR: Incrémente le compteur de blocages ; retourne le contexte
@@ -518,7 +518,7 @@ class FirewallManager:
             from detection.wfp import WfpBackend
         except ImportError:
             try:
-                from .wfp import WfpBackend            # type: ignore
+                from .wfp import WfpBackend  # type: ignore
             except ImportError:
                 self._wfp = False
                 return None
@@ -530,7 +530,7 @@ class FirewallManager:
         self._wfp = backend if ok else False
         return self._wfp or None
 
-    def _resolve_exe(self, name_or_path: str) -> Optional[str]:
+    def _resolve_exe(self, name_or_path: str) -> str | None:
         """EN: WFP ALE_APP_ID needs a real exe path — resolve bare process
         names through the running process table (netsh needed the same).
         FR: ALE_APP_ID exige un chemin d'exe — les noms nus sont résolus
@@ -641,7 +641,7 @@ class FirewallManager:
 
     # ── Sinkhole / Trou noir ─────────────────────────────────────────────────
 
-    def _hosts_path(self) -> Optional[Path]:
+    def _hosts_path(self) -> Path | None:
         """EN: Platform hosts file — where domain sinkholes are written.
         FR: Fichier hosts de la plateforme — là où vont les sinkholes domaine."""
         if self._platform in ("linux", "darwin"):
@@ -897,7 +897,7 @@ class FirewallManager:
     #     IP. Les règles se suppriment par leur tag `comment "wiretap-<rid>"`
     #     via les handles de `nft -a`.
 
-    def _linux_tool(self) -> Optional[str]:
+    def _linux_tool(self) -> str | None:
         """EN: Cached Linux backend — 'iptables' preferred (widest compat),
         'nft' when only nftables exists, False when neither.
         FR: Backend Linux en cache — 'iptables' de préférence, 'nft' quand

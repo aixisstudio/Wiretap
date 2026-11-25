@@ -15,7 +15,7 @@ import ctypes as _ct
 import socket as _socket
 import time
 import types as _types
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import psutil as _psutil
 
@@ -23,7 +23,7 @@ from capture.ebpf_probe import EbpfProbe, _Event
 from capture.sniffer import Packet
 from detection import explain as _explain
 from detection import iocshare, perfprobe
-from detection.anomaly import AnomalyDetector, BASELINE_LEARN_MIN
+from detection.anomaly import BASELINE_LEARN_MIN, AnomalyDetector
 from detection.deepinspect import DeepInspector, suspicious_module_paths
 from detection.firewall import FirewallManager
 from detection.integrity import IntegrityWatcher, _merkle_root, _names_match
@@ -49,7 +49,7 @@ def pkt(remote=PUBLIC_IP, direction="out", port=443, size=500,
         remote_port=port,
         protocol=proto,
         size=size,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         direction=direction,
         process_name=process,
         dns=dns or [],
@@ -655,6 +655,7 @@ def test_miner_cpu_corroboration(monkeypatch):
     """EN: Pool port + sustained high CPU → MINING_SUSPECT.
     FR: Port de pool + CPU haute soutenue → MINING_SUSPECT."""
     import types
+
     import psutil
     m = MinerDetector()
     m.analyze_packet(_mpkt(port=4444))
@@ -672,6 +673,7 @@ def test_miner_low_cpu_acquits(monkeypatch):
     matters. / FR: Port de pool avec CPU normale = rien — la
     corroboration compte."""
     import types
+
     import psutil
     m = MinerDetector()
     m.analyze_packet(_mpkt(port=4444))
@@ -866,7 +868,8 @@ def test_parser_app_head_cleartext_only():
     FR: La tête d'un payload TCP en clair est capturée (≤64 o.) pour la
     signature stratum ; TLS reste opaque (app_head vide)."""
     import struct as _st
-    from capture.parser import parse_frame, DLT_EN10MB
+
+    from capture.parser import DLT_EN10MB, parse_frame
 
     def frame(payload: bytes) -> bytes:
         # EN: 20-byte TCP header — offset byte (0x50) sits at position 12.
@@ -969,6 +972,7 @@ def test_custom_rules_validation():
     """EN: Bad field/op/regex/cidr all rejected at creation.
     FR: Mauvais champ/op/regex/cidr tous rejetés à la création."""
     import pytest as _pt
+
     from detection.customrules import CustomRules
     cr = CustomRules()
     for kw in (dict(field="nope"), dict(field="host", op="nope"),
@@ -1029,6 +1033,7 @@ def test_blocklist_fetch_requires_http():
     """EN: fetch_url rejects non-http(s) schemes outright.
     FR: fetch_url rejette carrément les schémas non http(s)."""
     import pytest as _pt
+
     from detection.blocklist import fetch_url
     with _pt.raises(ValueError):
         fetch_url("file:///etc/passwd")
@@ -1104,7 +1109,8 @@ def test_contain_platform_support():
     support that isn't there. / FR: available() rapporte le mécanisme
     réel par OS — jamais de support fantaisiste."""
     import sys
-    import detection.contain as contain
+
+    from detection import contain
     if sys.platform.startswith("linux"):
         ok, why = contain.available()
         assert isinstance(ok, bool) and why
@@ -1135,7 +1141,8 @@ def test_contain_wraps_command(monkeypatch, tmp_path):
     FR: Sous Linux la commande est enveloppée dans `unshare --user --net` ;
     sous macOS dans `sandbox-exec` deny-network. Le lanceur est mocké."""
     import sys
-    import detection.contain as contain
+
+    from detection import contain
 
     exe = tmp_path / "tool"
     exe.write_text("#!/bin/sh\n")
@@ -1172,6 +1179,7 @@ def test_pcapwriter_roundtrip():
     magic, version, linktype, timestamps et payloads intacts."""
     import io
     import struct
+
     from capture.pcapwriter import write_pcap
     buf = io.BytesIO()
     frames = [(1700000000.5, b"\xde\xad\xbe\xef" * 8, 32),

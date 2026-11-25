@@ -30,7 +30,6 @@ FR: Intégration DNS système — le dernier kilomètre du pare-feu DNS.
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 import subprocess

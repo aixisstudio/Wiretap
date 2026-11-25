@@ -15,8 +15,7 @@ import socket
 import struct
 import sys
 
-import capture.pcap as pcap
-import capture.sniffer as sniffer
+from capture import pcap, sniffer
 from capture.pcap import PcapDevice
 
 
@@ -73,7 +72,7 @@ def test_default_iface_falls_back_without_route(monkeypatch):
     ]
     monkeypatch.setattr(sniffer, "list_devices", lambda: devs)
     monkeypatch.setattr(sniffer, "_default_route_ip", lambda: None)
-    monkeypatch.setattr(sniffer.psutil, "net_if_addrs", lambda: {})
+    monkeypatch.setattr(sniffer.psutil, "net_if_addrs", dict)
     assert sniffer.PacketSniffer._default_iface() == "en0"
 
 

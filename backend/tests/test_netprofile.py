@@ -12,8 +12,8 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from detection import netprofile
-from detection.netprofile import NetworkProfiler
 from detection.firewall import FirewallManager
+from detection.netprofile import NetworkProfiler
 
 
 class _Fw(FirewallManager):

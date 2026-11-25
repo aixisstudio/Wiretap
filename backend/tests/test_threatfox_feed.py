@@ -13,7 +13,6 @@ from api.main import _import_blocklist_text, app
 from api.security import API_TOKEN
 from detection import blocklist
 
-
 SAMPLE_THREATFOX_CSV = """################################################################
 # ThreatFox IOC export (CSV)                                   #
 # Last updated: 2026-11-08 12:00:00 UTC                         #

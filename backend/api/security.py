@@ -36,7 +36,7 @@ import time
 
 from fastapi import HTTPException, Request, WebSocket, status
 
-from paths import data_dir, chown_to_user
+from paths import chown_to_user, data_dir
 
 logger = logging.getLogger("wiretap.api.security")
 

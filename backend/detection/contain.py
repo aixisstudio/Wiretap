@@ -38,6 +38,7 @@ import platform
 import shutil
 import subprocess
 import time
+
 from procutils import spawn_kwargs
 
 _SYSTEM = platform.system().lower()

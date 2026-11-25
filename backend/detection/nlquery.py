@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 # EN: Country aliases → ISO codes present in the geo enrichment cache rows.
 # FR: alias de pays → codes ISO.
@@ -34,10 +34,10 @@ COUNTRIES = {
 }
 
 WINDOWS = [
-    (re.compile(r"\b(week|semaine)\b", re.I), 7 * 24 * 60),
-    (re.compile(r"\b(month|mois)\b", re.I), 30 * 24 * 60),
-    (re.compile(r"\btoday|aujourd", re.I), 24 * 60),
-    (re.compile(r"\bhour|heure\b", re.I), 60),
+    (re.compile(r"\b(week|semaine)\b", re.IGNORECASE), 7 * 24 * 60),
+    (re.compile(r"\b(month|mois)\b", re.IGNORECASE), 30 * 24 * 60),
+    (re.compile(r"\btoday|aujourd", re.IGNORECASE), 24 * 60),
+    (re.compile(r"\bhour|heure\b", re.IGNORECASE), 60),
 ]
 
 
@@ -49,7 +49,7 @@ def parse_window(q: str) -> int:
 
 
 def _since(minutes: int) -> str:
-    return (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
+    return (datetime.now(UTC) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
 
 
 def answer(conn: sqlite3.Connection, question: str,
@@ -96,7 +96,7 @@ def answer(conn: sqlite3.Connection, question: str,
                      top=[{"process": r[0], "bytes": r[1]} for r in rows])
         if rows:
             def mb(n): return f"{n / (1024 * 1024):.1f} MB"
-            facts["answer"] = (f"Top processes in the window: "
+            facts["answer"] = ("Top processes in the window: "
                                + ", ".join(f"{r[0]} ({mb(r[1])})" for r in rows))
         else:
             facts["answer"] = "No process traffic recorded in the window."

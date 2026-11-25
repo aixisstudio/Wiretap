@@ -31,8 +31,7 @@ import logging
 import sqlite3
 import threading
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from paths import data_dir
 
@@ -68,12 +67,12 @@ def _utcnow_minute() -> str:
     """EN: Current UTC minute as 'YYYY-MM-DDTHH:MM' (timezone-aware; utcnow()
     is deprecated since Python 3.12). / FR: Minute UTC courante au format
     'YYYY-MM-DDTHH:MM' (conscient du fuseau ; utcnow() est déprécié depuis 3.12)."""
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M")
 
 
 def _utcnow_iso() -> str:
     """EN: Current UTC instant as ISO string. / FR: Instant UTC courant en ISO."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 # ── Connection & schema / Connexion & schéma ─────────────────────────────────
@@ -214,11 +213,11 @@ def all_settings() -> dict:
 
 # ── Remembered devices / Appareils mémorisés ─────────────────────────────────
 
-def upsert_device(ip: str, mac: Optional[str] = None,
-                  vendor: Optional[str] = None,
-                  device_type: Optional[str] = None,
-                  hostname: Optional[str] = None,
-                  private_mac: Optional[bool] = None) -> None:
+def upsert_device(ip: str, mac: str | None = None,
+                  vendor: str | None = None,
+                  device_type: str | None = None,
+                  hostname: str | None = None,
+                  private_mac: bool | None = None) -> None:
     """
     EN: Persist the best-known identity of a LAN device. NULL/empty fields
         never overwrite stored knowledge — a scan can only ENRICH a row.
@@ -255,7 +254,7 @@ def upsert_device(ip: str, mac: Optional[str] = None,
         logger.error("upsert_device(%s) failed: %s", ip, exc)
 
 
-def device_identity(ip: str, mac: Optional[str] = None) -> dict:
+def device_identity(ip: str, mac: str | None = None) -> dict:
     """
     EN: Recall a stored identity for a device. MAC match wins (DHCP can
         reassign IPs to OTHER devices — an IP-only name could misname a
@@ -441,7 +440,7 @@ def init_forensic_chain() -> None:
 def forensic_verify(limit: int = 5000) -> dict:
     """EN: Verify the hash chain over the most recent rows.
     FR: vérifier la chaîne sur les lignes les plus récentes."""
-    from detection.forensic import verify_chain, GENESIS
+    from detection.forensic import verify_chain
     with _conn_lock:
         rows = get_conn().execute("""
             SELECT type, severity, message, node_id, details, ts, hash, prev_hash
@@ -477,7 +476,7 @@ def get_timeline(minutes: int = 60) -> list[dict]:
     FR: Totaux de paquets/octets par minute plus le nombre d'alertes par
         minute — exactement ce que dessine le graphique timeline du frontend.
     """
-    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
+    cutoff = (datetime.now(UTC) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
 
     with _conn_lock:
         conn = get_conn()
@@ -516,7 +515,7 @@ def get_history(dim: str, key: str, minutes: int = 60) -> list[dict]:
     FR: Historique par entité — octets/paquets par minute pour un hôte ou un
         processus. Utilisé par la vue par application et le panneau de détail.
     """
-    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
+    cutoff = (datetime.now(UTC) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
     with _conn_lock:
         rows = get_conn().execute("""
             SELECT minute, packets, bytes FROM history
@@ -531,7 +530,7 @@ def get_top_processes(minutes: int = 60, limit: int = 50) -> list[dict]:
     EN: Top talkers by process over the window — feeds the Apps view.
     FR: Plus gros émetteurs par processus sur la fenêtre — alimente la vue Apps.
     """
-    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
+    cutoff = (datetime.now(UTC) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
     with _conn_lock:
         rows = get_conn().execute("""
             SELECT key, SUM(packets), SUM(bytes) FROM history
@@ -574,7 +573,7 @@ def cleanup_old_data(hours: int = 24) -> None:
     FR: Supprimer les lignes de plus de `hours` heures — borne la taille de la
         base puisque l'UI n'affiche qu'une fenêtre glissante.
     """
-    cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
+    cutoff = (datetime.now(UTC) - timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M")
     try:
         with _conn_lock:
             conn = get_conn()

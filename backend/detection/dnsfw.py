@@ -272,7 +272,7 @@ def _parse_hosts(text: str, fmt: str = "hosts") -> list[str]:
         else:
             # EN: bare domain or URL (phishing feeds) / FR: domaine nu ou URL
             d = re.sub(r"^https?://", "", line).split("/")[0].split("#")[0].strip()
-            if re.fullmatch(r"[a-z0-9][a-z0-9.\-]*\.[a-z]{2,}", d, re.I):
+            if re.fullmatch(r"[a-z0-9][a-z0-9.\-]*\.[a-z]{2,}", d, re.IGNORECASE):
                 out.append(d)
     return out
 
@@ -300,14 +300,14 @@ class _DnsProtocol(asyncio.DatagramProtocol):
     """EN: asyncio UDP endpoint. Parses, filters, forwards, relays.
     FR: endpoint UDP asyncio. Parse, filtre, relaie."""
 
-    def __init__(self, fw: "DnsFirewall") -> None:
+    def __init__(self, fw: DnsFirewall) -> None:
         self.fw = fw
         self.transport: asyncio.DatagramTransport | None = None
 
     def connection_made(self, transport: asyncio.BaseTransport) -> None:
         self.transport = transport  # type: ignore[assignment]
 
-    def datagram_received(self, data: bytes, addr) -> None:  # noqa: ANN001
+    def datagram_received(self, data: bytes, addr) -> None:
         asyncio.ensure_future(self.fw.handle_query(data, addr, self.transport))
 
     def error_received(self, exc: Exception) -> None:        # EN: ICMP refused upstream etc.
@@ -452,16 +452,16 @@ class DnsFirewall:
         for attempt in range(2):
             try:
                 return await asyncio.wait_for(self._udp_roundtrip(loop, query, ns), timeout=4.0)
-            except (asyncio.TimeoutError, OSError):
+            except (TimeoutError, OSError):
                 continue
         return None
 
     @staticmethod
-    async def _udp_roundtrip(loop, query: bytes, server: str) -> bytes:  # noqa: ANN001
+    async def _udp_roundtrip(loop, query: bytes, server: str) -> bytes:
         fut: asyncio.Future = loop.create_future()
 
         class Up(asyncio.DatagramProtocol):
-            def datagram_received(self, data, addr):  # noqa: ANN001
+            def datagram_received(self, data, addr):
                 if not fut.done():
                     fut.set_result(data)
             def error_received(self, exc):
@@ -505,7 +505,7 @@ class DnsFirewall:
 
     # ── query path / chemin de requête ──────────────────────────────────────
 
-    async def handle_query(self, data: bytes, addr, transport) -> None:  # noqa: ANN001
+    async def handle_query(self, data: bytes, addr, transport) -> None:
         """EN: One query in, one answer out. Never raises into the
         datagram loop. / FR: Une requête entrée, une réponse sortie. Ne
         lève jamais dans la boucle datagram."""

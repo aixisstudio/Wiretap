@@ -40,9 +40,9 @@ import io
 import ipaddress
 import json
 import re
-from typing import Any
 import urllib.parse
 import urllib.request
+from typing import Any
 
 _MAX_BYTES = 4 * 1024 * 1024          # EN: 4 MiB fetch cap / FR: plafond 4 Mio
 _FETCH_TIMEOUT = 10.0

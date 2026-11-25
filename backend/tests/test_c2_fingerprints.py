@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import struct
 
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 from api.main import app
 from api.security import API_TOKEN
@@ -191,8 +191,8 @@ class TestC2FingerprintsDatabase:
             assert "framework" in fp
             assert fp.get("severity") in ("critical", "warning", "info")
             assert fp.get("confidence", 0) >= 50
-            assert "source" in fp and fp["source"]
-            assert "provenance" in fp and fp["provenance"]
+            assert fp.get("source")
+            assert fp.get("provenance")
             assert "ja3" in fp or "ja4" in fp
 
     def test_lookup_c2_by_known_ja3(self) -> None:

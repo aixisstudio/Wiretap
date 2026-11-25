@@ -36,14 +36,14 @@ import subprocess
 import sys
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
 import psutil
 
-from scanner.oui import lookup, is_local_mac, DEVICE_TYPE_COLORS
 from procutils import spawn_kwargs
+from scanner.oui import DEVICE_TYPE_COLORS, is_local_mac, lookup
 
 logger = logging.getLogger("wiretap.scanner")
 
@@ -75,7 +75,7 @@ class Device:
     mac: str
     vendor: str = ""
     device_type: str = "unknown"        # phone / pc / router / iot / tv / unknown
-    hostname: Optional[str] = None
+    hostname: str | None = None
     is_gateway: bool = False            # EN: this device IS the internet box
                                        # FR: cet appareil EST la box internet
     private_mac: bool = False           # EN: randomized/locally-administered MAC
@@ -216,7 +216,7 @@ def _read_arp_cmd() -> list[tuple[str, str]]:
     return pairs
 
 
-def _resolve_hostname(ip: str) -> Optional[str]:
+def _resolve_hostname(ip: str) -> str | None:
     """EN: Reverse-DNS a LAN IP; None on failure. / FR: DNS inverse d'une IP LAN ; None en cas d'échec."""
     try:
         return socket.gethostbyaddr(ip)[0]
@@ -224,7 +224,7 @@ def _resolve_hostname(ip: str) -> Optional[str]:
         return None
 
 
-def default_gateway() -> Optional[str]:
+def default_gateway() -> str | None:
     """
     EN: The IPv4 default gateway — i.e. the user's internet box/router.
         Per-OS readers: /proc/net/route on Linux, `route -n get default` on
@@ -284,7 +284,7 @@ class ARPScanner:
         self.interval = interval
         self._known: dict[str, Device] = {}
         self._running = False
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
 
     def _run(self) -> None:
         """

@@ -39,8 +39,8 @@ from __future__ import annotations
 
 import json
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 
 _MAX_PEERS = 32
 _TIMEOUT = 8

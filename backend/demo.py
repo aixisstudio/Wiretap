@@ -16,7 +16,7 @@ import os
 import random
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from capture.sniffer import Packet
 
@@ -67,7 +67,7 @@ def _pkt(direction, remote_ip, remote_port, size, process=None,
         remote_port=remote_port,
         protocol=protocol,
         size=size,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         direction=direction,
         process_name=process,
         sni=sni,
@@ -96,7 +96,7 @@ class DemoFeeder(threading.Thread):
         FR: Même interface que PacketSniffer.stop() — termine la boucle."""
         self._stopped.set()
 
-    def run(self):                          # noqa: D401 — long-lived loop
+    def run(self):
         self._announce_lan()
         beacon_ip = "185.220.101.4"         # EN: Tor-exit range → suspicious / FR: plage Tor → suspect
         while not self._stopped.is_set():

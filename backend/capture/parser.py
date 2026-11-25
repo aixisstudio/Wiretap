@@ -30,7 +30,6 @@ import ipaddress
 import socket
 import struct
 from dataclasses import dataclass, field
-from typing import Optional
 
 # ── Link-layer types / Types de liaison ──────────────────────────────────────
 DLT_NULL       = 0    # EN: BSD loopback / FR: loopback BSD
@@ -76,14 +75,14 @@ class ParsedPacket:
     dst_ip: str
     protocol: str                          # "TCP" | "UDP" | "ICMP" | "OTHER"
     size: int                              # EN: bytes on the wire / FR: octets sur le fil
-    src_port: Optional[int] = None
-    dst_port: Optional[int] = None
+    src_port: int | None = None
+    dst_port: int | None = None
     tcp_flags: int = 0
     dns: list[tuple[str, str, int]] = field(default_factory=list)
-    sni: Optional[str] = None
+    sni: str | None = None
     # EN: (hostname, requested_ip|None, mac) from a client DHCP message.
     # FR: (nom d'hôte, ip demandée|None, mac) d'un message DHCP client.
-    dhcp: Optional[tuple] = None
+    dhcp: tuple | None = None
     # EN: First ≤64 bytes of a PLAINTEXT TCP payload — used internally by
     #     the stratum/mining detector and the entropy check. NEVER stored
     #     or broadcast: it exists to answer "does this flow speak a
@@ -102,14 +101,14 @@ class ParsedPacket:
     #     None en TLS 1.3, handshake incomplet ou flux non TLS. Les échos
     #     ICMP portent leur tête de payload dans app_head et type/code
     #     dans flags (type << 8 | code).
-    tls_cert: Optional[dict] = None
+    tls_cert: dict | None = None
     # EN: TLS ClientHello fingerprints (JA3 MD5 & JA4 hashes) when seen.
     # FR: Empreintes ClientHello TLS (hachages JA3 MD5 et JA4) quand observées.
-    ja3: Optional[str] = None
-    ja4: Optional[str] = None
+    ja3: str | None = None
+    ja4: str | None = None
 
 
-def parse_frame(linktype: int, buf: bytes) -> Optional[ParsedPacket]:
+def parse_frame(linktype: int, buf: bytes) -> ParsedPacket | None:
     """
     EN: Entry point — decode one captured frame. Returns None for frames we
         can't or don't care to decode (non-IP, truncated, malformed).
@@ -125,7 +124,7 @@ def parse_frame(linktype: int, buf: bytes) -> Optional[ParsedPacket]:
         return None
 
 
-def _parse_frame(linktype: int, buf: bytes) -> Optional[ParsedPacket]:
+def _parse_frame(linktype: int, buf: bytes) -> ParsedPacket | None:
     """EN: Internal — may raise on malformed input; parse_frame guards it.
     FR: Interne — peut lever des exceptions sur entrée malformée ; parse_frame la protège."""
     total_len = len(buf)
@@ -197,7 +196,7 @@ def _parse_frame(linktype: int, buf: bytes) -> Optional[ParsedPacket]:
 
 # ── IPv4 / IPv6 ──────────────────────────────────────────────────────────────
 
-def _parse_ipv4(buf: bytes, wire_len: int) -> Optional[ParsedPacket]:
+def _parse_ipv4(buf: bytes, wire_len: int) -> ParsedPacket | None:
     """
     EN: IPv4 header — variable IHL, fragment-aware (non-first fragments are
         dropped since their ports aren't present).
@@ -220,7 +219,7 @@ def _parse_ipv4(buf: bytes, wire_len: int) -> Optional[ParsedPacket]:
     return _parse_transport(buf[ihl:], proto, src, dst, wire_len)
 
 
-def _parse_ipv6(buf: bytes, wire_len: int) -> Optional[ParsedPacket]:
+def _parse_ipv6(buf: bytes, wire_len: int) -> ParsedPacket | None:
     """
     EN: IPv6 — fixed 40-byte header, then walk the extension-header chain
         (hop-by-hop / routing / dest-opts have a len field; fragment header is
@@ -259,7 +258,7 @@ def _parse_ipv6(buf: bytes, wire_len: int) -> Optional[ParsedPacket]:
 
 
 def _parse_transport(payload: bytes, proto: int, src: str, dst: str,
-                     wire_len: int) -> Optional[ParsedPacket]:
+                     wire_len: int) -> ParsedPacket | None:
     """
     EN: TCP/UDP/ICMP dispatch. TCP extracts flags + SNI attempt; UDP extracts
         DNS answers on port 53.
@@ -513,7 +512,7 @@ def parse_mdns(payload: bytes) -> list[tuple[str, str, int]]:
         return []
 
 
-def _nbns_name(buf: bytes, off: int) -> tuple[Optional[str], int]:
+def _nbns_name(buf: bytes, off: int) -> tuple[str | None, int]:
     """
     EN: Decode one NetBIOS-encoded name at `off`: a 0x20 length byte, then
         32 bytes of "first-level encoding" (each nibble as 'A'..'P'), then a
@@ -592,7 +591,7 @@ def parse_nbns(payload: bytes) -> list[tuple[str, str, int]]:
         return []
 
 
-def parse_dhcp(payload: bytes) -> Optional[tuple]:
+def parse_dhcp(payload: bytes) -> tuple | None:
     """
     EN: Parse a client DHCP/BOOTP message (UDP 67/68). Layout: fixed header
         (236 B, chaddr = client MAC at offset 28) + magic cookie 63 82 53 63
@@ -656,7 +655,7 @@ def _looks_like_ip(s: str) -> bool:
         return False
 
 
-def parse_tls_client_hello(payload: bytes) -> tuple[Optional[str], Optional[str], Optional[str]]:
+def parse_tls_client_hello(payload: bytes) -> tuple[str | None, str | None, str | None]:
     """
     EN: Unpack a TLS ClientHello record and extract:
           1. SNI hostname (server_name)
@@ -711,7 +710,7 @@ def parse_tls_client_hello(payload: bytes) -> tuple[Optional[str], Optional[str]
         sig_algs: list[int] = []
         supported_versions: list[int] = []
         alpn_str = "00"
-        sni: Optional[str] = None
+        sni: str | None = None
 
         if off + 2 <= len(body):
             ext_total = struct.unpack("!H", body[off:off + 2])[0]
@@ -817,7 +816,7 @@ def parse_tls_client_hello(payload: bytes) -> tuple[Optional[str], Optional[str]
         return None, None, None
 
 
-def parse_tls_sni(payload: bytes) -> Optional[str]:
+def parse_tls_sni(payload: bytes) -> str | None:
     """
     EN: Extract the SNI hostname from a TLS ClientHello when the whole
         handshake fits in one segment — the overwhelmingly common case.

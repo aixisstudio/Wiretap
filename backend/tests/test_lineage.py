@@ -50,5 +50,5 @@ def test_verdict_fires_once_per_signature():
 
 
 def test_dead_pid_no_crash():
-    w = LineageWatch(table_probe=lambda: {})
+    w = LineageWatch(table_probe=dict)
     assert w.verdict(999999, "ghost") is None

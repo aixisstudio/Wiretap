@@ -31,7 +31,6 @@ from __future__ import annotations
 import os
 import socket
 import struct
-from typing import Optional
 
 # EN: netlink + nfnetlink_queue constants / FR: constantes netlink
 NETLINK_NETFILTER = 12
@@ -100,7 +99,7 @@ def _parse_attrs(body: bytes) -> dict[int, bytes]:
     return out
 
 
-def parse_packet_message(data: bytes) -> Optional[tuple[int, bytes]]:
+def parse_packet_message(data: bytes) -> tuple[int, bytes] | None:
     """EN: Extract (packet_id, ip_payload) from one NFQNL_MSG_PACKET
     netlink message. Returns None for non-packet messages (ACKs etc.).
     Exposed for unit tests. / FR: Extrait (id, payload IP) d'un message
@@ -155,7 +154,7 @@ class NfqSocket:
 
     def __init__(self, queue: int = 7):
         self.queue = queue
-        self._fd: Optional[socket.socket] = None
+        self._fd: socket.socket | None = None
         self._seq = 0
 
     # ── lifecycle / cycle de vie ────────────────────────────────────────
@@ -232,7 +231,7 @@ class NfqSocket:
                                       f"{os.strerror(-err)}")
                         return
                     off += (length + 3) & ~3 if length else len(data)
-        except socket.timeout:
+        except TimeoutError:
             # EN: No ACK back within the window — the kernel answered
             #     nothing; treat tolerated steps as silent success.
             # FR: Pas d'ACK dans la fenêtre — étape tolérée = succès muet.
@@ -240,7 +239,7 @@ class NfqSocket:
                 raise OSError("nfqueue config timed out — kernel did "
                               "not acknowledge the bind")
 
-    def recv_packets(self, timeout: Optional[float] = None) \
+    def recv_packets(self, timeout: float | None = None) \
             -> list[tuple[int, bytes]]:
         """EN: All diverted packets in the next datagram as
         [(id, raw IP payload), ...] — a single recv() can carry several
@@ -250,7 +249,7 @@ class NfqSocket:
         self._fd.settimeout(timeout)
         try:
             data = self._fd.recv(65535)
-        except socket.timeout:
+        except TimeoutError:
             return []
         out = []
         off = 0

@@ -75,9 +75,10 @@ def main() -> int:
     os.environ["WIRETAP_PORT"] = str(port)
     os.environ["WIRETAP_BIND"] = args.bind
 
-    from api.main import app           # noqa: E402
-    from api.security import get_token  # noqa: E402
-    import uvicorn                      # noqa: E402
+    import uvicorn
+
+    from api.main import app
+    from api.security import get_token
 
     token = get_token()
     url = f"http://127.0.0.1:{port}/?token={token}"

@@ -42,7 +42,6 @@ import ipaddress
 import re
 import time
 import uuid
-from typing import Optional
 
 _FIELDS = ("remote_ip", "host", "process_name", "cmdline", "parent_name",
            "remote_port", "protocol", "direction", "size", "asn", "country",
@@ -196,7 +195,7 @@ class CustomRules:
 
     def __init__(self):
         self._rules: list[dict] = []
-        self._compiled: dict[str, "re.Pattern"] = {}
+        self._compiled: dict[str, re.Pattern] = {}
         self._hits: dict[str, dict] = {}   # EN: rid → {count,last} / FR: rid → {count,last}
 
     # ── persistence / persistance ────────────────────────────────────────────
@@ -277,7 +276,7 @@ class CustomRules:
 
     def add(self, name: str, field: str, op: str, value: str,
             severity: str = "warning", action: str = "alert",
-            conds: Optional[list] = None) -> dict:
+            conds: list | None = None) -> dict:
         if len(self._rules) >= _MAX_RULES:
             raise ValueError("rule limit reached")
         rule = {
@@ -309,7 +308,7 @@ class CustomRules:
                 return True
         return False
 
-    def toggle(self, rule_id: str, enabled: bool) -> Optional[dict]:
+    def toggle(self, rule_id: str, enabled: bool) -> dict | None:
         for r in self._rules:
             if r["id"] == rule_id:
                 r["enabled"] = bool(enabled)
@@ -319,7 +318,7 @@ class CustomRules:
     # ── matching / correspondance ────────────────────────────────────────────
 
     @staticmethod
-    def _field_value(pkt, field: str, geo: Optional[dict] = None):
+    def _field_value(pkt, field: str, geo: dict | None = None):
         """EN: Extract the comparable value from a Packet.
         FR: Extraire la valeur comparable d'un Packet."""
         if field == "remote_ip":
@@ -394,7 +393,7 @@ class CustomRules:
                 continue
         return False
 
-    def check(self, pkt, geo: Optional[dict] = None) -> list[dict]:
+    def check(self, pkt, geo: dict | None = None) -> list[dict]:
         """EN: All enabled rules matching this packet (usually one per
         packet is emitted — callers may cap). Hit counters updated.
         FR: Toutes les règles actives qui matchent ce paquet (en pratique

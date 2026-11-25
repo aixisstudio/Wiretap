@@ -136,7 +136,7 @@ class TestLinuxReal:
             pytest.skip("iptables missing")
         fm = FirewallManager(tempfile.mkdtemp())
         real_run = fm._run
-        fm._run = lambda args: real_run(_sudo(args))       # noqa: SLF001
+        fm._run = lambda args: real_run(_sudo(args))
         rule = fm.add_rule("ip", "203.0.113.9", action="block")
         try:
             assert rule["applied"], f"apply failed: {rule['error']}"
@@ -187,19 +187,19 @@ class TestLinuxReal:
             pytest.skip("tc missing")
         fm = FirewallManager(tempfile.mkdtemp())
         real_run = fm._run
-        fm._run = lambda args: real_run(_sudo(args))       # noqa: SLF001
+        fm._run = lambda args: real_run(_sudo(args))
         rule = fm.add_rule("ip", "203.0.113.10", action="throttle", rate=64)
         try:
             if not rule["applied"]:
                 pytest.skip(f"tc setup refused: {rule['error']}")
             show = _run(_sudo(["tc", "filter", "show", "dev",
-                               fm._tc_iface, "egress"]))                 # noqa: SLF001
+                               fm._tc_iface, "egress"]))
             assert "flower" in show.stdout
         finally:
             fm.remove_rule(rule["id"])
-            if fm._tc_iface:                                             # noqa: SLF001
+            if fm._tc_iface:
                 _run(_sudo(["tc", "qdisc", "del", "dev",
-                            fm._tc_iface, "clsact"]))                    # noqa: SLF001
+                            fm._tc_iface, "clsact"]))
 
     def test_perf_event_open(self):
         """EN: perf_event_open on own process through the production
@@ -310,13 +310,14 @@ class TestMacosReal:
         through FirewallManager against a temp hosts path (no /etc write).
         FR: Le sinkhole domaine est un bloc hosts marqué — apply/remove
         via FirewallManager sur un hosts temporaire (pas d'écriture /etc)."""
-        from detection.firewall import FirewallManager
         from pathlib import Path
+
+        from detection.firewall import FirewallManager
 
         fake_hosts = Path(tempfile.mkdtemp()) / "hosts"
         fake_hosts.write_text("127.0.0.1 localhost\n")
         fm = FirewallManager(tempfile.mkdtemp())
-        fm._hosts_path = lambda: fake_hosts                          # noqa: SLF001
+        fm._hosts_path = lambda: fake_hosts
         rule = fm.add_rule("domain", "itest-sinkhole.example",
                            action="sinkhole")
         try:

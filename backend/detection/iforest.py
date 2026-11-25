@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Optional
 
 
 def _c(n: int) -> float:
@@ -45,13 +44,13 @@ def _c(n: int) -> float:
 
 
 class _Node:
-    __slots__ = ("feat", "split", "left", "right", "size")
+    __slots__ = ("feat", "left", "right", "size", "split")
 
     def __init__(self, size: int):
         self.feat = -1
         self.split = 0.0
-        self.left: Optional[_Node] = None
-        self.right: Optional[_Node] = None
+        self.left: _Node | None = None
+        self.right: _Node | None = None
         self.size = size
 
 
@@ -62,7 +61,7 @@ class IsolationForest:
     nouveau vecteur vers un score 0..1 (plus haut = plus isolé)."""
 
     def __init__(self, n_trees: int = 64, sample: int = 256,
-                 max_depth: int = 8, seed: Optional[int] = None):
+                 max_depth: int = 8, seed: int | None = None):
         self.n_trees = n_trees
         self.sample = sample
         self.max_depth = max_depth

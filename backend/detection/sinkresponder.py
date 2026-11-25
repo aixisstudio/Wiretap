@@ -41,9 +41,9 @@ import threading
 import time
 
 try:                                                 # EN: reuse our own TLS parser
-    from capture.parser import parse_tls_sni         # FR: réutilise notre parseur TLS
+    from capture.parser import parse_tls_sni  # FR: réutilise notre parseur TLS
 except ImportError:                                  # pragma: no cover
-    from ..capture.parser import parse_tls_sni       # type: ignore
+    from ..capture.parser import parse_tls_sni  # type: ignore
 
 _MAX_HITS = 200
 _READ_TIMEOUT = 4.0
@@ -136,7 +136,7 @@ class SinkholeResponder:
         while not self._stop.is_set():
             try:
                 conn, peer = sock.accept()
-            except socket.timeout:
+            except TimeoutError:
                 continue
             except OSError:
                 break
@@ -173,7 +173,7 @@ class SinkholeResponder:
                           "body_head": body})
             conn.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\n"
                          b"Connection: close\r\n\r\nOK")
-        except (OSError, socket.timeout):
+        except (TimeoutError, OSError):
             pass
         finally:
             try:
@@ -192,7 +192,7 @@ class SinkholeResponder:
             sni = parse_tls_sni(data) if data[:2] == b"\x16\x03" else None
             self._record("tls", peer[1], sni or "",
                          {"cipher_attempt": bool(data)})
-        except (OSError, socket.timeout):
+        except (TimeoutError, OSError):
             pass
         finally:
             try:

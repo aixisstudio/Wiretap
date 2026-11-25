@@ -50,7 +50,8 @@ import os
 import platform
 import threading
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
+
 from procutils import spawn_kwargs
 
 logger = logging.getLogger(__name__)
@@ -94,7 +95,7 @@ class AskMode:
         self._timeout = max(3.0, min(float(timeout), 120.0))
         self._failopen = failopen
         self._nfq = None                     # EN: NfqSocket / FR: NfqSocket
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         self._running = False
         # EN: flow-key → [event, packet_id, ts] pending verdict;
         #     decided flow-key → allow verdict
@@ -119,8 +120,8 @@ class AskMode:
 
     # ── lifecycle / cycle de vie ──────────────────────────────────────────
 
-    def configure(self, timeout: Optional[float] = None,
-                  failopen: Optional[bool] = None) -> None:
+    def configure(self, timeout: float | None = None,
+                  failopen: bool | None = None) -> None:
         """EN: Live-update timeout / fail-open policy from settings — takes
             effect on the next pending flow (no restart needed).
         FR: Met à jour à chaud timeout / fail-open depuis les réglages —
@@ -133,7 +134,7 @@ class AskMode:
         if failopen is not None:
             self._failopen = bool(failopen)
 
-    def start(self, exempt_ips: Optional[list] = None) -> tuple[bool, str]:
+    def start(self, exempt_ips: list | None = None) -> tuple[bool, str]:
         """EN: `exempt_ips` get iptables RETURN rules before the NFQUEUE
         jump so "allow always" verdicts survive restarts — bounded to 64.
         FR: `exempt_ips` reçoivent des règles RETURN avant le saut NFQUEUE
@@ -160,7 +161,8 @@ class AskMode:
             except ValueError:
                 continue
         import subprocess
-        from .nfqueue import NfqSocket                        # noqa: PLC0415
+
+        from .nfqueue import NfqSocket
         try:
             self._nfq = NfqSocket(_QUEUE_NUM)
             self._nfq.open()
@@ -303,7 +305,7 @@ class AskMode:
     # ── verdict path / chemin du verdict ─────────────────────────────────
 
     @staticmethod
-    def _flow_key(payload: bytes) -> Optional[tuple]:
+    def _flow_key(payload: bytes) -> tuple | None:
         """EN: Extract (remote_ip, remote_port, proto) from the raw IPv4/6
         packet payload NFQUEUE hands us — only TCP/UDP outbound matters.
         FR: Extrait (ip, port, proto) du paquet brut NFQUEUE — TCP/UDP

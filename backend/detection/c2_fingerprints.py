@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger("wiretap.detection.c2_fingerprints")
 
@@ -25,7 +25,7 @@ _FINGERPRINTS: list[dict[str, Any]] = []
 _LOADED = False
 
 
-def _find_c2_file() -> Optional[Path]:
+def _find_c2_file() -> Path | None:
     """EN: Locate c2_fingerprints.json from data_dir, package, or repo root.
     FR: Localiser c2_fingerprints.json depuis data_dir, paquet ou racine du repo."""
     try:
@@ -100,7 +100,7 @@ def _ensure_loaded() -> None:
         reload_fingerprints()
 
 
-def lookup_c2(ja3: Optional[str] = None, ja4: Optional[str] = None) -> Optional[dict[str, Any]]:
+def lookup_c2(ja3: str | None = None, ja4: str | None = None) -> dict[str, Any] | None:
     """EN: Match observed JA3 / JA4 hashes against known C2 profiles.
     Returns matched profile dict or None. O(1) dictionary hit.
     FR: Associer les empreintes JA3 / JA4 observées aux profils C2 connus.

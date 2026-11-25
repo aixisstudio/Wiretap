@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detection.secretwatch import SecretWatch, harvest, _shape
+from detection.secretwatch import SecretWatch, _shape, harvest
 
 AWS = "AKIAIOSFODNN7EXAMPLE"
 OAI = "sk-" + "a" * 40

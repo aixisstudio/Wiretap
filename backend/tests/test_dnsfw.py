@@ -11,8 +11,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detection.dnsfw import (DnsFirewall, DomainFilter, _parse_hosts,
-                             build_nxdomain, parse_qname, parse_qtype)
+from detection.dnsfw import (
+    DnsFirewall,
+    DomainFilter,
+    _parse_hosts,
+    build_nxdomain,
+    parse_qname,
+    parse_qtype,
+)
 
 
 def _query(name: str, qtype: int = 1) -> bytes:

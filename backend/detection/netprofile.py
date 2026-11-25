@@ -65,16 +65,16 @@ def wifi_ssid_bssid(sysname: str) -> tuple[str | None, str | None]:
         #     du temps ; wdutil exige sudo depuis 14.4.
         for iface in ("en0", "en1"):
             out = _run(["ipconfig", "getsummary", iface])
-            m = re.search(r"^\s*SSID\s*:\s*(.+)$", out, re.M)
+            m = re.search(r"^\s*SSID\s*:\s*(.+)$", out, re.MULTILINE)
             if m:
                 ssid = m.group(1).strip()
-                mb = re.search(r"^\s*BSSID\s*:\s*([0-9a-fA-F:]{17})", out, re.M)
+                mb = re.search(r"^\s*BSSID\s*:\s*([0-9a-fA-F:]{17})", out, re.MULTILINE)
                 return ssid, (mb.group(1).lower() if mb else None)
         return None, None
     if sysname == "Windows":
         out = _run(["netsh", "wlan", "show", "interfaces"])
-        ms = re.search(r"^\s*SSID\s*:\s*(.+)$", out, re.M)
-        mb = re.search(r"^\s*BSSID\s*:\s*([0-9A-Fa-f:]{17})", out, re.M)
+        ms = re.search(r"^\s*SSID\s*:\s*(.+)$", out, re.MULTILINE)
+        mb = re.search(r"^\s*BSSID\s*:\s*([0-9A-Fa-f:]{17})", out, re.MULTILINE)
         if ms:
             return ms.group(1).strip(), (mb.group(1).lower() if mb else None)
         return None, None
@@ -149,7 +149,7 @@ class NetworkProfiler:
     le profil pare-feu mappé au changement. No-op silencieux si désactivé,
     non mappé ou empreinte inconnue."""
 
-    def __init__(self, fw, sysname: str) -> None:  # noqa: ANN001
+    def __init__(self, fw, sysname: str) -> None:
         self.fw = fw
         self.sysname = sysname
         self.enabled = False

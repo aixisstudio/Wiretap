@@ -42,7 +42,7 @@ if sys.stderr is None:
 
 # EN: Configure logging BEFORE importing app modules so they inherit handlers.
 # FR: Configurer les logs AVANT d'importer les modules pour qu'ils héritent des handlers.
-from logging_config import setup_logging  # noqa: E402
+from logging_config import setup_logging
 
 setup_logging(logging.INFO)
 
@@ -52,8 +52,9 @@ setup_logging(logging.INFO)
 # FR: Import direct — PyInstaller suit cette chaîne et embarque tous les
 #     paquets backend (api, capture, classifier, detection, resolver,
 #     scanner, storage) automatiquement.
-from api.main import app  # noqa: E402
-import uvicorn             # noqa: E402
+import uvicorn
+
+from api.main import app
 
 if __name__ == '__main__':
     # EN: Optional --port/--bind argv flags — needed by the Windows elevated

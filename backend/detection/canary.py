@@ -32,7 +32,6 @@ import asyncio
 import hashlib
 import logging
 import threading
-import time
 from pathlib import Path
 
 logger = logging.getLogger("wiretap.canary")
@@ -166,7 +165,7 @@ class HoneyPorts:
                 self.errors.append(f"{port}: {e}")
         return {"bound": bound, "errors": list(self.errors)}
 
-    async def _touch(self, reader, writer, port: int) -> None:  # noqa: ANN001
+    async def _touch(self, reader, writer, port: int) -> None:
         peer = writer.get_extra_info("peername")
         src = peer[0] if peer else "?"
         try:

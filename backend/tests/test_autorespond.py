@@ -1,12 +1,11 @@
 """EN/FR: Tests réponse automatique."""
 
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from detection.autorespond import AutoResponder, ELIGIBLE_TYPES
+from detection.autorespond import AutoResponder
 
 
 class FakeFw:

@@ -34,7 +34,6 @@ FR: Verdicts par lignée de processus — le malware se cache dans l'ascen-
 
 from __future__ import annotations
 
-import re
 import subprocess
 import threading
 import time

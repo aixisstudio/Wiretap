@@ -79,8 +79,7 @@ import time
 import uuid
 from collections import OrderedDict, defaultdict, deque
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from capture.sniffer import Packet
 from scanner.arp_scanner import Device
@@ -291,10 +290,10 @@ class Alert:
     type: str
     severity: str          # "info" | "warning" | "critical"
     message: str           # EN: English fallback / FR: texte de repli en anglais
-    node_id: Optional[str] = None
+    node_id: str | None = None
     details: dict = field(default_factory=dict)
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
 
     def to_dict(self) -> dict:
         return {

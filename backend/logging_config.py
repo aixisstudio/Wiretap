@@ -18,7 +18,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from paths import data_dir, chown_to_user
+from paths import chown_to_user, data_dir
 
 
 def setup_logging(level: int = logging.INFO) -> Path:
