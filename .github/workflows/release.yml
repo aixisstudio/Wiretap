@@ -75,8 +75,11 @@ jobs:
           mkdir -p tap/Formula
           cp wiretap.rb tap/Formula/wiretap.rb
           cd tap && git add Formula/wiretap.rb
+          # EN: idempotent — a re-run with an unchanged formula is not a
+          #     failure. / FR: idempotent — relancer sans changement de
+          #     formule n'est pas un échec.
           git -c user.name=wiretap-bot -c user.email=bot@aixisstudio.github.io \
-              commit -m "wiretap $V" && git push
+              commit -m "wiretap $V" && git push || echo "formula unchanged, skipping push"
 
   winget:
     runs-on: windows-latest
