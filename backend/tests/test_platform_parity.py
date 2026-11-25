@@ -4,6 +4,9 @@ import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
+import platform as _plat
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
@@ -112,6 +115,10 @@ def test_powershell_primary_path():
     assert listeners["8080"]["pid"] == 1000
 
 
+@pytest.mark.skipif(_plat.system() == "Windows", reason=(
+    "pathlib is platform-locked: Path('/proc/net/tcp') becomes a Windows path "
+    "on win32 and the Linux /proc fixture cannot be simulated faithfully — "
+    "the hex parsing is verified on the ubuntu and macOS runners"))
 def test_linux_proc_net_tcp():
     """EN: /proc/net/tcp hex parsing — no lsof needed on minimal installs.
     FR: parsing hexa /proc/net/tcp — pas besoin de lsof."""
