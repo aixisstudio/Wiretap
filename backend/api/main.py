@@ -118,6 +118,8 @@ from detection.dnsfw import DnsFirewall
 from detection.netprofile import NetworkProfiler
 from detection import digest as digestmod
 from detection.aiwatch import AiWatch
+from detection.secretwatch import SecretWatch
+from detection.supplychain import SupplyChainWatch
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -164,6 +166,8 @@ dnsfw = DnsFirewall(data_dir())   # EN: filtering DNS proxy (opt-in) / FR: proxy
 import platform as _platform
 netprofiler = NetworkProfiler(fw, _platform.system())  # EN: network-aware auto profiles / FR: profils auto selon le réseau
 aiwatch = AiWatch()                  # EN: AI traffic governance / FR: gouvernance du trafic IA
+secretwatch = SecretWatch()          # EN: local DLP / FR: DLP local
+scwatch = SupplyChainWatch()         # EN: install-time governance / FR: gouvernance des installs
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -1154,6 +1158,27 @@ def _process_batch(packets: list[Packet]) -> None:
         #     lock-guarded internally, no executor hop needed.
         # FR: La détection tourne dans la boucle — analyze_packet est
         #     protégée par verrou, pas besoin de saut d'executor.
+        _hostname_lc = (geo or {}).get("hostname") or ""
+        for sc_alert in scwatch.observe(pkt.process_name or "",
+                                        _hostname_lc, pkt.direction, remote_ip):
+            sc = Alert(type=sc_alert["type"], severity=sc_alert["severity"],
+                       message=sc_alert["message"],
+                       node_id=remote_ip, details=sc_alert["details"])
+            _flag_alert(sc, nodes)
+            scd = sc.to_dict()
+            db.log_alert(scd)
+            out_alerts.append(scd)
+        if pkt.direction == "out" and pkt.remote_port in (80, 8080, 8000, 8888):
+            for sw_alert in secretwatch.scan_payload(
+                    getattr(pkt, "app_head", b"") or b"",
+                    pkt.process_name or "", remote_ip):
+                sw = Alert(type=sw_alert["type"], severity=sw_alert["severity"],
+                           message=sw_alert["message"],
+                           node_id=remote_ip, details=sw_alert["details"])
+                _flag_alert(sw, nodes)
+                swd = sw.to_dict()
+                db.log_alert(swd)
+                out_alerts.append(swd)
         for aw_alert in aiwatch.observe(pkt.process_name or "",
                                         (geo or {}).get("hostname") or "",
                                         pkt.direction, pkt.size):
@@ -1164,6 +1189,20 @@ def _process_batch(packets: list[Packet]) -> None:
             awd = aw.to_dict()
             db.log_alert(awd)
             out_alerts.append(awd)
+        if pkt.direction == "out":
+            from detection.aiwatch import match_service as _msvc, AI_SERVICES as _AISVC
+            _svc = _msvc(_hostname_lc)
+            if _svc and pkt.pid:
+                corr = secretwatch.correlate_ai(pkt.process_name or "", pkt.pid,
+                                                _AISVC[_svc]["name"])
+                if corr:
+                    ca = Alert(type=corr["type"], severity=corr["severity"],
+                               message=corr["message"],
+                               node_id=remote_ip, details=corr["details"])
+                    _flag_alert(ca, nodes)
+                    cad = ca.to_dict()
+                    db.log_alert(cad)
+                    out_alerts.append(cad)
         for alert in detector.analyze_packet(pkt, geo):
             _flag_alert(alert, nodes)
             alert_dict = alert.to_dict()
@@ -2139,6 +2178,16 @@ def _load_settings() -> None:
     #     connus persistent pour que SHADOW_AI ne tire qu'une fois.
     aiwatch.enabled = bool(db.get_setting("aiwatch_enabled", True))
     aiwatch.load_known(db.get_setting("aiwatch_known", []) or [])
+    # EN: Secrets egress watch — harvest at startup (RAM only, opt-out).
+    # FR: veille secrets — récolte au démarrage (RAM seulement).
+    secretwatch.enabled = bool(db.get_setting("secretwatch_enabled", True))
+    if secretwatch.enabled:
+        try:
+            n = secretwatch.register()
+            if n:
+                logger.info("secretwatch: %d secret(s) registered (values never stored/logged)", n)
+        except Exception as e:                      # noqa: BLE001
+            logger.warning("secretwatch harvest failed: %s", e)
     # EN: Network-aware profiles — opt-in; mappings restored, watcher
     #     started when enabled. / FR: Profils selon le réseau — opt-in.
     netprofiler.mappings = {str(k): str(v) for k, v in
@@ -3309,6 +3358,28 @@ async def aiwatch_config(body: dict) -> dict:
     if body.get("reset"):
         aiwatch.reset_rows()
     return aiwatch.activity()
+
+
+
+@app.get("/secretwatch", dependencies=_AUTH)
+async def secretwatch_status() -> dict:
+    """EN: Secrets egress watch state — counts/shapes only, NEVER values.
+    FR: état de la veille secrets — compteurs/formes, JAMAIS les valeurs."""
+    return secretwatch.status()
+
+
+@app.post("/secretwatch/rescan", dependencies=_AUTH)
+async def secretwatch_rescan() -> dict:
+    """EN: Re-harvest env/dotfiles on demand. / FR: récolte à la demande."""
+    loop = asyncio.get_running_loop()
+    n = await loop.run_in_executor(None, secretwatch.register)
+    return {"ok": True, "registered": n}
+
+
+@app.get("/supplychain", dependencies=_AUTH)
+async def supplychain_status() -> dict:
+    """EN: Supply-chain watch state. / FR: état de la veille supply-chain."""
+    return scwatch.status()
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)

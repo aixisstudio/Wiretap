@@ -294,7 +294,17 @@ def _parse_transport(payload: bytes, proto: int, src: str, dst: str,
             #     tête. TLS reste opaque : du chiffré dans app_head serait
             #     inutile et le contrat vie privée dit « clair seulement ».
             if tcp_payload[:2] != b"\x16\x03":
-                app_head = tcp_payload[:64]
+                # EN: HTTP-shaped plaintext gets a wider head (256B) — the
+                #     secrets egress watch needs Authorization-style headers
+                #     which sit past 64B. Still transient, never stored.
+                # FR: le plaintext HTTP gagne une tête plus large (256o) —
+                #     la veille secrets a besoin des en-têtes type
+                #     Authorization au-delà de 64o. Toujours transitoire.
+                if tcp_payload[:4] in (b"GET ", b"POST", b"PUT ", b"HEAD",
+                                       b"DELE", b"PATC", b"OPTI"):
+                    app_head = tcp_payload[:256]
+                else:
+                    app_head = tcp_payload[:64]
             # EN: Passive server-cert watch — bounded flow reassembly,
             #     returns the leaf cert dict once the handshake completes.
             #     Feeds on the FULL segment, independent of app_head.
