@@ -476,4 +476,11 @@ export default {  // Navigation
   dnsfw_stopped: 'stopped',
   dnsfw_refresh: 'Refresh lists',
   dnsfw_setup: 'One-time setup: set your system DNS to 127.0.0.1 (port 5353: see docs) — encrypted upstream hides queries from your ISP.',
+  np_title: 'Automatic profiles by network',
+  np_hint: 'Switch firewall profile automatically when you change networks (Wi-Fi or gateway). Assign the current network to a profile — the switch happens silently next time you join it.',
+  np_enable: 'Auto-switch profiles by network',
+  np_current: 'Current network',
+  np_assign: 'Assign current network to',
+  np_none: '(none)',
+  np_applied: 'last applied',
 }

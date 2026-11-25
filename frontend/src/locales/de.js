@@ -472,4 +472,11 @@ export default {
   dnsfw_stopped: 'gestoppt',
   dnsfw_refresh: 'Listen aktualisieren',
   dnsfw_setup: 'Einmalige Einrichtung: System-DNS auf 127.0.0.1 setzen (Port 5353: siehe Doku).',
+  np_title: 'Automatische Profile pro Netzwerk',
+  np_hint: 'Wechselt das Firewall-Profil automatisch je nach Netzwerk (WLAN oder Gateway).',
+  np_enable: 'Auto-Wechsel pro Netzwerk',
+  np_current: 'Aktuelles Netzwerk',
+  np_assign: 'Aktuelles Netzwerk zuweisen zu',
+  np_none: '(keines)',
+  np_applied: 'zuletzt angewendet',
 }

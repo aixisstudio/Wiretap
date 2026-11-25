@@ -472,4 +472,11 @@ export default {
   dnsfw_stopped: '',
   dnsfw_refresh: ' ',
   dnsfw_setup: ' :   DNS 127.0.0.1 ( 5353: . ).',
+  np_title: 'Автопрофили по сети',
+  np_hint: 'Автоматическое переключение профиля файрвола по сети (Wi-Fi или шлюз).',
+  np_enable: 'Автопереключение по сети',
+  np_current: 'Текущая сеть',
+  np_assign: 'Назначить текущую сеть',
+  np_none: '(нет)',
+  np_applied: 'последнее применение',
 }

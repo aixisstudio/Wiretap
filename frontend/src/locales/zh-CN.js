@@ -472,4 +472,11 @@ export default {
   dnsfw_stopped: '已停止',
   dnsfw_refresh: '刷新列表',
   dnsfw_setup: '一次性设置：将系统 DNS 设为 127.0.0.1（端口 5353：见文档）。',
+  np_title: '按网络自动切换配置文件',
+  np_hint: '根据网络（Wi-Fi 或网关）自动切换防火墙配置文件。将当前网络分配给配置文件，下次加入时会静默切换。',
+  np_enable: '按网络自动切换',
+  np_current: '当前网络',
+  np_assign: '将当前网络分配给',
+  np_none: '（无）',
+  np_applied: '上次应用',
 }

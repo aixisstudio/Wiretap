@@ -472,4 +472,11 @@ export default {  // Navigation
   dnsfw_stopped: 'arrêté',
   dnsfw_refresh: 'Rafraîchir les listes',
   dnsfw_setup: 'Configuration unique : passez le DNS système à 127.0.0.1 (port 5353 : voir docs) — l\'amont chiffré masque les requêtes au FAI.',
+  np_title: 'Profils automatiques par réseau',
+  np_hint: 'Change de profil pare-feu automatiquement selon le réseau (Wi-Fi ou passerelle). Assignez le réseau courant à un profil — la bascule se fera silencieusement à la prochaine connexion.',
+  np_enable: 'Bascule auto par réseau',
+  np_current: 'Réseau courant',
+  np_assign: 'Assigner le réseau courant à',
+  np_none: '(aucun)',
+  np_applied: 'dernière application',
 }

@@ -472,4 +472,11 @@ export default {
   dnsfw_stopped: '停止',
   dnsfw_refresh: 'リスト更新',
   dnsfw_setup: '初回設定: システムDNSを127.0.0.1に（ポート5353: ドキュメント参照）。',
+  np_title: 'ネットワーク別自動プロファイル',
+  np_hint: 'ネットワーク（Wi-Fiまたはゲートウェイ）に応じてファイアウォールプロファイルを自動切替。',
+  np_enable: 'ネットワーク別自動切替',
+  np_current: '現在のネットワーク',
+  np_assign: '現在のネットワークを割り当て',
+  np_none: '（なし）',
+  np_applied: '最終適用',
 }

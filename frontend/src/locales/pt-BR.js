@@ -472,4 +472,11 @@ export default {
   dnsfw_stopped: 'parado',
   dnsfw_refresh: 'Atualizar listas',
   dnsfw_setup: 'Configuração única: defina o DNS do sistema para 127.0.0.1 (porta 5353: ver docs).',
+  np_title: 'Perfis automáticos por rede',
+  np_hint: 'Troca o perfil do firewall conforme a rede (Wi-Fi ou gateway).',
+  np_enable: 'Troca automática por rede',
+  np_current: 'Rede atual',
+  np_assign: 'Atribuir rede atual a',
+  np_none: '(nenhum)',
+  np_applied: 'última aplicação',
 }

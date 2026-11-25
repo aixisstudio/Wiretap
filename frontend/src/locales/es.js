@@ -470,4 +470,11 @@ export default {  // Navegación
   dnsfw_stopped: 'detenido',
   dnsfw_refresh: 'Actualizar listas',
   dnsfw_setup: 'Configuración única: DNS del sistema a 127.0.0.1 (puerto 5353: ver docs).',
+  np_title: 'Perfiles automáticos por red',
+  np_hint: 'Cambia de perfil de cortafuegos según la red (Wi-Fi o puerta de enlace).',
+  np_enable: 'Cambio automático por red',
+  np_current: 'Red actual',
+  np_assign: 'Asignar red actual a',
+  np_none: '(ninguno)',
+  np_applied: 'última aplicación',
 }

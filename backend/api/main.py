@@ -115,6 +115,7 @@ from detection import protomatch
 from detection.sinkresponder import SinkholeResponder
 from detection.threatintel import ThreatIntel
 from detection.dnsfw import DnsFirewall
+from detection.netprofile import NetworkProfiler
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -158,6 +159,8 @@ miner = MinerDetector()           # EN: stratum/pool/CPU mining signals / FR: si
 slm = LocalSlm()                  # EN: optional localhost LLM enrichment / FR: enrichissement LLM local
 custom_rules = CustomRules()      # EN: user-defined alert rules / FR: règles d'alerte utilisateur
 dnsfw = DnsFirewall(data_dir())   # EN: filtering DNS proxy (opt-in) / FR: proxy DNS filtrant (opt-in)
+import platform as _platform
+netprofiler = NetworkProfiler(fw, _platform.system())  # EN: network-aware auto profiles / FR: profils auto selon le réseau
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -2116,6 +2119,13 @@ def _load_settings() -> None:
                     bind_port=int(db.get_setting("dnsfw_bind_port", 5353) or 5353))
     for _d in (db.get_setting("dnsfw_whitelist", []) or []):
         dnsfw.filter.whitelist_add(_d)
+    # EN: Network-aware profiles — opt-in; mappings restored, watcher
+    #     started when enabled. / FR: Profils selon le réseau — opt-in.
+    netprofiler.mappings = {str(k): str(v) for k, v in
+                            (db.get_setting("netprofile_mappings", {}) or {}).items()}
+    if db.get_setting("netprofile_enabled", False):
+        netprofiler.enabled = True
+        netprofiler.start()
     # EN: Ask-on-first-connect (Linux NFQUEUE) — started only when the
     #     persisted opt-in is set AND the platform allows it.
     # FR: Ask-on-first-connect (NFQUEUE Linux) — démarré seulement si
@@ -3182,6 +3192,45 @@ async def dnsfw_whitelist(body: DnsfwWhitelistBody) -> dict:
     wl = sorted(dnsfw.filter._whitelist)
     db.set_setting("dnsfw_whitelist", wl)
     return {"whitelist": wl}
+
+
+
+class NetprofileConfigBody(BaseModel):
+    enabled: bool | None = None
+    mappings: dict | None = None
+
+
+@app.get("/netprofile/status", dependencies=_AUTH)
+async def netprofile_status() -> dict:
+    """EN: Network-aware profile switching state — current fingerprint,
+        mapped profile, last auto-applied. / FR: État de la bascule auto —
+        empreinte courante, profil mappé, dernière application."""
+    return netprofiler.status()
+
+
+@app.post("/netprofile/config", dependencies=_AUTH)
+async def netprofile_config(body: NetprofileConfigBody) -> dict:
+    """EN: Enable/disable auto switching and edit the fp→profile mapping.
+        Everything persists. / FR: Active/désactive la bascule et édite
+        le mapping. Tout persiste."""
+    st = netprofiler.configure(enabled=body.enabled, mappings=body.mappings)
+    db.set_setting("netprofile_enabled", netprofiler.enabled)
+    db.set_setting("netprofile_mappings", netprofiler.mappings)
+    return st
+
+
+class NetprofileAssignBody(BaseModel):
+    profile: str
+
+
+@app.post("/netprofile/assign", dependencies=_AUTH)
+async def netprofile_assign(body: NetprofileAssignBody) -> dict:
+    """EN: One-tap gesture — map the CURRENT network to a profile
+        ("none" unmaps). / FR: Geste en un tap — mapper le réseau
+        COURANT à un profil (« none » démappe)."""
+    r = netprofiler.assign_current(body.profile)
+    db.set_setting("netprofile_mappings", netprofiler.mappings)
+    return r
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)

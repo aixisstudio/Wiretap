@@ -39,6 +39,7 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
   const [geoStatus, setGeoStatus] = useState(null)
   const [geoMsg, setGeoMsg] = useState('')
   const [dnsfw, setDnsfw] = useState(null)
+  const [netprof, setNetprof] = useState(null)
   const [saved, setSaved] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(false)
   const [ifaces, setIfaces] = useState(null)
@@ -114,6 +115,22 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
     const j = await r.json()
     setDnsfw(prev => ({ ...prev, ...j }))
     return j
+  }
+  async function npCall(path, body) {
+    const base = await apiBase()
+    const h = await authHeaders({ 'Content-Type': 'application/json' })
+    const r = await fetch(base + path, body
+      ? { method: 'POST', headers: h, body: JSON.stringify(body) }
+      : { headers: h })
+    const j = await r.json()
+    setNetprof(prev => ({ ...prev, ...j }))
+    return j
+  }
+  async function npLoad() {
+    const base = await apiBase()
+    const h = await authHeaders()
+    const r = await fetch(base + '/netprofile/status', { headers: h })
+    if (r.ok) setNetprof(await r.json())
   }
   async function dnsfwLoad() {
     const base = await apiBase()
@@ -490,6 +507,55 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
             </div>
           )}
           <div style={{ ...hint, marginTop: 4 }}>{t('dnsfw_setup')}</div>
+        </div>
+
+
+        {/* Auto profiles by network / Profils auto par réseau */}
+        <div style={{ ...row, display: 'block' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={label}>{t('np_title')}</div>
+            {netprof && netprof.current?.fp && netprof.current.fp !== 'unknown' && (
+              <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>
+                {netprof.current.kind === 'wifi' ? netprof.current.ssid : netprof.current.fp}
+              </span>
+            )}
+          </div>
+          <div style={hint}>{t('np_hint')}</div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => npCall('/netprofile/config', { enabled: !(netprof?.enabled) })}
+              role="switch" aria-checked={!!netprof?.enabled}
+              style={{
+                width: 36, height: 20, borderRadius: 10, border: '1px solid var(--border)',
+                background: netprof?.enabled ? '#3b82f6' : 'var(--bg)', cursor: 'pointer', position: 'relative',
+              }}>
+              <span style={{
+                position: 'absolute', top: 3, left: netprof?.enabled ? 19 : 3,
+                width: 12, height: 12, borderRadius: 6, background: 'var(--text)',
+              }} />
+            </button>
+            <span style={{ fontSize: 11, color: 'var(--text)' }}>{t('np_enable')}</span>
+            <select
+              value={netprof?.mapped_profile ?? 'none'}
+              onChange={e => npCall('/netprofile/assign', { profile: e.target.value })}
+              aria-label={t('np_assign')}
+              style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', padding: '4px 8px', fontSize: 11 }}
+            >
+              <option value="none">{t('np_none')}</option>
+              {(netprof?.profiles || []).map(pr => (
+                <option key={pr} value={pr}>{pr}</option>
+              ))}
+            </select>
+          </div>
+          {netprof?.mappings && Object.keys(netprof.mappings).length > 0 && (
+            <div style={{ ...hint, marginTop: 6 }}>
+              {Object.entries(netprof.mappings).map(([fp, prof]) => {
+                const short = fp.startsWith('wifi:') ? fp.slice(5).split('@')[0] : fp
+                return <div key={fp}>{short} → {prof}</div>
+              })}
+              {netprof.last_applied && <div>{t('np_applied')}: {netprof.last_applied}</div>}
+            </div>
+          )}
         </div>
 
         {/* External webhook / Webhook externe */}
