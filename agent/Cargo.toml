@@ -7,7 +7,7 @@
 #     POST ingest en requête HTTP/1.1 manuelle.
 [package]
 name = "wiretap-agent"
-version = "1.6.4"
+version = "1.7.0"
 edition = "2021"
 license = "AGPL-3.0-only"
 description = "Lightweight socket-observation agent for the Wiretap collector"

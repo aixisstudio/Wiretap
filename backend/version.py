@@ -5,4 +5,4 @@ FR: Source unique de la version du backend (affichée dans /diagnostics).
     À garder alignée avec electron/package.json et frontend/package.json.
 """
 
-__version__ = "1.6.4"
+__version__ = "1.7.0"
