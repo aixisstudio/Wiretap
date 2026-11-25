@@ -123,6 +123,7 @@ from detection.supplychain import SupplyChainWatch
 from detection import nlquery
 from detection.canary import CanaryWatch, HoneyPorts
 from detection.autorespond import AutoResponder
+from detection.killchain import KillChain
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -174,6 +175,7 @@ scwatch = SupplyChainWatch()         # EN: install-time governance / FR: gouvern
 canary = CanaryWatch()               # EN: ransomware tripwires / FR: pièges ransomware
 honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scans LAN
 autoresponder = AutoResponder(fw)    # EN: act on critical alerts / FR: agir sur les critiques
+killchain = KillChain()              # EN: cross-signal correlator / FR: corrélateur inter-signaux
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
@@ -196,6 +198,15 @@ def _security_alert(alert: dict) -> None:
         db.log_alert(ad)
         detector.history.append(ad)
         asyncio.ensure_future(broadcast({"type": "alert", "alert": ad}))
+        kc2 = killchain.observe(alert["type"], alert["severity"],
+                                alert.get("details") or {}, None,
+                                alert.get("message", ""))
+        if kc2:
+            ka2 = Alert(type=kc2["type"], severity=kc2["severity"],
+                        message=kc2["message"], details=kc2["details"])
+            kad2 = ka2.to_dict()
+            db.log_alert(kad2)
+            asyncio.ensure_future(broadcast({"type": "alert", "alert": kad2}))
         for rec in autoresponder.observe(alert["type"], alert["severity"],
                                          (alert.get("details") or {}).get("pid")):
             act = Alert(type="AUTORESPOND",
@@ -1552,6 +1563,16 @@ def _process_batch(packets: list[Packet]) -> None:
         asyncio.get_running_loop().create_task(
             _integrity_scan(list(seen_pids.items())))
 
+    for _ad in list(out_alerts):
+        kc = killchain.observe(_ad.get("type", ""), _ad.get("severity", ""),
+                               _ad.get("details") or {}, _ad.get("node_id"),
+                               _ad.get("message", ""))
+        if kc:
+            ka = Alert(type=kc["type"], severity=kc["severity"],
+                       message=kc["message"], details=kc["details"])
+            kad = ka.to_dict()
+            db.log_alert(kad)
+            out_alerts.append(kad)
     for _ad in list(out_alerts):
         for rec in autoresponder.observe(
                 _ad.get("type", ""), _ad.get("severity", ""),
@@ -3516,6 +3537,14 @@ async def autorespond_config(body: dict) -> dict:
     db.set_setting("autorespond_enabled", autoresponder.enabled)
     db.set_setting("autorespond_actions", autoresponder.actions)
     return st
+
+
+
+@app.get("/killchain", dependencies=_AUTH)
+async def killchain_status() -> dict:
+    """EN: Correlator state — entities tracked, chains fired.
+    FR: état du corrélateur — entités suivies, chaînes tirées."""
+    return killchain.status()
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)

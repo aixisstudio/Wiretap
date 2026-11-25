@@ -38,7 +38,7 @@ logger = logging.getLogger("wiretap.autorespond")
 #     les secondes comptent.
 ELIGIBLE_TYPES = {
     "RANSOMWARE_CANARY", "POSTINSTALL_NET", "SECRET_PLAINTEXT_LEAK",
-    "HONEYPORT_TOUCH", "C2_BEACON", "AI_UPLOAD_SPIKE",
+    "HONEYPORT_TOUCH", "C2_BEACON", "AI_UPLOAD_SPIKE", "KILLCHAIN",
 }
 
 
