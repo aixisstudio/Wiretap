@@ -514,6 +514,24 @@ export function SettingsPanel({ onClose, lang, setLang, watchlist = [], onWatchl
               <option value="quad9">quad9 (DoH)</option>
               <option value="google">google (DoH)</option>
             </select>
+            <button onClick={async () => {
+              const base = await apiBase()
+              const h = await authHeaders({ 'Content-Type': 'application/json' })
+              await fetch(base + '/dnsfw/system/apply', { method: 'POST', headers: h })
+              dnsfwLoad()
+            }} style={{
+              background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+              color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
+            }}>{t('dnsfw_sys_apply')}</button>
+            <button onClick={async () => {
+              const base = await apiBase()
+              const h = await authHeaders({ 'Content-Type': 'application/json' })
+              await fetch(base + '/dnsfw/system/revert', { method: 'POST', headers: h })
+              dnsfwLoad()
+            }} style={{
+              background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+              color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',
+            }}>{t('dnsfw_sys_revert')}</button>
             <button onClick={() => dnsfwCall('/dnsfw/refresh', {})} style={{
               background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
               color: 'var(--text-dim)', padding: '4px 10px', fontSize: 10, cursor: 'pointer',

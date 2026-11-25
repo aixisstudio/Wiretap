@@ -497,4 +497,8 @@ export default {
   sec_ask: 'Ask your network',
   sec_ask_ph: 'did anything talk to Russia this week?',
   sec_ask_btn: 'Ask',
+  dnsfw_sys_hint: 'One-click: point your system DNS at Wiretap (requires admin rights)',
+  dnsfw_sys_apply: 'Apply system DNS',
+  dnsfw_sys_revert: 'Revert',
+  dnsfw_sys_on: 'applied',
 }
