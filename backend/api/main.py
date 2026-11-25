@@ -123,6 +123,8 @@ from detection.gossip import PeerSync
 from detection.integrity import IntegrityWatcher
 from detection.killchain import KillChain
 from detection.flowdna import FlowDNA
+from detection.perswatch import PersistenceWatch
+from detection.blastradius import BlastRadius
 from detection.mcpwatch import McpWatch
 from detection.lineage import LineageWatch
 from detection.llm_local import LocalSlm
@@ -197,7 +199,9 @@ honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scan
 autoresponder = AutoResponder(fw)    # EN: act on critical alerts / FR: agir sur les critiques
 killchain = KillChain()                 # EN: cross-signal correlator / FR: corrélateur inter-signaux
 flowdna = FlowDNA()                 # EN: per-process traffic metabolism / FR: métabolisme réseau par processus
-mcpwatch = McpWatch()               # EN: MCP config governance / FR: gouvernance des configs MCP
+mcpwatch = McpWatch()
+perswatch = PersistenceWatch()       # EN: auto-start surface diff / FR: diff de la surface auto-start
+blastradius = BlastRadius()          # EN: impact assessment engine / FR: moteur d'évaluation d'impact               # EN: MCP config governance / FR: gouvernance des configs MCP
 systemdns = SystemDns(_platform.system())  # EN: system DNS integration / FR: intégration DNS système
 presencew = PresenceWatch(_platform.system())  # EN: was a human there? / FR: un humain était-il là ?
 lineagew = LineageWatch()            # EN: ancestry verdicts / FR: verdicts d'ascendance
@@ -1222,6 +1226,8 @@ def _process_batch(packets: list[Packet]) -> None:
         db.accumulate_history(minute, "host", remote_ip, pkt.size)
         if pkt.process_name:
             db.accumulate_history(minute, "process", pkt.process_name, pkt.size)
+            db.accumulate_history(minute, "procdest",
+                                  f"{pkt.process_name}|{remote_ip}", pkt.size)
 
         # EN: Detection runs in the event loop — analyze_packet is
         #     lock-guarded internally, no executor hop needed.
@@ -1613,8 +1619,19 @@ def _process_batch(packets: list[Packet]) -> None:
 
     for _ad in list(out_alerts):
         if _ad.get("severity") == "critical":
-            _pid = (_ad.get("details") or {}).get("pid")
+            _pid = (_ad.get("details") or {}).get("pid") or 0
             _proc = (_ad.get("details") or {}).get("process", "")
+            if _proc:
+                # EN: blast radius — the impact assessment ships WITH the
+                #     alert: worst-case summary in details, full assessment
+                #     queryable at /impact/alert/<id>.
+                # FR: rayon de blast — l'évaluation part AVEC l'alerte.
+                try:
+                    assess = blastradius.assess(_proc, pid=int(_pid or 0))
+                    blastradius.attach(str(_ad.get("id", "")), assess)
+                    _ad.setdefault("details", {})["blast_worst_case"] = assess["worst_case"]
+                except Exception as e:              # noqa: BLE001
+                    logger.debug("blast assessment failed: %s", e)
             if _pid and _proc:
                 lv = lineagew.verdict(_pid, _proc, context=_ad.get("type", ""))
                 if lv:
@@ -2329,6 +2346,78 @@ def _load_settings() -> None:
     #     started when enabled. / FR: Profils selon le réseau — opt-in.
     netprofiler.mappings = {str(k): str(v) for k, v in
                             (db.get_setting("netprofile_mappings", {}) or {}).items()}
+    # EN: Persistence surface — silent baseline at startup, then diff scans
+    #     every 5 min feed the alert pipeline (PERSISTENCE_NEW/MOD/DEL).
+    # FR: surface de persistance — baseline silencieuse au démarrage, puis
+    #     scans de diff toutes les 5 min dans le pipeline d'alertes.
+    try:
+        perswatch.scan()                            # EN: baseline / FR: baseline
+    except Exception as e:                          # noqa: BLE001
+        logger.warning("perswatch baseline failed: %s", e)
+
+    # EN: Blast radius sources — evidence assembly from existing modules.
+    # FR: sources blast radius — assemblage de preuves depuis les modules.
+    def _net_footprint(process: str) -> list:
+        try:
+            rows = db.process_destinations(process, window_s=3600) or []
+            return rows if isinstance(rows, list) else []
+        except Exception:                           # noqa: BLE001
+            return []
+
+    def _ai_exposure(process: str) -> list:
+        try:
+            act = aiwatch.activity()
+            rows = []
+            for row in act.get("rows", []) if isinstance(act, dict) else []:
+                if str(row.get("process", "")).lower() == process.lower():
+                    rows.append({"service": row.get("service", "?"),
+                                 "bytes_out": row.get("bytes_out", 0)})
+            return rows
+        except Exception:                           # noqa: BLE001
+            return []
+
+    def _secret_count(process: str, pid: int = 0) -> int:
+        # EN: count registered secret shapes visible in the process env —
+        #     Linux /proc only; elsewhere honestly degrades to 0.
+        # FR: compter les formes de secrets visibles dans l'env du processus —
+        #     /proc Linux uniquement ; ailleurs dégradation honnête à 0.
+        if not pid or os.name == "nt":
+            return 0
+        try:
+            env_text = Path(f"/proc/{pid}/environ").read_bytes().decode(errors="replace")
+        except OSError:
+            return 0
+        try:
+            hashes = getattr(secretwatch, "_secrets", {}) or {}
+            return sum(1 for meta in hashes.values()
+                       if meta.get("value") and meta["value"] in env_text)
+        except Exception:                           # noqa: BLE001
+            return 0
+
+    def _persistence_hit(process: str, target_path: str = "") -> list:
+        try:
+            hits = []
+            tl = (target_path or "").lower()
+            pl = process.lower()
+            for eid, entry in perswatch.entries().items():
+                tgt = (entry.get("target") or "").lower()
+                if pl and pl in tgt or (tl and tl == tgt):
+                    hits.append({"entry": eid, "target": entry.get("target", "")})
+            return hits
+        except Exception:                           # noqa: BLE001
+            return []
+
+    def _lineage_lookup(pid: int) -> list:
+        try:
+            chain = lineagew.chain_for(pid) if pid else []
+            return [{"name": n} for n in chain]
+        except Exception:                           # noqa: BLE001
+            return []
+
+    blastradius.register_sources(
+        network_footprint=_net_footprint, ai_exposure=_ai_exposure,
+        secret_count=_secret_count, persistence_hit=_persistence_hit,
+        lineage=_lineage_lookup)
     if db.get_setting("netprofile_enabled", False):
         netprofiler.enabled = True
         netprofiler.start()
@@ -2352,6 +2441,25 @@ def _load_settings() -> None:
                   db.get_setting("slm_model_path", "") or "")
     if _port_filter:
         logger.info("restored port filter: %s", _port_filter)
+
+
+def _perswatch_tick() -> None:
+    """EN: One persistence diff scan, alerts into the pipeline. Module level
+        so lifespan can schedule the loop.
+    FR: un scan de diff persistance, alertes dans le pipeline. Niveau module
+        pour que lifespan planifie la boucle."""
+    try:
+        for pa in perswatch.scan():
+            _security_alert(pa)
+    except Exception as e:                          # noqa: BLE001
+        logger.warning("perswatch scan failed: %s", e)
+
+
+async def _perswatch_loop() -> None:
+    """EN: 5-minute persistence diff cadence. FR: cadence de diff 5 minutes."""
+    while True:
+        await asyncio.sleep(300)
+        await asyncio.get_running_loop().run_in_executor(None, _perswatch_tick)
 
 
 async def _startup() -> None:
@@ -2458,6 +2566,7 @@ async def lifespan(app: FastAPI):
         hst = await honeyports.start()
         if hst["errors"]:
             logger.warning("honeyports partial: %s", hst["errors"])
+    asyncio.ensure_future(_perswatch_loop())     # EN: 5-min persistence diff / FR: diff persistance 5 min
     if db.get_setting("dnsfw_enabled", False):
         asyncio.ensure_future(asyncio.get_running_loop().run_in_executor(None, dnsfw.refresh_lists))
         st = await dnsfw.start()
@@ -3481,6 +3590,32 @@ async def privacy_digest_txt(hours: int = 24):
                              dnsfw_stats=dnsfw.stats)
     return PlainTextResponse(digestmod.render_text(data))
 
+
+
+@app.get("/persistence", dependencies=_AUTH)
+async def persistence_status() -> dict:
+    """EN: Persistence surface — every auto-start entry with risk scoring.
+    FR: surface de persistance — chaque entrée auto-start avec scoring."""
+    return perswatch.status()
+
+
+@app.get("/impact/process/{name}", dependencies=_AUTH)
+async def impact_for_process(name: str, pid: int = 0) -> dict:
+    """EN: Live blast-radius assessment for a process — worst-case footprint
+        assembled from network history, AI exposure, secrets, persistence,
+        lineage, open files. Evidence, not verdict.
+    FR: évaluation d'impact live pour un processus. Preuve, pas verdict."""
+    return blastradius.assess(name, pid=pid)
+
+
+@app.get("/impact/alert/{alert_id}", dependencies=_AUTH)
+async def impact_for_alert(alert_id: str) -> dict:
+    """EN: The assessment captured when a critical alert fired.
+    FR: l'évaluation capturée au moment de l'alerte critique."""
+    a = blastradius.get(alert_id)
+    if not a:
+        return {"error": "no assessment for this alert", "alert_id": alert_id}
+    return a
 
 
 @app.get("/flowdna", dependencies=_AUTH)

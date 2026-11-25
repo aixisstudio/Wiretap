@@ -6,6 +6,23 @@ All notable changes to Wiretap. / Toutes les modifications notables de Wiretap.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
+### Added — the intrusion cycle, closed (round 3)
+- **Persistence surface watch** (`perswatch.py`): the layer every network-first
+  tool misses. Enumerates every auto-start mechanism without privileges —
+  LaunchAgents/Daemons (macOS), Run keys + startup (Windows), systemd units,
+  cron, autostart (Linux) — fingerprints each entry and diffs over time:
+  `PERSISTENCE_NEW/MOD/DEL`. Risk scoring: temp-dir targets, interpreter-as-
+  target, run-at-load+keep-alive. Verified live: 19 entries on a real machine.
+- **Blast radius** (`blastradius.py`): automated impact assessment attached to
+  every critical alert — "if this was malicious, what did it touch" answered in
+  milliseconds: network footprint per destination (new procdest join in the
+  history table), AI exposure, secret shapes in reach, survives-reboot check,
+  lineage, open files. Every field labeled with source and confidence; failures
+  degrade to "unknown", never silence. `GET /impact/process/{name}`,
+  `GET /impact/alert/{id}`, `GET /persistence`.
+- Killchain families extended: `persistence`, `metabolism` — a supply-chain
+  install + persistence + metabolism drift now correlates as one incident.
+
 ### Added — deep signals, round 2 (unreleased on main)
 - **Flow DNA** (`flowdna.py`): per-process network metabolism profiles — flow
   density, burst sizes, rhythm, out:in ratio, destination entropy — learned

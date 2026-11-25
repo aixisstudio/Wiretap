@@ -540,6 +540,33 @@ def get_top_processes(minutes: int = 60, limit: int = 50) -> list[dict]:
     return [{"process": r[0], "packets": r[1], "bytes": r[2]} for r in rows]
 
 
+def process_destinations(process: str, window_s: int = 3600) -> list[dict]:
+    """
+    EN: Per-(process, destination) joined footprint from the history table —
+        rows are stored as dim="procdest", key="<process>|<host>".
+        Returns [{dest, bytes, packets, last_minute}] sorted by bytes desc.
+    FR: empreinte jointe (processus, destination) depuis la table history —
+        dim="procdest", clé "<processus>|<hôte>".
+    """
+    minutes = max(1, window_s // 60)
+    since = _minutes_ago(minutes)
+    out: dict[str, dict] = {}
+    with _conn_lock:
+        rows = _conn.execute(
+            "SELECT key, packets, bytes, minute FROM history "
+            "WHERE dim = 'procdest' AND minute >= ?", (since,)).fetchall()
+    prefix = process.lower() + "|"
+    for key, packets, size, minute in rows:
+        if not key.lower().startswith(prefix):
+            continue
+        dest = key.split("|", 1)[1] if "|" in key else key
+        agg = out.setdefault(dest, {"dest": dest, "bytes": 0, "packets": 0, "last_minute": ""})
+        agg["bytes"] += size
+        agg["packets"] += packets
+        agg["last_minute"] = max(agg["last_minute"], minute)
+    return sorted(out.values(), key=lambda r: -r["bytes"])
+
+
 def get_alerts(limit: int = 100) -> list[dict]:
     """
     EN: Most recent persisted alerts, newest first — the /alerts endpoint now

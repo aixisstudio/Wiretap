@@ -53,6 +53,8 @@ FAMILIES = {
     "lineage":     {"LINEAGE_SUSPECT"},
     "mining":      {"MINER_STRATUM", "MINER_CPU", "MINING"},
     "dns":         {"DNS_TUNNEL", "DNSFW_POLICY"},
+    "persistence": {"PERSISTENCE_NEW", "PERSISTENCE_MOD"},
+    "metabolism":  {"FLOW_DRIFT"},
 }
 
 TYPE_TO_FAMILY = {t: fam for fam, types in FAMILIES.items() for t in types}
