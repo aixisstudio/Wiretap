@@ -8,6 +8,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ## [1.8.0] — "full-spectrum" security update
 
+### Added — the deep signals (v1.8.x innovation series)
+
+- **Presence-correlated exfiltration detection**: no security tool on earth crosses network flows with human input activity. Wiretap now reads OS input-idle time (zero privileges) and grades every sensitive outbound flow — data leaving while you type is you, data leaving while you are away is something else acting in your name. UNATTENDED_EXFIL critical alert.
+- **Tamper-evident forensic log**: every alert hash-chained to the previous one (transparency-log construction). An attacker wiping or editing past alerts breaks the chain — deletion itself becomes evidence. Offline verification at /forensic/verify, pinnable chain head.
+- **Process-lineage verdicts**: `browser -> sh -> curl -> evil.bin` tells the story a bare process name hides. Ancestry scoring with explainable evidence sentences, LINEAGE_SUSPECT critical alerts.
+- **Kill-chain correlator**: cross-detector sliding-window correlation — 3 distinct detector families on the same entity inside 15 minutes is not noise, it is an active incident. Feeds the auto-response engine.
+- **System DNS integration**: one-click apply/revert of system DNS configuration per platform, snapshot-first safety.
+
 ### Added — the post-AI security stack nobody else has
 
 - **AI traffic governance** (`aiwatch`): per-(service, process) byte accounting for 21 AI providers, SHADOW_AI first-contact alerts, AI_UPLOAD_SPIKE mass-export detection, MCP server watch. Metadata only, never payload content.
