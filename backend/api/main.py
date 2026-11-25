@@ -122,6 +122,8 @@ from detection.firewall import FirewallManager
 from detection.gossip import PeerSync
 from detection.integrity import IntegrityWatcher
 from detection.killchain import KillChain
+from detection.flowdna import FlowDNA
+from detection.mcpwatch import McpWatch
 from detection.lineage import LineageWatch
 from detection.llm_local import LocalSlm
 from detection.miner import MinerDetector
@@ -193,7 +195,9 @@ scwatch = SupplyChainWatch()         # EN: install-time governance / FR: gouvern
 canary = CanaryWatch()               # EN: ransomware tripwires / FR: pièges ransomware
 honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scans LAN
 autoresponder = AutoResponder(fw)    # EN: act on critical alerts / FR: agir sur les critiques
-killchain = KillChain()              # EN: cross-signal correlator / FR: corrélateur inter-signaux
+killchain = KillChain()                 # EN: cross-signal correlator / FR: corrélateur inter-signaux
+flowdna = FlowDNA()                 # EN: per-process traffic metabolism / FR: métabolisme réseau par processus
+mcpwatch = McpWatch()               # EN: MCP config governance / FR: gouvernance des configs MCP
 systemdns = SystemDns(_platform.system())  # EN: system DNS integration / FR: intégration DNS système
 presencew = PresenceWatch(_platform.system())  # EN: was a human there? / FR: un humain était-il là ?
 lineagew = LineageWatch()            # EN: ancestry verdicts / FR: verdicts d'ascendance
@@ -1244,6 +1248,17 @@ def _process_batch(packets: list[Packet]) -> None:
                 swd = sw.to_dict()
                 db.log_alert(swd)
                 out_alerts.append(swd)
+        fd_alert = flowdna.observe(pkt.process_name or "", pkt.direction,
+                                   pkt.size,
+                                   (geo or {}).get("hostname") or remote_ip)
+        if fd_alert:
+            fd = Alert(type=fd_alert["type"], severity=fd_alert["severity"],
+                       message=fd_alert["message"],
+                       node_id=remote_ip, details=fd_alert["details"])
+            _flag_alert(fd, nodes)
+            fdd = fd.to_dict()
+            db.log_alert(fdd)
+            out_alerts.append(fdd)
         for aw_alert in aiwatch.observe(pkt.process_name or "",
                                         (geo or {}).get("hostname") or "",
                                         pkt.direction, pkt.size):
@@ -3466,6 +3481,37 @@ async def privacy_digest_txt(hours: int = 24):
                              dnsfw_stats=dnsfw.stats)
     return PlainTextResponse(digestmod.render_text(data))
 
+
+
+@app.get("/flowdna", dependencies=_AUTH)
+async def flowdna_status() -> dict:
+    """EN: Flow DNA status — baselines learned, processes tracked.
+    FR: État Flow DNA — baselines apprises, processus suivis."""
+    return flowdna.status()
+
+
+@app.post("/flowdna/rebaseline", dependencies=_AUTH)
+async def flowdna_rebaseline(body: dict) -> dict:
+    """EN: Re-baseline a process after a legit metabolism change.
+    FR: re-baseliner un processus après un changement légitime."""
+    ok = flowdna.rebaseline(str(body.get("process", "")))
+    return {"ok": ok}
+
+
+@app.post("/flowdna/dismiss", dependencies=_AUTH)
+async def flowdna_dismiss(body: dict) -> dict:
+    """EN: Dismiss drift alerts for a process. FR: ignorer les dérives."""
+    flowdna.dismiss(str(body.get("process", "")))
+    return {"ok": True}
+
+
+@app.get("/mcp/audit", dependencies=_AUTH)
+async def mcp_audit() -> dict:
+    """EN: MCP governance — risk audit of every declared MCP server across
+        Cursor/Claude/Windsurf/Zed/VS Code configs. Local reads only.
+    FR: Gouvernance MCP — audit de risque de chaque serveur déclaré.
+        Lectures locales uniquement."""
+    return mcpwatch.scan()
 
 
 @app.get("/aiwatch", dependencies=_AUTH)

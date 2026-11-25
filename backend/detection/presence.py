@@ -143,7 +143,7 @@ class PresenceWatch:
             return None
         key = process_name.lower()
         with self._lock:
-            if now - self._alerted.get(key, 0) < 3600:
+            if key in self._alerted and now - self._alerted[key] < 3600:
                 return None
             self._alerted[key] = now
         mb = bytes_out / (1024 * 1024)

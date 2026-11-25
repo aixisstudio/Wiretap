@@ -6,6 +6,23 @@ All notable changes to Wiretap. / Toutes les modifications notables de Wiretap.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
+### Added — deep signals, round 2 (unreleased on main)
+- **Flow DNA** (`flowdna.py`): per-process network metabolism profiles — flow
+  density, burst sizes, rhythm, out:in ratio, destination entropy — learned
+  silently for 30 flows, then scored in non-overlapping windows. Multi-feature
+  drift (2+ independent features past threshold) emits `FLOW_DRIFT`: "the
+  binary is the same but the behavior is not". Explainable alerts ("rhythm
+  collapsed 4.2x"), one-click re-baseline. Compromised apps betray themselves
+  by metabolism, not name.
+- **MCP governance** (`mcpwatch.py`): risk audit of every MCP server declared
+  in Cursor / Claude (Desktop + Code incl. per-project nesting) / Windsurf /
+  Zed / VS Code / Devin CLI configs. Scores download-and-run launchers
+  (npx/uvx), unscoped filesystem access, shell/browser capabilities, secrets
+  passed in env (shape-only, values never leave). Verified on a real machine:
+  12 servers found and scored.
+- Endpoints: `GET /flowdna`, `POST /flowdna/rebaseline|dismiss`, `GET /mcp/audit`.
+- Fixed latent cooldown logic bug in presence/flowdna alert dedup.
+
 ## [1.8.0] — "full-spectrum" security update
 
 ### Added — the deep signals (v1.8.x innovation series)
