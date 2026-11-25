@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>See every connection.es - Wiretap</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "See every connection.es";
+        var mkdocs_page_input_path = "articles/see-every-connection.es.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">See every connection.es</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/articles/see-every-connection.es.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Tu ordenador está hablando con internet ahora mismo. Probablemente docenas de conexiones — sync, telemetría, chequeos de update, tus pestañas abiertas, el ruido de fondo de tus apps. La pregunta "¿qué hace realmente mi máquina?" suena básica, pero intenta responderla y verás que las herramientas son microscópicas (Wireshark) o de pago.</p>
+<p>Aquí va una guía práctica para verlo de verdad — incluida la herramienta que construí para ello, <a href="https://github.com/aixisstudio/Wiretap">Wiretap</a> (open source, AGPL — declaración: es mía).</p>
+<h2 id="la-version-de-60-segundos">La versión de 60 segundos<a class="headerlink" href="#la-version-de-60-segundos" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash"># macOS / Linux — clásico pero crudo
+sudo tcpdump -i any -n | head -50        # cada paquete, sin contexto
+netstat -anp tcp | grep ESTABLISHED      # solo conexiones actuales
+lsof -i -nP | head                       # mapeo proceso → socket
+
+# Windows
+netstat -ano | findstr ESTABLISHED
+Get-NetTCPConnection -State Established  # PowerShell
+</code></pre>
+<p>Estas responden "qué conexiones existen ahora". No te dicen qué app, dónde está el servidor, ni si es sospechoso. Ese hueco es exactamente lo que llena un visualizador.</p>
+<h2 id="el-enfoque-de-visualizacion">El enfoque de visualización<a class="headerlink" href="#el-enfoque-de-visualizacion" title="Permanent link">&para;</a></h2>
+<p>Wiretap dibuja cada conexión como un grafo en vivo + mapa mundial:</p>
+<ul>
+<li><strong>Nodo = tu máquina</strong> en el centro, líneas hacia cada endpoint remoto</li>
+<li><strong>Cada endpoint etiquetado</strong>: hostname (vía DNS inverso + TLS SNI), país/ciudad geolocalizado — todo offline, desde una base local MaxMind/DB-IP</li>
+<li><strong>Atribución por app</strong>: la conexión se dibuja hacia el <em>proceso</em> que la abrió</li>
+<li><strong>Timeline</strong>: volumen de tráfico de 15/30/60 min, 24 h de historial en un SQLite local</li>
+</ul>
+<p>Lo que lo diferencia de tcpdump: el dato <em>ya está procesado</em>. No "paquete a 142.250.74.78" — "Chrome → google.com → Fráncfort".</p>
+<h2 id="leyendo-el-mapa-normal-vs-sospechoso">Leyendo el mapa: normal vs sospechoso<a class="headerlink" href="#leyendo-el-mapa-normal-vs-sospechoso" title="Permanent link">&para;</a></h2>
+<p>Un mapa normal: radios hacia Apple/Google/Microsoft/CDNs de tus pestañas, tu router, otros dispositivos LAN.</p>
+<p>Lo que destaca:</p>
+<ul>
+<li><strong>Beaconing</strong> — una conexión que dispara a intervalos regulares (Wiretap las marca; es un patrón C2 clásico)</li>
+<li><strong>Subidas largas a endpoints desconocidos</strong> — datos saliendo constantemente hacia algún sitio que no reconoces</li>
+<li><strong>Port scans</strong> — un host LAN tocando muchos puertos de tu máquina queda marcado</li>
+<li><strong>Apps hablando con países sin sentido</strong> para lo que hace la app</li>
+<li><strong>Trackers</strong> — Wiretap cruza hostnames con listas de sufijos de trackers editables y los integra en un privacy score</li>
+<li><strong>DNS tunneling</strong> — consultas DNS con nombres anormalmente largos o frecuencia inusual</li>
+</ul>
+<p>La <strong>detección de anomalías</strong> integrada vigila todo esto automáticamente, y puedes suprimir alertas por regla una vez validado un patrón.</p>
+<h2 id="instalalo-2-minutos">Instálalo (2 minutos)<a class="headerlink" href="#instalalo-2-minutos" title="Permanent link">&para;</a></h2>
+<pre><code class="language-bash"># macOS: descarga la app de releases, o brew
+# Windows: instala Npcap → ejecuta wiretap-backend.exe como Admin
+# Linux / Docker:
+docker run --network host ghcr.io/aixisstudio/wiretap
+
+# ¿Sin derechos de admin? El modo demo muestra la UI completa con tráfico sintético:
+WIRETAP_DEMO=1 wiretap-backend
+</code></pre>
+<p>Todo queda local — API autenticada por token en loopback, cero telemetría, sin cuenta, y cada llamada saliente (GeoIP, updates, threat intel, webhooks) es opt-in. No es frase de marketing; es una codebase AGPL, puedes verificar la ruta de red tú mismo.</p>
+<p>Y cuando algo parece mal, puedes actuar — desde la v1.2, Wiretap empuja reglas de bloqueo al firewall nativo del SO (netsh / iptables / pf), tiene un interruptor lockdown de un clic, botones kill/suspend, y exportación forense (JSON/CSV/STIX) para lo que cazaste.</p>
+<h2 id="y-luego">¿Y luego?<a class="headerlink" href="#y-luego" title="Permanent link">&para;</a></h2>
+<p>Cuando puedes <em>ver</em> el tráfico empieza lo interesante — el pasatiempo favorito de la comunidad es el <a href="https://github.com/aixisstudio/Wiretap/discussions/39">hilo "¿Qué atrapaste?"</a>: impresoras hablando con servidores cloud a las 3am, telemetría de TVs, de todo.</p>
+<p>Repo: https://github.com/aixisstudio/Wiretap — ⭐ si responde la pregunta que se propuso responder.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

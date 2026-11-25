@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Deep signals - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Deep signals";
+        var mkdocs_page_input_path = "deep-signals.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Deep signals</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#english">English</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#presence-correlated-exfiltration-unattended_exfil">Presence-correlated exfiltration — UNATTENDED_EXFIL</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flow-dna-flow_drift">Flow DNA — FLOW_DRIFT</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#process-lineage-verdicts-lineage_suspect">Process-lineage verdicts — LINEAGE_SUSPECT</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#persistence-surface-watch-persistence_newmoddel">Persistence surface watch — PERSISTENCE_NEW/MOD/DEL</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#blast-radius-automated-impact-assessment">Blast radius — automated impact assessment</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#time-travel-state-diff">Time-travel state diff</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tamper-evident-forensic-log">Tamper-evident forensic log</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#kill-chain-correlation">Kill-chain correlation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mcp-governance-the-ai-agent-attack-surface">MCP governance — the AI-agent attack surface</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cross-platform-honesty-matrix">Cross-platform honesty matrix</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#francais">Français</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#exfiltration-correlee-a-la-presence-unattended_exfil">Exfiltration corrélée à la présence — UNATTENDED_EXFIL</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flow-dna-flow_drift_1">Flow DNA — FLOW_DRIFT</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#verdicts-par-lignee-lineage_suspect">Verdicts par lignée — LINEAGE_SUSPECT</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#surveillance-de-persistance-persistence_newmoddel">Surveillance de persistance — PERSISTENCE_NEW/MOD/DEL</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rayon-de-blast-evaluation-dimpact-automatisee">Rayon de blast — évaluation d'impact automatisée</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diff-temporel">Diff temporel</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#journal-forensique-inviolable">Journal forensique inviolable</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#correlation-kill-chain">Corrélation kill-chain</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#gouvernance-mcp-la-surface-dattaque-des-agents-ia">Gouvernance MCP — la surface d'attaque des agents IA</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#matrice-dhonnetete-cross-plateforme">Matrice d'honnêteté cross-plateforme</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Deep signals</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/deep-signals.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="deep-signals-signaux-profonds">Deep signals / Signaux profonds<a class="headerlink" href="#deep-signals-signaux-profonds" title="Permanent link">&para;</a></h1>
+<p><a href="./">English</a> | <a href="./">Français</a> | Español <em>(soon)</em> | Deutsch <em>(soon)</em> | Русский <em>(soon)</em> | 日本語 <em>(soon)</em> | Português <em>(soon)</em> | 中文 <em>(soon)</em></p>
+<h2 id="english">English<a class="headerlink" href="#english" title="Permanent link">&para;</a></h2>
+<p>The deep signals are Wiretap's v1.8/v1.9 detection layer — the questions
+no other firewall asks. Everything here is <strong>local-first</strong>: no cloud, no
+telemetry, every verdict computed on your machine and explainable in one
+sentence.</p>
+<h3 id="presence-correlated-exfiltration-unattended_exfil">Presence-correlated exfiltration — <code>UNATTENDED_EXFIL</code><a class="headerlink" href="#presence-correlated-exfiltration-unattended_exfil" title="Permanent link">&para;</a></h3>
+<p>5 MB to an AI provider while you type is you using your IDE. The same
+5 MB while you're away is something else acting in your name.</p>
+<ul>
+<li><strong>Sensor</strong>: OS input-idle time — <code>IOHIDSystem</code> (macOS), <code>GetLastInputInfo</code>
+  (Windows), <code>xprintidle</code> (X11 Linux). Zero privileges, zero keylogging —
+  a single idle-second counter, never input content.</li>
+<li><strong>Logic</strong>: sensitive outbound flow (AI provider, new rare destination,
+  mass upload) × machine unattended beyond threshold → critical alert.</li>
+<li><strong>Honesty framing</strong>: presence is <em>evidence, not verdict</em> — backups and
+  cloud sync also upload while you're away. The alert says so and asks
+  for confirmation. Linux/Wayland degrades honestly (no idle source).</li>
+<li>Cooldown-per-process logic fixed in v1.9 (latent dedup bug).</li>
+</ul>
+<h3 id="flow-dna-flow_drift">Flow DNA — <code>FLOW_DRIFT</code><a class="headerlink" href="#flow-dna-flow_drift" title="Permanent link">&para;</a></h3>
+<p>A compromised app keeps its name but changes its metabolism.</p>
+<ul>
+<li><strong>Profile per process</strong>: burst sizes, inter-flow rhythm (coefficient of
+  variation), out:in byte ratio, destination entropy — browsers disperse,
+  exfiltration tunnels.</li>
+<li><strong>Learning</strong>: 30 flows silently, then non-overlapping scoring windows —
+  a slow drift cannot dilute itself across overlapping windows.</li>
+<li><strong>Multi-feature requirement</strong>: 2+ independent features past threshold.
+  Watching a video changes one feature; being compromised changes them
+  all — structural false-positive resistance.</li>
+<li><strong>Explainable</strong>: "rhythm collapsed 4.2x, out:in inverted, destinations
+  tunneled (entropy 3.3 → 0 bits)" — plus one-click re-baseline.</li>
+<li>Endpoints: <code>GET /flowdna</code>, <code>POST /flowdna/rebaseline</code>, <code>POST /flowdna/dismiss</code>.</li>
+</ul>
+<h3 id="process-lineage-verdicts-lineage_suspect">Process-lineage verdicts — <code>LINEAGE_SUSPECT</code><a class="headerlink" href="#process-lineage-verdicts-lineage_suspect" title="Permanent link">&para;</a></h3>
+<p><code>browser -&gt; sh -&gt; curl -&gt; evil.bin</code> tells the story a bare process name
+hides. Ancestry scoring: shells/interpreters in the chain, browser/Office/
+terminal roots, nesting depth — rendered as a plain evidence sentence.
+Cross-platform: <code>/proc</code> + psutil on Linux/macOS, PowerShell CIM process
+table on Windows (wmic removed from Windows 11 — never relied on).</p>
+<h3 id="persistence-surface-watch-persistence_newmoddel">Persistence surface watch — <code>PERSISTENCE_NEW/MOD/DEL</code><a class="headerlink" href="#persistence-surface-watch-persistence_newmoddel" title="Permanent link">&para;</a></h3>
+<p>What malware needs most is surviving reboot — and every network-first
+tool misses it.</p>
+<ul>
+<li>Enumerates without privileges: LaunchAgents/Daemons (macOS), Run keys +
+  startup folder (Windows), systemd units, cron, autostart (Linux).</li>
+<li>Fingerprints each entry (target path + binary hash + content hash),
+  diffs every 5 minutes — deletion is itself a signal (post-infection
+  cleanup).</li>
+<li>Risk scoring: <code>/tmp</code> targets (+3 — legitimate software doesn't
+  auto-start from temp), interpreter-as-target (+2 — real payload hidden
+  in script argument), run-at-load + keep-alive.</li>
+<li>Endpoint: <code>GET /persistence</code>. Windows scope: Run keys (services and
+  scheduled tasks on the frontier list).</li>
+</ul>
+<h3 id="blast-radius-automated-impact-assessment">Blast radius — automated impact assessment<a class="headerlink" href="#blast-radius-automated-impact-assessment" title="Permanent link">&para;</a></h3>
+<p>Every critical alert carries a computed answer to "if this was malicious,
+what did it touch":</p>
+<ul>
+<li>network footprint per destination (procdest SQLite join), AI-provider
+  exposure, secret shapes in reach, survives-reboot check, lineage,
+  open files.</li>
+<li>Every field labeled with <strong>source + confidence</strong>; failures degrade to
+  "unknown", never to silence.</li>
+<li>Attached as <code>blast_worst_case</code> on the alert itself; shown in the UI.</li>
+<li>Endpoints: <code>GET /impact/process/{name}</code>, <code>GET /impact/alert/{id}</code>.</li>
+<li>Honest degradation: open-files section is "unknown" on Windows
+  (no <code>/proc</code>, no lsof) — documented, not hidden.</li>
+</ul>
+<h3 id="time-travel-state-diff">Time-travel state diff<a class="headerlink" href="#time-travel-state-diff" title="Permanent link">&para;</a></h3>
+<p>"What changed on this machine since Tuesday?" — the first question of
+every investigation, answered in milliseconds.</p>
+<ul>
+<li>Hourly snapshots: persistence entries, listening ports with owners,
+  process shapes. Disk-persisted, 48 h retention.</li>
+<li>Diff any point: appeared / vanished / mutated, risk-noted.</li>
+<li>Endpoints: <code>GET /timetravel/status</code>, <code>POST /timetravel/snapshot</code>,
+  <code>GET /timetravel/diff?since=&lt;ts&gt;</code>.</li>
+<li>Linux without lsof: <code>/proc/net/tcp</code> hex parser — zero dependencies.</li>
+</ul>
+<h3 id="tamper-evident-forensic-log">Tamper-evident forensic log<a class="headerlink" href="#tamper-evident-forensic-log" title="Permanent link">&para;</a></h3>
+<p>Every alert is hash-chained to the previous one (transparency-log
+construction): <code>hash[n] = sha256(hash[n-1] | alert[n])</code>.</p>
+<ul>
+<li>An attacker wiping or editing past alerts <strong>breaks the chain</strong> —
+  deletion itself becomes evidence.</li>
+<li>Continuity across restarts; chain head pinnable externally for
+  mathematical finality.</li>
+<li>Offline verification: <code>GET /forensic/verify</code>.</li>
+</ul>
+<h3 id="kill-chain-correlation">Kill-chain correlation<a class="headerlink" href="#kill-chain-correlation" title="Permanent link">&para;</a></h3>
+<p>Three distinct detector families on the same entity within 15 minutes is
+not noise — it's one incident.</p>
+<ul>
+<li>15-minute sliding window per entity (process preferred, IP fallback);
+  families: network, presence, metabolism, lineage, persistence, supply
+  chain, secrets, AI governance…</li>
+<li>Same-detector repetitions never count as a chain — amplification of
+  false positives is structurally impossible.</li>
+<li>Wired <em>before</em> the auto-responder: a correlated chain can itself
+  trigger lockdown — one narrated incident instead of three separate
+  noises.</li>
+</ul>
+<h3 id="mcp-governance-the-ai-agent-attack-surface">MCP governance — the AI-agent attack surface<a class="headerlink" href="#mcp-governance-the-ai-agent-attack-surface" title="Permanent link">&para;</a></h3>
+<p>Risk audit of every MCP server declared in Cursor, Claude (Desktop +
+Code including per-project nesting), Windsurf, Zed, VS Code and
+Devin CLI configs.</p>
+<ul>
+<li>Scores download-and-run launchers (<code>npx</code>/<code>uvx</code> — package fetched at
+  runtime, nothing pinned auditable), unscoped filesystem access,
+  shell/browser capabilities, secrets passed in env (shape-only —
+  values never leave).</li>
+<li>Endpoint: <code>GET /mcp/audit</code>; risky servers surface in Settings →
+  Deep signals.</li>
+</ul>
+<h3 id="cross-platform-honesty-matrix">Cross-platform honesty matrix<a class="headerlink" href="#cross-platform-honesty-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>macOS</th>
+<th>Windows</th>
+<th>Linux</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Presence</td>
+<td>IOHID</td>
+<td>GetLastInputInfo</td>
+<td>xprintidle (X11; Wayland degrades)</td>
+</tr>
+<tr>
+<td>Flow DNA / killchain / forensic chain</td>
+<td>full</td>
+<td>full</td>
+<td>full (pure Python)</td>
+</tr>
+<tr>
+<td>Lineage</td>
+<td>psutil</td>
+<td>PowerShell CIM (simulated-tested)</td>
+<td>/proc + psutil</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>LaunchAgents/Daemons</td>
+<td>Run keys</td>
+<td>systemd/cron/autostart</td>
+</tr>
+<tr>
+<td>Time-travel listeners</td>
+<td>lsof</td>
+<td>PowerShell structured netstat</td>
+<td>lsof or /proc/net/tcp</td>
+</tr>
+<tr>
+<td>Blast open-files</td>
+<td>lsof</td>
+<td>unknown (honest)</td>
+<td>/proc</td>
+</tr>
+</tbody>
+</table>
+<p>Windows sensors use <strong>PowerShell structured output</strong> — immune to
+localized <code>netstat</code> ("ABHÖREN", "ÉCOUTE"…) — with positional-parsing
+fallback. Verified by German-locale fixture tests and green CI on
+<code>windows-latest</code>.</p>
+<hr />
+<h2 id="francais">Français<a class="headerlink" href="#francais" title="Permanent link">&para;</a></h2>
+<p>Les signaux profonds sont la couche de détection v1.8/v1.9 de Wiretap —
+les questions qu'aucun autre pare-feu ne pose. Tout est <strong>local-first</strong> :
+pas de cloud, pas de télémétrie, chaque verdict calculé sur votre machine
+et explicable en une phrase.</p>
+<h3 id="exfiltration-correlee-a-la-presence-unattended_exfil">Exfiltration corrélée à la présence — <code>UNATTENDED_EXFIL</code><a class="headerlink" href="#exfiltration-correlee-a-la-presence-unattended_exfil" title="Permanent link">&para;</a></h3>
+<p>5 Mo vers un provider IA pendant que vous tapez, c'est vous avec votre
+IDE. Les mêmes 5 Mo pendant votre absence, c'est autre chose qui agit en
+votre nom.</p>
+<ul>
+<li><strong>Capteur</strong> : temps d'inactivité de l'input OS — <code>IOHIDSystem</code> (macOS),
+  <code>GetLastInputInfo</code> (Windows), <code>xprintidle</code> (X11 Linux). Zéro privilège,
+  zéro keylogging — un simple compteur de secondes d'inactivité, jamais
+  le contenu des saisies.</li>
+<li><strong>Logique</strong> : flux sortant sensible (provider IA, destination rare
+  nouvelle, upload massif) × machine inactive au-delà du seuil → alerte
+  critique.</li>
+<li><strong>Honnêteté</strong> : la présence est une <em>preuve, pas un verdict</em> — les
+  backups et syncs cloud uploadent aussi en votre absence. L'alerte le
+  dit et demande confirmation. Linux/Wayland dégrade honnêtement.</li>
+</ul>
+<h3 id="flow-dna-flow_drift_1">Flow DNA — <code>FLOW_DRIFT</code><a class="headerlink" href="#flow-dna-flow_drift_1" title="Permanent link">&para;</a></h3>
+<p>Une app compromise garde son nom mais change de métabolisme : tailles de
+rafales, rythme inter-flux, ratio sortant:entrant, entropie des
+destinations. Apprentissage silencieux (30 flux), fenêtres de scoring non
+recouvrantes, exigence multi-feature (2+) contre les faux positifs, alertes
+explicables, re-baseline en un clic. Endpoints <code>/flowdna</code>.</p>
+<h3 id="verdicts-par-lignee-lineage_suspect">Verdicts par lignée — <code>LINEAGE_SUSPECT</code><a class="headerlink" href="#verdicts-par-lignee-lineage_suspect" title="Permanent link">&para;</a></h3>
+<p><code>navigateur -&gt; sh -&gt; curl -&gt; evil.bin</code> raconte l'histoire qu'un nom de
+processus cache. Scoring d'ascendance avec phrase de preuve. Windows :
+table processus PowerShell CIM (wmic supprimé de Windows 11).</p>
+<h3 id="surveillance-de-persistance-persistence_newmoddel">Surveillance de persistance — <code>PERSISTENCE_NEW/MOD/DEL</code><a class="headerlink" href="#surveillance-de-persistance-persistence_newmoddel" title="Permanent link">&para;</a></h3>
+<p>Survivre au reboot est ce dont le malware a le plus besoin — et tous les
+outils network-first le ratent. LaunchAgents/Daemons, clés Run, systemd,
+cron, autostart — empreintes comparées toutes les 5 minutes ; la
+suppression elle-même est un signal. Endpoint <code>GET /persistence</code>.</p>
+<h3 id="rayon-de-blast-evaluation-dimpact-automatisee">Rayon de blast — évaluation d'impact automatisée<a class="headerlink" href="#rayon-de-blast-evaluation-dimpact-automatisee" title="Permanent link">&para;</a></h3>
+<p>Chaque alerte critique porte la réponse calculée à « si c'était malveillant,
+qu'est-ce que ça a touché » : destinations, exposition IA, secrets à
+portée, survie au reboot, lignée, fichiers ouverts — chaque champ labellé
+source + confiance, dégradation honnête vers « unknown ». Attaché comme
+<code>blast_worst_case</code>, visible dans l'UI.</p>
+<h3 id="diff-temporel">Diff temporel<a class="headerlink" href="#diff-temporel" title="Permanent link">&para;</a></h3>
+<p>« Qu'est-ce qui a changé sur cette machine depuis mardi ? » — snapshots
+horaires (persistance + listeners + formes de processus), rétention 48 h,
+diff appeared/vanished/mutated en millisecondes. Linux sans lsof : parseur
+<code>/proc/net/tcp</code> zéro dépendance.</p>
+<h3 id="journal-forensique-inviolable">Journal forensique inviolable<a class="headerlink" href="#journal-forensique-inviolable" title="Permanent link">&para;</a></h3>
+<p>Chaque alerte hash-chainée à la précédente : un attaquant qui efface des
+alertes <strong>casse la chaîne</strong> — la suppression devient la preuve. Continuité
+entre redémarrages, vérification offline sur <code>GET /forensic/verify</code>.</p>
+<h3 id="correlation-kill-chain">Corrélation kill-chain<a class="headerlink" href="#correlation-kill-chain" title="Permanent link">&para;</a></h3>
+<p>3 familles de détecteurs distinctes sur la même entité en 15 minutes, ce
+n'est pas du bruit — c'est un incident unique. Les répétitions du même
+détecteur ne comptent jamais ; branché avant l'auto-responder : une chaîne
+corrélée peut déclencher le lockdown.</p>
+<h3 id="gouvernance-mcp-la-surface-dattaque-des-agents-ia">Gouvernance MCP — la surface d'attaque des agents IA<a class="headerlink" href="#gouvernance-mcp-la-surface-dattaque-des-agents-ia" title="Permanent link">&para;</a></h3>
+<p>Audit de risque de chaque serveur MCP déclaré dans Cursor, Claude (Desktop
++ Code, imbrication par projet incluse), Windsurf, Zed, VS Code et Devin
+CLI : lanceurs download-and-run, accès filesystem non scopé, capacités
+shell/browser, secrets en env (formes salées uniquement). Endpoint
+<code>GET /mcp/audit</code>.</p>
+<h3 id="matrice-dhonnetete-cross-plateforme">Matrice d'honnêteté cross-plateforme<a class="headerlink" href="#matrice-dhonnetete-cross-plateforme" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>macOS</th>
+<th>Windows</th>
+<th>Linux</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Présence</td>
+<td>IOHID</td>
+<td>GetLastInputInfo</td>
+<td>xprintidle (X11 ; Wayland dégrade)</td>
+</tr>
+<tr>
+<td>Flow DNA / killchain / chaîne</td>
+<td>complet</td>
+<td>complet</td>
+<td>complet (pur Python)</td>
+</tr>
+<tr>
+<td>Lignée</td>
+<td>psutil</td>
+<td>PowerShell CIM</td>
+<td>/proc + psutil</td>
+</tr>
+<tr>
+<td>Persistance</td>
+<td>LaunchAgents/Daemons</td>
+<td>clés Run</td>
+<td>systemd/cron/autostart</td>
+</tr>
+<tr>
+<td>Listeners time-travel</td>
+<td>lsof</td>
+<td>netstat PowerShell structuré</td>
+<td>lsof ou /proc/net/tcp</td>
+</tr>
+<tr>
+<td>Fichiers ouverts blast</td>
+<td>lsof</td>
+<td>unknown (honnête)</td>
+<td>/proc</td>
+</tr>
+</tbody>
+</table>
+<p>Les capteurs Windows utilisent la <strong>sortie structurée PowerShell</strong> —
+immunisés contre le <code>netstat</code> localisé — avec fallback positionnel.
+Vérifié par fixtures de locale allemande et CI verte sur
+<code>windows-latest</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../architecture/" class="btn btn-neutral float-right" title="Architecture">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="../architecture/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

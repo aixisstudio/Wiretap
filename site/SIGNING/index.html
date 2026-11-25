@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Signing deep-dive - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Signing deep-dive";
+        var mkdocs_page_input_path = "SIGNING.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Signing deep-dive</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#current-state-etat-actuel">Current state / État actuel</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#windows-signpath-foundation-free-for-oss">Windows — SignPath Foundation (free for OSS)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#setup-one-time-maintainer-only">Setup (one-time, maintainer only)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ready-to-paste-application-text-texte-de-candidature-pret-a-coller">Ready-to-paste application text / Texte de candidature prêt à coller</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#macos-no-free-path-exists">macOS — no free path exists</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#alternatives-evaluated-and-rejected">Alternatives evaluated and rejected</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#francais">Français</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#windows-fondation-signpath-gratuit-pour-lopen-source">Windows — Fondation SignPath (gratuit pour l'open source)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#installation-une-fois-mainteneur">Installation (une fois, mainteneur)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#macos-aucune-voie-gratuite">macOS — aucune voie gratuite</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#alternatives-evaluees-et-rejetees">Alternatives évaluées et rejetées</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Signing deep-dive</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/SIGNING.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="code-signing-signature-de-code">Code signing / Signature de code<a class="headerlink" href="#code-signing-signature-de-code" title="Permanent link">&para;</a></h1>
+<p><a href="./">English</a> | <a href="./">Français</a> | <a href="../SIGNING.es/">Español</a> | <a href="../SIGNING.de/">Deutsch</a> | <a href="../SIGNING.ru/">Русский</a> | <a href="../SIGNING.ja/">日本語</a> | <a href="../SIGNING.pt-BR/">Português</a> | <a href="../SIGNING.zh-CN/">中文</a></p>
+<h2 id="current-state-etat-actuel">Current state / État actuel<a class="headerlink" href="#current-state-etat-actuel" title="Permanent link">&para;</a></h2>
+<p>Wiretap builds are <strong>unsigned</strong> on Windows and macOS. This is honest and
+deliberate: we will not ship self-signed certificates that defeat the point
+of signing, and we will not buy a certificate while a legitimate free path
+exists for open-source projects.</p>
+<p>Les builds Wiretap sont <strong>non signés</strong> sous Windows et macOS. C'est honnête et
+volontaire : pas de certificat auto-signé qui viderait la signature de son
+sens, et pas d'achat de certificat tant qu'une voie gratuite légitime existe
+pour l'open source.</p>
+<h2 id="windows-signpath-foundation-free-for-oss">Windows — SignPath Foundation (free for OSS)<a class="headerlink" href="#windows-signpath-foundation-free-for-oss" title="Permanent link">&para;</a></h2>
+<p><a href="https://signpath.org">SignPath</a> offers <strong>free Authenticode signing</strong> to
+qualifying open-source projects. Approved projects get a <code>release-signing</code>
+policy that produces publicly trusted signatures — SmartScreen stops
+warning once reputation builds.</p>
+<p><strong>Status (Oct 2026) / État (oct. 2026) :</strong> the <code>Wiretap [OSS]</code> organization is
+approved and fully wired — CI user confirmed, <code>*.exe</code>-in-ZIP artifact
+configuration, GitHub trusted build system + GitHub App, secrets and
+variables set. A real signing request already completed end-to-end under
+<code>test-signing</code>. The <code>release-signing</code> certificate is still being issued
+(CSR pending); <code>SIGNPATH_POLICY_SLUG</code> will switch from <code>test-signing</code> to
+<code>release-signing</code> once it lands.</p>
+<p>L'organisation <code>Wiretap [OSS]</code> est approuvée et entièrement câblée — le
+pipeline a déjà produit un installeur signé de bout en bout en
+<code>test-signing</code>. Le certificat <code>release-signing</code> est en cours d'émission ;
+on basculera la variable de politique dès qu'il arrive.</p>
+<h3 id="setup-one-time-maintainer-only">Setup (one-time, maintainer only)<a class="headerlink" href="#setup-one-time-maintainer-only" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Apply at <a href="https://signpath.org/apply">https://signpath.org/apply</a> — a HubSpot form asking for your
+   name, email, project name, repository URL and a description. Approval is
+   manual (days). Wiretap meets every published condition: AGPL-3.0
+   (OSI-approved, no dual licensing), all-source public, actively
+   maintained, already released on GitHub Releases, documented.</li>
+<li>Create the SignPath organization, a <strong>project</strong> (slug, e.g. <code>Wiretap</code>),
+   link the <em>GitHub.com</em> trusted build system to it, and install the
+   SignPath GitHub App on this repository (required for origin verification).</li>
+<li>Create a <strong>release-signing policy</strong> restricted to tag builds, with an
+   artifact configuration matching <code>*.exe</code> in a ZIP (the standard template
+   works).</li>
+<li>In GitHub → repo <em>Settings → Secrets and variables → Actions</em>:</li>
+<li>Variables: <code>SIGNPATH_ORGANIZATION_ID</code>, <code>SIGNPATH_PROJECT_SLUG</code>,
+     <code>SIGNPATH_POLICY_SLUG</code></li>
+<li>Secret: <code>SIGNPATH_API_TOKEN</code></li>
+<li>Done — the CI job <code>SignPath — submit signing request</code> in
+   <code>.github/workflows/ci.yml</code> activates automatically on the next tag: it
+   uploads the unsigned installer, waits for the signed copy, and replaces
+   the artifact before release upload. <strong>Everything is inert until step 4.</strong></li>
+</ol>
+<h3 id="ready-to-paste-application-text-texte-de-candidature-pret-a-coller">Ready-to-paste application text / Texte de candidature prêt à coller<a class="headerlink" href="#ready-to-paste-application-text-texte-de-candidature-pret-a-coller" title="Permanent link">&para;</a></h3>
+<pre><code>Project name: Wiretap
+Repository: https://github.com/aixisstudio/Wiretap
+License: AGPL-3.0-or-later
+Website: https://aixisstudio.github.io/Wiretap/
+
+Wiretap is a local-first network traffic visualizer for Windows, macOS and
+Linux — a free, privacy-focused alternative to Little Snitch's monitoring
+side. It captures packets via libpcap/Npcap through a custom ctypes
+binding, attributes traffic to processes, geolocates IPs offline against
+local .mmdb databases, and detects anomalies (port scans, beaconing,
+exfiltration spikes). All analysis happens on-device: no telemetry, no
+analytics, no account.
+
+Release artifacts are built entirely by public GitHub Actions workflows
+(.github/workflows/ci.yml) from tagged commits. We want to sign the
+Windows NSIS installer (Wiretap-Setup-windows.exe) so users stop seeing
+SmartScreen warnings on install. The signing request will be submitted
+from the tagged-release CI job via the signpath/github-action-submit-
+signing-request action, signing only artifacts built from this repository.
+</code></pre>
+<h2 id="macos-no-free-path-exists">macOS — no free path exists<a class="headerlink" href="#macos-no-free-path-exists" title="Permanent link">&para;</a></h2>
+<p>Apple requires a paid <strong>Developer Program</strong> membership ($99/yr) for a
+Developer ID certificate + notarization. There is no legal free
+alternative. Until/unless the project funds one:</p>
+<ul>
+<li>the <code>.zip</code>/<code>.dmg</code> builds stay unsigned — first launch needs
+  <strong>right-click → Open</strong>, or <code>xattr -d com.apple.quarantine Wiretap.app</code></li>
+<li>SHA256 checksums are published on every release for integrity checking</li>
+<li>public CI build logs provide provenance (reproducible pipeline)</li>
+</ul>
+<p>If <code>APPLE_ID</code> / <code>APPLE_TEAM_ID</code> / <code>APPLE_APP_PASSWORD</code> / <code>MACOS_CERT_P12</code>
+secrets are ever configured, the <code>ENABLE_CODESIGNING</code> placeholder steps in
+CI are the hook.</p>
+<h2 id="alternatives-evaluated-and-rejected">Alternatives evaluated and rejected<a class="headerlink" href="#alternatives-evaluated-and-rejected" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Why not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Azure Trusted Signing</td>
+<td>~$10/mo — not free; free/trial/sponsored Azure subs are explicitly unsupported</td>
+</tr>
+<tr>
+<td>Microsoft Store (MSIX)</td>
+<td>Microsoft re-signs for free after certification — but only for Store distribution; kept as a future channel</td>
+</tr>
+<tr>
+<td>Self-signed cert</td>
+<td>Defeats SmartScreen/Gatekeeper trust — worse than unsigned</td>
+</tr>
+<tr>
+<td>Community/shared certs</td>
+<td>Illegal under CA terms — never</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="francais">Français<a class="headerlink" href="#francais" title="Permanent link">&para;</a></h2>
+<h3 id="windows-fondation-signpath-gratuit-pour-lopen-source">Windows — Fondation SignPath (gratuit pour l'open source)<a class="headerlink" href="#windows-fondation-signpath-gratuit-pour-lopen-source" title="Permanent link">&para;</a></h3>
+<p><a href="https://signpath.org">SignPath</a> offre la <strong>signature Authenticode gratuite</strong>
+aux projets open source éligibles. Les projets acceptés obtiennent une
+politique <code>release-signing</code> produisant des signatures publiquement
+reconnues — SmartScreen cesse d'avertir une fois la réputation établie.</p>
+<h4 id="installation-une-fois-mainteneur">Installation (une fois, mainteneur)<a class="headerlink" href="#installation-une-fois-mainteneur" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Postuler sur <a href="https://signpath.org">https://signpath.org</a> → <em>Open Source</em>. Approbation manuelle.</li>
+<li>Créer l'organisation SignPath, un <strong>projet</strong> (slug ex. <code>Wiretap</code>), lier le
+   build system de confiance <em>GitHub.com</em> et installer l'app GitHub SignPath
+   sur ce dépôt (requis pour la vérification d'origine).</li>
+<li>Créer une <strong>politique release-signing</strong> restreinte aux builds de tag, avec
+   une configuration d'artefact couvrant <code>*.exe</code> dans un ZIP.</li>
+<li>Dans GitHub → <em>Settings → Secrets and variables → Actions</em> :</li>
+<li>Variables : <code>SIGNPATH_ORGANIZATION_ID</code>, <code>SIGNPATH_PROJECT_SLUG</code>,
+     <code>SIGNPATH_POLICY_SLUG</code></li>
+<li>Secret : <code>SIGNPATH_API_TOKEN</code></li>
+<li>Terminé — le job CI <code>SignPath — submit signing request</code> s'active tout
+   seul au prochain tag. <strong>Tout reste inerte tant que l'étape 4 n'est pas faite.</strong></li>
+</ol>
+<h3 id="macos-aucune-voie-gratuite">macOS — aucune voie gratuite<a class="headerlink" href="#macos-aucune-voie-gratuite" title="Permanent link">&para;</a></h3>
+<p>Apple exige un compte <strong>Developer Program</strong> payant (99 $/an) pour un
+certificat Developer ID + notarisation. Pas d'alternative gratuite légale.
+En attendant :</p>
+<ul>
+<li>les builds <code>.zip</code>/<code>.dmg</code> restent non signés — premier lancement via
+  <strong>clic droit → Ouvrir</strong>, ou <code>xattr -d com.apple.quarantine Wiretap.app</code></li>
+<li>les SHA256 de chaque release permettent de vérifier l'intégrité</li>
+<li>les logs CI publics fournissent la provenance (pipeline reproductible)</li>
+</ul>
+<h3 id="alternatives-evaluees-et-rejetees">Alternatives évaluées et rejetées<a class="headerlink" href="#alternatives-evaluees-et-rejetees" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Pourquoi non</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Azure Trusted Signing</td>
+<td>~10 $/mois — pas gratuit ; abonnements Azure gratuits/sponsorisés explicitement non supportés</td>
+</tr>
+<tr>
+<td>Microsoft Store (MSIX)</td>
+<td>Microsoft re-signe gratuitement après certification — distribution Store seulement ; piste future</td>
+</tr>
+<tr>
+<td>Certificat auto-signé</td>
+<td>Neutralise la confiance SmartScreen/Gatekeeper — pire que non signé</td>
+</tr>
+<tr>
+<td>Certificats partagés/communautaires</td>
+<td>Illégal selon les termes des CA — jamais</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../PACKAGING/" class="btn btn-neutral float-left" title="Packaging & signing"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../threat-model/" class="btn btn-neutral float-right" title="Threat model">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../PACKAGING/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../threat-model/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Wiretap — Arquitetura - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Wiretap \u2014 Arquitetura";
+        var mkdocs_page_input_path = "architecture.pt-BR.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Wiretap — Arquitetura</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/architecture.pt-BR.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="wiretap-arquitetura">Wiretap — Arquitetura<a class="headerlink" href="#wiretap-arquitetura" title="Permanent link">&para;</a></h1>
+<p><a href="../architecture/">English</a> | <a href="../architecture/">Français</a> | <a href="../architecture.es/">Español</a> | <a href="../architecture.de/">Deutsch</a> | <a href="../architecture.ru/">Русский</a> | <a href="../architecture.ja/">日本語</a> | <strong>Português</strong> | <a href="../architecture.zh-CN/">中文</a></p>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│  Browser / Electron renderer (React + D3)                    │
+│  WS ◄──── batch (250 ms) ──── REST (token: X-Wiretap-Token)   │
+└───────────────────────────▲──────────────────────────────────┘
+                            │ 127.0.0.1 only
+┌───────────────────────────┴──────────────────────────────────┐
+│  FastAPI (api/main.py)                                       │
+│    _pkt_queue (bounded) → _drain_loop → _process_batch       │
+│      filters → LAN accounting → graph aggregates → detector  │
+│      enrichment: fire-and-forget, dedup per IP               │
+│      settings ←→ SQLite settings table                       │
+├──────────────────────────────────────────────────────────────┤
+│  capture/sniffer.py  — PacketSniffer thread                  │
+│    capture/pcap.py   — ctypes → wpcap.dll / libpcap.so       │
+│    capture/parser.py — own parser: Ethernet, IPv4/IPv6,      │
+│                        TCP/UDP, DNS answers, TLS SNI         │
+│    ConnectionTable   — psutil snapshot every ~1.5 s          │
+│                        (proto, local_port) → (pid, name)     │
+├──────────────────────────────────────────────────────────────┤
+│  scanner/arp_scanner.py — system ARP table (passive)         │
+│  capture/media_monitor.py — mic/camera (win/linux; macOS:    │
+│                             explicitly unsupported)          │
+│  detection/anomaly.py   — NEW_HOST, SUSPICIOUS_PROCESS/PORT, │
+│                           PORT_SCAN, BEACON (regularity),    │
+│                           VOLUME_SPIKE (window vs baseline), │
+│                           MEDIA_EXFIL, LAN device rules      │
+│  detection/firewall.py  — OS-firewall orchestration +        │
+│                           lockdown + blocked counters        │
+│  detection/threatintel.py — opt-in reputation lookups        │
+│  resolver/dns_geo.py    — observed DNS/SNI map &gt; reverse DNS │
+│                           &gt; offline .mmdb (DB-IP/GeoLite2)   │
+│  storage/db.py          — SQLite: traffic, alerts, settings  │
+└──────────────────────────────────────────────────────────────┘
+</code></pre>
+<p><strong>Invariantes-chave</strong></p>
+<ul>
+<li>Sem corrotinas ou broadcasts por pacote — uma fila, uma tarefa de
+  drenagem, uma mensagem WS <code>batch</code> a cada ~250 ms.</li>
+<li><code>remote_port</code> é consciente da direção em todo lugar; <code>dst_port</code> nunca é
+  usado para classificar (é uma porta <em>local</em> no tráfego de entrada).</li>
+<li>Nenhuma chamada a terceiros existe no código sem opt-in explícito.</li>
+<li>O detector segura um lock em todo estado mutável e cada contêiner tem
+  tamanho limitado.</li>
+<li>macOS: o monitoramento de mídia reporta <code>supported: false</code>; a UI oculta
+  o selo.</li>
+</ul>
+<p><strong>Camadas em resumo</strong></p>
+<ul>
+<li><strong>Captura</strong>: <code>pcap.py</code> (ctypes → libpcap/Npcap) + <code>parser.py</code> próprio
+  (Ethernet, IPv4/IPv6 com extensões, TCP/UDP, respostas DNS, SNI TLS).</li>
+<li><strong>Pipeline</strong>: fila limitada → tarefa de drenagem única (~4 Hz) → uma
+  mensagem WS <code>batch</code> por tick.</li>
+<li><strong>Classificação</strong>: sempre sobre <code>remote_port</code> (consciente da direção).</li>
+<li><strong>Enriquecimento</strong>: DNS/SNI observados &gt; DNS reverso &gt; .mmdb local;
+  tarefas deduplicadas, falhas nunca cacheadas para sempre.</li>
+<li><strong>Segurança</strong>: <code>firewall.py</code> orquestra o firewall do SO
+  (netsh/iptables/pf) com regras persistidas, lockdown e contadores de
+  bloqueio; <code>threatintel.py</code> faz consultas de reputação opt-in com cache
+  LRU.</li>
+<li><strong>Persistência</strong>: agregados de tráfego, alertas e configurações em
+  SQLite; flush ao parar; retenção configurável.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Code-Signierung - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Code-Signierung";
+        var mkdocs_page_input_path = "SIGNING.de.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Code-Signierung</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/SIGNING.de.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="code-signierung">Code-Signierung<a class="headerlink" href="#code-signierung" title="Permanent link">&para;</a></h1>
+<p><a href="../SIGNING/">English</a> | <a href="../SIGNING/">Français</a> | <a href="../SIGNING.es/">Español</a> | <strong>Deutsch</strong> | <a href="../SIGNING.ru/">Русский</a> | <a href="../SIGNING.ja/">日本語</a> | <a href="../SIGNING.pt-BR/">Português</a> | <a href="../SIGNING.zh-CN/">中文</a></p>
+<h2 id="aktueller-stand">Aktueller Stand<a class="headerlink" href="#aktueller-stand" title="Permanent link">&para;</a></h2>
+<p>Wiretap-Builds sind unter Windows und macOS <strong>unsigniert</strong>. Das ist ehrlich
+und bewusst so: keine selbstsignierten Zertifikate, die den Sinn der
+Signierung unterlaufen, und kein Zertifikatskauf, solange ein legitimer
+kostenloser Weg für Open Source existiert.</p>
+<h2 id="windows-signpath-foundation-kostenlos-fur-oss">Windows — SignPath Foundation (kostenlos für OSS)<a class="headerlink" href="#windows-signpath-foundation-kostenlos-fur-oss" title="Permanent link">&para;</a></h2>
+<p><a href="https://signpath.org">SignPath</a> bietet qualifizierten Open-Source-Projekten
+<strong>kostenlose Authenticode-Signierung</strong>. Genehmigte Projekte erhalten eine
+<code>release-signing</code>-Policy mit öffentlich vertrauenswürdigen Signaturen —
+SmartScreen hört auf zu warnen, sobald Reputation aufgebaut ist.</p>
+<h3 id="einrichtung-einmalig-nur-maintainer">Einrichtung (einmalig, nur Maintainer)<a class="headerlink" href="#einrichtung-einmalig-nur-maintainer" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Bewerben auf <a href="https://signpath.org/apply">https://signpath.org/apply</a> — Formular mit Name, E-Mail,
+   Projekt, Repository-URL und Beschreibung. Manuelle Genehmigung (Tage).
+   Wiretap erfüllt jede veröffentlichte Bedingung: AGPL-3.0 (OSI-approved,
+   kein Dual Licensing), vollständig öffentliche Quellen, aktiv gepflegt,
+   bereits auf GitHub Releases veröffentlicht, dokumentiert.
+   <strong>Bewerbung eingereicht — Prüfung läuft.</strong></li>
+<li>SignPath-Organisation anlegen, ein <strong>Projekt</strong> (Slug, z. B. <code>Wiretap</code>),
+   das Trusted Build System <em>GitHub.com</em> verknüpfen und die SignPath
+   GitHub App auf diesem Repo installieren (für Origin-Verifikation nötig).</li>
+<li><strong>Release-Signing-Policy</strong> auf Tag-Builds beschränkt anlegen, mit
+   Artifact-Konfiguration für <code>*.exe</code> in einem ZIP (Standardvorlage).</li>
+<li>In GitHub → <em>Settings → Secrets and variables → Actions</em>:</li>
+<li>Variablen: <code>SIGNPATH_ORGANIZATION_ID</code>, <code>SIGNPATH_PROJECT_SLUG</code>,
+     <code>SIGNPATH_POLICY_SLUG</code></li>
+<li>Secret: <code>SIGNPATH_API_TOKEN</code></li>
+<li>Fertig — der CI-Job <code>SignPath — submit signing request</code> aktiviert sich
+   beim nächsten Tag: lädt den unsignierten Installer hoch, wartet auf die
+   signierte Kopie und ersetzt das Artefakt vor dem Release-Upload.
+   <strong>Alles inert bis Schritt 4.</strong></li>
+</ol>
+<h2 id="macos-kein-kostenloser-weg">macOS — kein kostenloser Weg<a class="headerlink" href="#macos-kein-kostenloser-weg" title="Permanent link">&para;</a></h2>
+<p>Apple verlangt eine bezahlte <strong>Developer-Program</strong>-Mitgliedschaft
+($99/Jahr) für Developer-ID-Zertifikat + Notarisierung. Keine legale
+kostenlose Alternative. Bis dahin:</p>
+<ul>
+<li><code>.zip</code>/<code>.dmg</code>-Builds bleiben unsigniert — erster Start per
+  <strong>Rechtsklick → Öffnen</strong> oder <code>xattr -d com.apple.quarantine Wiretap.app</code></li>
+<li>SHA256-Checksums jeder Release erlauben Integritätsprüfung</li>
+<li>öffentliche CI-Buildlogs liefern Provenienz (reproduzierbare Pipeline)</li>
+</ul>
+<p>Falls je <code>APPLE_ID</code> / <code>APPLE_TEAM_ID</code> / <code>APPLE_APP_PASSWORD</code> /
+<code>MACOS_CERT_P12</code> konfiguriert werden, sind die <code>ENABLE_CODESIGNING</code>-
+Platzhalter-Schritte in CI der Ankerpunkt.</p>
+<h2 id="geprufte-und-verworfene-alternativen">Geprüfte und verworfene Alternativen<a class="headerlink" href="#geprufte-und-verworfene-alternativen" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Warum nicht</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Azure Trusted Signing</td>
+<td>~$10/Monat — nicht gratis; Free-/Trial-/gesponserte Azure-Subs explizit nicht unterstützt</td>
+</tr>
+<tr>
+<td>Microsoft Store (MSIX)</td>
+<td>Microsoft resigniert gratis nach Zertifizierung — nur für Store-Vertrieb; Zukunftskanal</td>
+</tr>
+<tr>
+<td>Selbstsigniertes Zertifikat</td>
+<td>Unterläuft SmartScreen/Gatekeeper — schlechter als unsigniert</td>
+</tr>
+<tr>
+<td>Community-/geteilte Zertifikate</td>
+<td>Illegal nach CA-Bedingungen — niemals</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

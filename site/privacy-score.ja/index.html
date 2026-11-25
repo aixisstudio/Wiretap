@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Privacy Score — 方法論 - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Privacy Score \u2014 \u65b9\u6cd5\u8ad6";
+        var mkdocs_page_input_path = "privacy-score.ja.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Privacy Score — 方法論</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/privacy-score.ja.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="privacy-score">Privacy Score — 方法論<a class="headerlink" href="#privacy-score" title="Permanent link">&para;</a></h1>
+<p><a href="../privacy-score/">English</a> | <a href="../privacy-score/">Français</a> | <a href="../privacy-score.es/">Español</a> | <a href="../privacy-score.de/">Deutsch</a> | <a href="../privacy-score.ru/">Русский</a> | <strong>日本語</strong> | <a href="../privacy-score.pt-BR/">Português</a> | <a href="../privacy-score.zh-CN/">中文</a></p>
+<p>スコア（A–F、右上に表示）は
+<code>frontend/src/scoring/privacy.js</code> でノード/エッジ/アラートのライブ状態
+から計算される。これは<strong>ヒューリスティック</strong>であり正式な保証ではない
+— 評価に頼る前に脅威モデルを文書化してほしい。</p>
+<p>入力と重み:</p>
+<table>
+<thead>
+<tr>
+<th>シグナル</th>
+<th>効果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>トラッカーカテゴリのノード（DNS/SNI で観測される既知 ad/analytics ドメイン）</td>
+<td>各 −8 pt</td>
+</tr>
+<tr>
+<td>ウィンドウ内の <code>critical</code>/<code>warning</code> アラート</td>
+<td>各 −10 / −4 pt</td>
+</tr>
+<tr>
+<td>トラッカー判定宛先へのバイト割合</td>
+<td>比例的ペナルティ</td>
+</tr>
+<tr>
+<td>相異なるリモートホスト数</td>
+<td>~30 超で軽いペナルティ</td>
+</tr>
+<tr>
+<td>HTTPS 割合（ポート 443 トラフィック）</td>
+<td>小さなボーナス</td>
+</tr>
+</tbody>
+</table>
+<p>既知の限界:</p>
+<ul>
+<li>トラッカーのマッチは観測された DNS/SNI 名のみに依存 — 素の IP で
+  到達したトラッカーはマッチしない。これは意図的（逆引き PTR への
+  部分一致は <code>notfacebook.com</code> のような誤検出を生んだため）。</li>
+<li>A–F の評価は序数的な要約であって測定値ではない。絶対スコアではなく
+  時系列のトレンドとして読むこと。</li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Wiretap vs Little Snitch vs GlassWire vs Portmaster vs LuLu - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Wiretap vs Little Snitch vs GlassWire vs Portmaster vs LuLu";
+        var mkdocs_page_input_path = "COMPARISON.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../PACKAGING/">Packaging & signing</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Wiretap vs Little Snitch vs GlassWire vs Portmaster vs LuLu</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/COMPARISON.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="wiretap-vs-little-snitch-vs-glasswire-vs-portmaster-vs-lulu">Wiretap vs Little Snitch vs GlassWire vs Portmaster vs LuLu<a class="headerlink" href="#wiretap-vs-little-snitch-vs-glasswire-vs-portmaster-vs-lulu" title="Permanent link">&para;</a></h1>
+<p><strong>English</strong> | <a href="../COMPARISON.fr/">Français</a></p>
+<p>An honest, feature-level comparison of the main application firewalls and
+connection monitors. We wrote it ourselves, so read it with that bias in mind —
+we call out where competitors genuinely win.</p>
+<h2 id="quick-table">Quick table<a class="headerlink" href="#quick-table" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Wiretap</strong></th>
+<th><strong>Little Snitch</strong></th>
+<th><strong>GlassWire</strong></th>
+<th><strong>Portmaster</strong></th>
+<th><strong>LuLu</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>License</td>
+<td>AGPL-3.0 (FOSS)</td>
+<td>Proprietary</td>
+<td>Proprietary (freemium)</td>
+<td>AGPL-3.0</td>
+<td>GPL-3.0 (FOSS)</td>
+</tr>
+<tr>
+<td>Price</td>
+<td>Free</td>
+<td>~€59 (macOS)</td>
+<td>Free + paid tiers</td>
+<td>Free (+ paid SPN)</td>
+<td>Free / donation</td>
+</tr>
+<tr>
+<td>Platforms</td>
+<td>macOS, Windows, Linux</td>
+<td>macOS only</td>
+<td>Windows, Android</td>
+<td>Windows, macOS, Linux</td>
+<td>macOS only</td>
+</tr>
+<tr>
+<td>Per-app connection view</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Ask-on-first-connect prompt</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Packet-level inspection</td>
+<td>✅ (own bounded parsers)</td>
+<td>❌ (flows only)</td>
+<td>❌</td>
+<td>Partial (DNS, SNI)</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Passive JA3/JA4 TLS fingerprinting</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>C2 / threat-intel feeds (ThreatFox…)</td>
+<td>✅</td>
+<td>❌</td>
+<td>Paid tier</td>
+<td>✅ (filter lists)</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Process context (cmdline, parent)</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>Partial</td>
+</tr>
+<tr>
+<td>Offline GeoIP map</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Scriptable REST/WebSocket API</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅ (API)</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>SIEM export (CEF/ECS/Syslog)</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Sends telemetry to vendor</td>
+<td>❌ (local-first)</td>
+<td>❌</td>
+<td>Yes (optional)</td>
+<td>Optional</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Requires account</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>Optional</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<h2 id="where-each-one-wins">Where each one wins<a class="headerlink" href="#where-each-one-wins" title="Permanent link">&para;</a></h2>
+<p><strong>Little Snitch</strong> — the most polished per-app firewall on macOS, bar none. Deep
+rules UI, research assistant, years of refinement. If you want the smoothest
+macOS-only experience and don't need source access, packet inspection or an
+API, it's the safe pick. Wiretap exists because there was no Little Snitch for
+Windows/Linux that is also open-source and inspects traffic, not just flows.</p>
+<p><strong>GlassWire</strong> — the prettiest bandwidth/usage graphs on Windows and an easy
+mobile companion. Good "what did my PC do yesterday" visualization. It is
+closed-source with paid tiers; no packet inspection and less of a privacy
+stance.</p>
+<p><strong>Portmaster (Safing)</strong> — the closest philosophical sibling: FOSS, local-first,
+great DNS-level filtering with filter lists, and a paid SPN network. Stronger
+than Wiretap on DNS ad/tracker blocking out of the box; weaker on raw packet
+visibility — Wiretap shows you the actual bytes (TLS ClientHello, DNS questions,
+JA3 fingerprints) and lets you write rules on them.</p>
+<p><strong>LuLu</strong> — the minimalist, free macOS outbound firewall from Objective-See.
+Excellent if all you want is "block app X from phoning home" on a Mac with zero
+cruft. No inspection, no cross-platform, no API — by design.</p>
+<p><strong>Wiretap</strong> — the only one of the five that combines: cross-platform FOSS,
+passive TLS fingerprinting (JA3/JA4) for C2 beacon detection, pluggable
+threat-intel feeds (ThreatFox/abuse.ch, your own lists), a scriptable
+authenticated API, SIEM exports, and per-process context — all local, no
+account, no vendor telemetry. The trade-off: the UI is younger than Little
+Wiretap's, and kernel-level enforcement varies by OS (pf/netsh/nftables under
+the hood — see FIREWALL.md for the honest matrix).</p>
+<h2 id="one-line-summary">One-line summary<a class="headerlink" href="#one-line-summary" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Need the most polished <strong>macOS-only</strong> firewall → <strong>Little Snitch</strong></li>
+<li>Need <strong>bandwidth graphs</strong> on Windows → <strong>GlassWire</strong></li>
+<li>Need <strong>DNS ad/tracker blocking</strong> + optional VPN-like SPN → <strong>Portmaster</strong></li>
+<li>Need a <strong>minimal free macOS</strong> outbound blocker → <strong>LuLu</strong></li>
+<li>Need <strong>open, cross-platform, inspectable traffic + C2 detection</strong> → <strong>Wiretap</strong></li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

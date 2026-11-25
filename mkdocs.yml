@@ -11,7 +11,7 @@ docs_dir: docs
 theme:
   name: readthedocs
 nav:
-  - Home: ../README.md
+  - Home: index.md
   - Deep signals: deep-signals.md
   - Architecture: architecture.md
   - Firewall & blocking: FIREWALL.md

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Packaging & signing - Wiretap</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Packaging \u0026 signing";
+        var mkdocs_page_input_path = "PACKAGING.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wiretap
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../README.md">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../deep-signals/">Deep signals</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../FIREWALL/">Firewall & blocking</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../INTEGRATIONS/">Integrations (SIEM/deploy)</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Packaging & signing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#formats-shipped">Formats shipped</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#snap-packet-capture-under-confinement">Snap — packet capture under confinement</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rpm-homebrew-formula-release-pipeline">rpm + Homebrew formula + release pipeline</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#flatpak-deliberately-not-shipped">Flatpak — deliberately not shipped</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#francais">Français</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#formats-publies">Formats publiés</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#snap-capture-de-paquets-sous-confinement">Snap — capture de paquets sous confinement</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#flatpak-volontairement-non-publie">Flatpak — volontairement non publié</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rpm-formule-homebrew-pipeline-de-release">rpm + formule Homebrew + pipeline de release</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../SIGNING/">Signing deep-dive</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../threat-model/">Threat model</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../privacy-score/">Privacy score</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wiretap</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Packaging & signing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/aixisstudio/Wiretap/edit/master/docs/PACKAGING.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="linux-packaging-empaquetage-linux">Linux packaging / Empaquetage Linux<a class="headerlink" href="#linux-packaging-empaquetage-linux" title="Permanent link">&para;</a></h1>
+<p><a href="./">English</a> | <a href="./">Français</a> | <a href="../PACKAGING.es/">Español</a> | <a href="../PACKAGING.de/">Deutsch</a> | <a href="../PACKAGING.ru/">Русский</a> | <a href="../PACKAGING.ja/">日本語</a> | <a href="../PACKAGING.pt-BR/">Português</a> | <a href="../PACKAGING.zh-CN/">中文</a></p>
+<h2 id="formats-shipped">Formats shipped<a class="headerlink" href="#formats-shipped" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>File</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AppImage</td>
+<td><code>Wiretap-x86_64.AppImage</code></td>
+<td>portable, needs <code>libfuse2</code>; update info via <code>latest-linux.yml</code></td>
+</tr>
+<tr>
+<td>deb</td>
+<td><code>wiretap-linux-amd64.deb</code></td>
+<td>standard Debian/Ubuntu install</td>
+</tr>
+<tr>
+<td>snap</td>
+<td><code>Wiretap-amd64.snap</code></td>
+<td>strict confinement — see below</td>
+</tr>
+</tbody>
+</table>
+<h2 id="snap-packet-capture-under-confinement">Snap — packet capture under confinement<a class="headerlink" href="#snap-packet-capture-under-confinement" title="Permanent link">&para;</a></h2>
+<p>The snap is built by electron-builder (<code>linux.target</code> includes <code>"snap"</code>) in
+strict confinement. Packet capture uses <code>AF_PACKET</code> sockets, which the
+<code>network-observe</code> interface grants (the same model the <code>tcpdump</code> snap
+uses). After installing a local <code>.snap</code>:</p>
+<pre><code class="language-bash">sudo snap install --dangerous Wiretap-amd64.snap
+sudo snap connect wiretap:network-observe   # grants AF_PACKET read access
+</code></pre>
+<p>Without the <code>network-observe</code> connection the UI still runs but capture
+stays empty. Store publication would auto-connect that interface once
+human-reviewed; until then the manual connect is required.</p>
+<h2 id="rpm-homebrew-formula-release-pipeline">rpm + Homebrew formula + release pipeline<a class="headerlink" href="#rpm-homebrew-formula-release-pipeline" title="Permanent link">&para;</a></h2>
+<p>The <code>release.yml</code> workflow (on every <code>v*</code> tag or <code>workflow_dispatch</code>)
+runs four publish jobs:</p>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nfpm</code></td>
+<td><code>wiretap-linux-amd64.rpm</code> — native build via nfpm v2.48 (<code>packaging/nfpm.yaml</code> + <code>packaging/postinstall.sh</code>)</td>
+</tr>
+<tr>
+<td><code>homebrew</code></td>
+<td>pushes <code>Formula/wiretap.rb</code> to <code>aixisstudio/homebrew-tap</code> — installs the headless <code>wiretapd</code> daemon (<code>brew install aixisstudio/tap/wiretap</code>). Requires <code>HOMEBREW_TAP_TOKEN</code>.</td>
+</tr>
+<tr>
+<td><code>winget</code></td>
+<td>submits <code>Wiretap-Setup-*.exe</code> via winget-releaser when the asset exists; skips cleanly otherwise. Requires <code>WINGET_TOKEN</code>.</td>
+</tr>
+<tr>
+<td><code>chocolatey</code></td>
+<td><code>choco pack</code>/<code>push</code> of <code>installer/Wiretap.nuspec</code> when <code>CHOCO_API_KEY</code> is set.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="flatpak-deliberately-not-shipped">Flatpak — deliberately not shipped<a class="headerlink" href="#flatpak-deliberately-not-shipped" title="Permanent link">&para;</a></h2>
+<p>Flatpak's sandbox cannot grant <code>AF_PACKET</code> access: there is no portal or
+<code>finish-args</code> combination that exposes raw packet capture, and process
+attribution via <code>psutil</code> needs host <code>/proc</code> visibility the sandbox denies.
+Shipping a Flatpak would produce a pretty UI that can never see a packet —
+we'd rather not publish a broken app than fake it. If flathub ever grows a
+capture-capable permission, revisit.</p>
+<hr />
+<h2 id="francais">Français<a class="headerlink" href="#francais" title="Permanent link">&para;</a></h2>
+<h3 id="formats-publies">Formats publiés<a class="headerlink" href="#formats-publies" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Fichier</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AppImage</td>
+<td><code>Wiretap-x86_64.AppImage</code></td>
+<td>portable, requiert <code>libfuse2</code> ; info de mise à jour via <code>latest-linux.yml</code></td>
+</tr>
+<tr>
+<td>deb</td>
+<td><code>wiretap-linux-amd64.deb</code></td>
+<td>installation Debian/Ubuntu standard</td>
+</tr>
+<tr>
+<td>snap</td>
+<td><code>Wiretap-amd64.snap</code></td>
+<td>confinement strict — voir ci-dessous</td>
+</tr>
+</tbody>
+</table>
+<h3 id="snap-capture-de-paquets-sous-confinement">Snap — capture de paquets sous confinement<a class="headerlink" href="#snap-capture-de-paquets-sous-confinement" title="Permanent link">&para;</a></h3>
+<p>Le snap est construit par electron-builder (<code>linux.target</code> inclut
+<code>"snap"</code>) en confinement strict. La capture utilise des sockets
+<code>AF_PACKET</code>, que l'interface <code>network-observe</code> autorise (le même modèle
+que le snap <code>tcpdump</code>). Après installation d'un <code>.snap</code> local :</p>
+<pre><code class="language-bash">sudo snap install --dangerous Wiretap-amd64.snap
+sudo snap connect wiretap:network-observe   # autorise la lecture AF_PACKET
+</code></pre>
+<p>Sans cette connexion, l'UI tourne mais la capture reste vide. Une
+publication sur le Store connecterait l'interface automatiquement après
+revue ; en attendant, la connexion manuelle est requise.</p>
+<h3 id="flatpak-volontairement-non-publie">Flatpak — volontairement non publié<a class="headerlink" href="#flatpak-volontairement-non-publie" title="Permanent link">&para;</a></h3>
+<p>La sandbox Flatpak ne peut pas accorder l'accès <code>AF_PACKET</code> : aucun portal
+ni combinaison de <code>finish-args</code> n'expose la capture de paquets brute, et
+l'attribution par processus via <code>psutil</code> exige une visibilité <code>/proc</code> de
+l'hôte que la sandbox refuse. Publier un Flatpak produirait une jolie UI
+incapable de voir le moindre paquet — mieux vaut ne pas publier une app
+cassée que de simuler. À revoir si flathub ajoute une permission de
+capture.</p>
+<h3 id="rpm-formule-homebrew-pipeline-de-release">rpm + formule Homebrew + pipeline de release<a class="headerlink" href="#rpm-formule-homebrew-pipeline-de-release" title="Permanent link">&para;</a></h3>
+<p>Le workflow <code>release.yml</code> (à chaque tag <code>v*</code> ou <code>workflow_dispatch</code>)
+exécute quatre jobs de publication :</p>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Sortie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nfpm</code></td>
+<td><code>wiretap-linux-amd64.rpm</code> — build natif via nfpm v2.48 (<code>packaging/nfpm.yaml</code> + <code>packaging/postinstall.sh</code>)</td>
+</tr>
+<tr>
+<td><code>homebrew</code></td>
+<td>pousse <code>Formula/wiretap.rb</code> vers <code>aixisstudio/homebrew-tap</code> — installe le daemon headless <code>wiretapd</code> (<code>brew install aixisstudio/tap/wiretap</code>). Exige <code>HOMEBREW_TAP_TOKEN</code>.</td>
+</tr>
+<tr>
+<td><code>winget</code></td>
+<td>soumet <code>Wiretap-Setup-*.exe</code> via winget-releaser quand l'asset existe ; sinon saute proprement. Exige <code>WINGET_TOKEN</code>.</td>
+</tr>
+<tr>
+<td><code>chocolatey</code></td>
+<td><code>choco pack</code>/<code>push</code> de <code>installer/Wiretap.nuspec</code> si <code>CHOCO_API_KEY</code> est posé.</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../INTEGRATIONS/" class="btn btn-neutral float-left" title="Integrations (SIEM/deploy)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../SIGNING/" class="btn btn-neutral float-right" title="Signing deep-dive">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/aixisstudio/Wiretap" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../INTEGRATIONS/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../SIGNING/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
