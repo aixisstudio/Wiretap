@@ -8,6 +8,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) — EN/FR.
 
 ## [Unreleased]
 
+### Changed / Modifié
+
+- EN: **Project renamed from Snitch to Wiretap** — at the polite request
+  of Objective Development (makers of Little Snitch), whose registered
+  EU trademark the old name overlapped. Binary, CLI, package names,
+  `WIRETAP_*` environment variables (was `SNITCH_*`), deploy units
+  (systemd, Helm, Ansible, Puppet, Salt, GPO) and documentation all
+  follow the new name. The old GitHub URL redirects to
+  `aixisstudio/Wiretap`. Migration: rename `SNITCH_*` env vars and
+  `snitch.toml` to `wiretap.toml` equivalents.
+- FR: **Projet renommé de Snitch en Wiretap** — à la demande polie
+  d'Objective Development (éditeur de Little Snitch), dont la marque
+  déposée UE recouvrait l'ancien nom. Binaires, CLI, noms de paquets,
+  variables `WIRETAP_*` (anciennement `SNITCH_*`), unités de déploiement
+  (systemd, Helm, Ansible, Puppet, Salt, GPO) et documentation suivent
+  le nouveau nom. L'ancienne URL GitHub redirige vers
+  `aixisstudio/Wiretap`. Migration : renommer les variables `SNITCH_*`
+  et `snitch.toml` en équivalents `wiretap.toml`.
+
+
 ### Added / Ajouté
 
 - EN: **Recent-traffic search** — the live packet feed gains a query
