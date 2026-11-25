@@ -121,6 +121,7 @@ from detection.aiwatch import AiWatch
 from detection.secretwatch import SecretWatch
 from detection.supplychain import SupplyChainWatch
 from detection import nlquery
+from detection.canary import CanaryWatch, HoneyPorts
 from api.notify import notifier
 from paths import data_dir, chown_tree
 import storage.db as db
@@ -169,12 +170,31 @@ netprofiler = NetworkProfiler(fw, _platform.system())  # EN: network-aware auto 
 aiwatch = AiWatch()                  # EN: AI traffic governance / FR: gouvernance du trafic IA
 secretwatch = SecretWatch()          # EN: local DLP / FR: DLP local
 scwatch = SupplyChainWatch()         # EN: install-time governance / FR: gouvernance des installs
+canary = CanaryWatch()               # EN: ransomware tripwires / FR: pièges ransomware
+honeyports = HoneyPorts()            # EN: LAN scan tripwires / FR: pièges scans LAN
 # EN: ML flow scoring (pure-Python isolation forest) + IOC peer sync +
 #     NFQUEUE ask-mode — all opt-in / self-limiting, see their modules.
 # FR: Scoring ML des flux (forêt d'isolation pur Python) + sync IOC entre
 #     pairs + mode ask NFQUEUE — tous opt-in / auto-limités.
 flow_ml = FlowAnomaly()
 peer_sync = PeerSync(get_token)
+
+
+def _security_alert(alert: dict) -> None:
+    """EN: Module-originated security alerts (canary/honeyport threads) —
+        persisted and broadcast like detector alerts.
+    FR: alertes émises par les modules (threads canary/honeyport) —
+        persistées et diffusées comme celles du détecteur."""
+    if _loop is None:
+        return
+    def _go():
+        a = Alert(type=alert["type"], severity=alert["severity"],
+                  message=alert["message"], details=alert.get("details") or {})
+        ad = a.to_dict()
+        db.log_alert(ad)
+        detector.history.append(ad)
+        asyncio.ensure_future(broadcast({"type": "alert", "alert": ad}))
+    _loop.call_soon_threadsafe(_go)
 
 
 def _ask_notify(ctx: dict) -> None:
@@ -2182,6 +2202,13 @@ def _load_settings() -> None:
     # EN: Secrets egress watch — harvest at startup (RAM only, opt-out).
     # FR: veille secrets — récolte au démarrage (RAM seulement).
     secretwatch.enabled = bool(db.get_setting("secretwatch_enabled", True))
+    # EN: Canary + honeyport wiring — canary ON by default (read-only),
+    #     honeyports opt-in (binding 445/3389 can conflict on some hosts).
+    # FR: câblage canaris + honeyports — canaris ON par défaut, honeyports opt-in.
+    canary.on_alert = _security_alert
+    honeyports.on_alert = _security_alert
+    if db.get_setting("canary_enabled", True):
+        canary.start()
     if secretwatch.enabled:
         try:
             n = secretwatch.register()
@@ -2317,6 +2344,11 @@ async def lifespan(app: FastAPI):
     """EN: FastAPI lifespan — startup, yield, then clean shutdown.
     FR: Lifespan FastAPI — démarrage, yield, puis arrêt propre."""
     await _startup()
+    if db.get_setting("honeyports_enabled", False):
+        honeyports.enabled = True
+        hst = await honeyports.start()
+        if hst["errors"]:
+            logger.warning("honeyports partial: %s", hst["errors"])
     if db.get_setting("dnsfw_enabled", False):
         asyncio.ensure_future(asyncio.get_running_loop().run_in_executor(None, dnsfw.refresh_lists))
         st = await dnsfw.start()
@@ -3398,6 +3430,46 @@ async def ask_nl(body: dict) -> dict:
         None, nlquery.answer, db.get_conn(), question,
         detector.history[-200:], aiwatch.activity())
     return facts
+
+
+
+@app.get("/canary", dependencies=_AUTH)
+async def canary_status() -> dict:
+    """EN: Ransomware canary state. / FR: état des canaris ransomware."""
+    return canary.status()
+
+
+@app.post("/canary/config", dependencies=_AUTH)
+async def canary_config(body: dict) -> dict:
+    """EN: Enable/disable or replant canaries. / FR: activer/replanter."""
+    if "enabled" in body:
+        if body["enabled"]:
+            canary.start()
+        else:
+            canary.stop()
+        db.set_setting("canary_enabled", bool(body["enabled"]))
+    if body.get("replant"):
+        canary.plant()
+    return canary.status()
+
+
+@app.get("/honeyports", dependencies=_AUTH)
+async def honeyports_status() -> dict:
+    """EN: Honeyport tripwire state. / FR: état des honeyports."""
+    return honeyports.status()
+
+
+@app.post("/honeyports/config", dependencies=_AUTH)
+async def honeyports_config(body: dict) -> dict:
+    """EN: Opt-in bind of the tripwire ports. / FR: bind opt-in des pièges."""
+    if body.get("enabled"):
+        st = await honeyports.start()
+        db.set_setting("honeyports_enabled", True)
+        return {**st, **honeyports.status()}
+    if body.get("enabled") is False:
+        await honeyports.stop()
+        db.set_setting("honeyports_enabled", False)
+    return honeyports.status()
 
 
 @app.post("/firewall/blocklist", dependencies=_AUTH)
