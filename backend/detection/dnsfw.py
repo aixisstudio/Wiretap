@@ -70,21 +70,39 @@ from pathlib import Path
 logger = logging.getLogger("wiretap.dnsfw")
 
 # ── Curated filter-list presets / Préréglages de listes ─────────────────────
-# EN: hosts-format public lists (0.0.0.0 domain per line). Licenses are
-#     redistribution-friendly (StevenBlack: MIT; abuse.ch: CC0). Sizes are
-#     enforced at fetch time (4 MiB cap, same policy as blocklist.py).
-# FR: listes publiques au format hosts. Licences compatibles redistribution
-#     (StevenBlack : MIT ; abuse.ch : CC0). Tailles bornées au fetch (4 Mio).
+# EN: public lists, hosts format (0.0.0.0 domain per line) or bare domains
+#     ("format": "domains"). Licenses are redistribution-friendly
+#     (StevenBlack: MIT; NetAPI: CC BY 4.0). Sizes are enforced at fetch
+#     time (4 MiB cap, same policy as blocklist.py). Every URL here must
+#     answer without an account or key: the UI offers a checkbox only.
+# FR: listes publiques, format hosts ou domaines nus ("format": "domains").
+#     Licences compatibles redistribution (StevenBlack : MIT ; NetAPI :
+#     CC BY 4.0). Tailles bornées au fetch (4 Mio). Chaque URL doit
+#     répondre sans compte ni clé : l'UI ne propose qu'une case à cocher.
 LIST_PRESETS: dict[str, dict] = {
     "ads_trackers": {
         "label": "Ads & trackers (StevenBlack unified)",
         "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
         "license": "MIT",
     },
-    "malware_abusech": {
-        "label": "Malware domains (abuse.ch URLhaus)",
-        "url": "https://urlhaus.abuse.ch/downloads/hostfile/",
-        "license": "CC0",
+    # EN: replaces "malware_abusech" (URLhaus hostfile): abuse.ch retired its
+    #     keyless downloads on 2026-10-21 and that URL answers HTTP 410, so
+    #     the category loaded nothing. NetAPI list without sinkholed names:
+    #     phishing and scam sites, regenerated hourly, no key. The key is
+    #     new on purpose: a saved "malware_abusech" choice is dropped by
+    #     configure(), never moved to another host without a fresh opt-in.
+    # FR: remplace "malware_abusech" (hostfile URLhaus) : abuse.ch a retiré
+    #     ses téléchargements sans clé le 2026-10-21 et cette URL répond
+    #     HTTP 410, la catégorie ne chargeait donc rien. Liste NetAPI sans
+    #     les noms en sinkhole : sites de phishing et d'arnaque, régénérée
+    #     chaque heure, sans clé. La clé est nouvelle exprès : un choix
+    #     "malware_abusech" enregistré est écarté par configure(), jamais
+    #     déplacé vers un autre hôte sans nouvel opt-in.
+    "malicious_netapi": {
+        "label": "Malicious domains: phishing & scams (NetAPI)",
+        "url": "https://netapi.com/api2/netapi-compromised-domains-short.txt",
+        "license": "CC BY 4.0",
+        "format": "domains",
     },
     "phishing_openphish": {
         "label": "Phishing (OpenPhish community)",
